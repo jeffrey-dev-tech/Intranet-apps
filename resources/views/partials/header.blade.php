@@ -75,7 +75,7 @@
             </a>
             <div class="collapse" id="forms">
               <ul class="nav sub-menu">
-				<li class="nav-item"><a href="{{ route('IT.Request.Form') }}" class="nav-link">Borrowing Form</a> </li>
+				<li class="nav-item"><a href="{{ route('IT.Request.Form') }}" class="nav-link">IT Request Form</a> </li>
 				<!-- <li class="nav-item"><a href="{{ route('Shuttle_Form') }}" class="nav-link">Shuttle Form</a> </li> -->
 				<li class="nav-item"><a href="{{ route('Deposit_Form') }}" class="nav-link">Deposit Form</a> </li>
 				<li class="nav-item"><a href="{{ route('LunchPass_Form') }}" class="nav-link">Lunch Pass Form</a> </li>
@@ -167,7 +167,7 @@
             </a>
             <div class="collapse" id="form_data">
               <ul class="nav sub-menu">
-				<li class="nav-item"><a href="{{ route('IT.Request.Data.view') }}" class="nav-link">Item & Device Request Data</a> </li>
+				<li class="nav-item"><a href="{{ route('IT.Request.Data.view') }}" class="nav-link">IT Request Data</a> </li>
               </ul>
             </div>
           </li>

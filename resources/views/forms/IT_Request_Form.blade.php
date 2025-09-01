@@ -1,7 +1,7 @@
 @if (auth()->check())
 @extends('layouts.app')
 
-@section('title', 'Item & Device Request Form')
+@section('title', 'IT Request Form')
 
 @section('content')
 
@@ -152,7 +152,7 @@ input[type="file"]::file-selector-button:active {
     <nav class="page-breadcrumb">
 					<ol class="breadcrumb">
 						<li class="breadcrumb-item"><a href="#">Forms</a></li>
-						<li class="breadcrumb-item active" aria-current="page">Deposit Form</li>
+						<li class="breadcrumb-item active" aria-current="page">IT Request Form</li>
 					</ol>
 				</nav>
 		<div class="row">
@@ -163,110 +163,124 @@ input[type="file"]::file-selector-button:active {
 							   	<div class="sanden-logo">
 										<img src="{{ asset('img/Sanden_Logo_SCP2_.png')}}" alt="sanden-logo">
 										<div class="title-form">
-											<h6 class="card-title" style="font-size:25px;">Item & Device Request Form</h6>
+											<h6 class="card-title" style="font-size:25px;">IT Request Form</h6>
 										</div>
                     
 									</div>
 									<hr>
-		    <form id="item_request_form" enctype="multipart/form-data">
-          <div class="row">
-            <div class="col-sm-3">
-              <div class="form-group">
-                <label class="control-label">Item*</label>
-                <select name="item_name" id="item_name" required>
-                  <option selected disabled>Choose Item</option>
-                  <option value="Laptop">Laptop</option>
-                	<option value="Desktop">Desktop</option>
-                   <option value="Wired Mouse">Wired Mouse</option>
-				    <option value="Wired Mouse">Wireless Mouse</option>
-				   <option value="Wired Keyboard">Wired Keyboard</option>
-				   <option value="Wired Keyboard">Wireless Keyboard</option>
-				    <option value="Pocket Wifi">Pocket Wifi</option>
-					<option value="Flashdrive">Flashdrive</option>
-					<option value="External Drive">External Drive</option>
-                </select>
-              </div>
-            </div>
-             <div class="col-sm-3">
-              <div class="form-group">
-                <label class="control-label">Qty*</label>
-               <input type="number" id="Qty" name="qty"placeholder="Enter Qty" class="form-control" required>
-              </div>
-            </div>
-                <div class="col-sm-3">
-              <div class="form-group">
-                <label class="control-label">Date Needed*</label>
-               <input type="date" id="date_needed" name="date_needed" class="form-control" required>
-              </div>
-            </div>
+		   <form id="item_request_form" >
+  <div class="row">
+    <div class="col-sm-3">
+      <div class="form-group">
+        <label class="control-label">Type of Request*</label>
+        <select name="type_request" id="type_request" required>
+          <option selected disabled>Type of Request</option>
+          <option value="Repair_Request">Repair | Request</option>
+          <option value="Borrow_Item">Borrow Item</option>
+          <option value="Purchase_Item">Purchase New Item</option>
+          <option value="Project_Request">Project Request</option>
+          <option value="New_Intranet_Subsystem">New Intranet Subsystem</option>
+          <option value="Change_Request_Intranet">Change Request Intranet</option>
+        </select>
+      </div>
+    </div>
+<div class="col-sm-3">
+      <div class="form-group">
+        <label class="control-label">Email</label>
+        <input type="text" id="requestor_email" class="form-control" name="requestor_email" value="{{ Auth::user()->email }}" readonly>
+      </div>
+    </div>
 
-  			<div class="col-sm-3">
-              <div class="form-group">
-                <label class="control-label">Date Plan Return*</label>
-               <input type="date" id="date_plan_return" name="date_plan_return"  class="form-control" required>
-              </div>
-            </div>
+    <div class="col-sm-3">
+      <div class="form-group">
+        <label class="control-label">Department</label>
+        <input type="text" id="department" name="department" class="form-control" value="{{ Auth::user()->department }}" readonly>
+      </div>
+    </div>
 
-			<div class="col-sm-4">
-              <div class="form-group">
-                <label class="control-label">Email</label>
-               <input type="text" id="email"  class="form-control" name="email" value="{{ Auth::user()->email }}" readonly>
-              </div>
-            </div>
-			<div class="col-sm-4">
-              <div class="form-group">
-                <label class="control-label">Department</label>
-               <input type="text" id="department"  name="department"class="form-control" value="{{ Auth::user()->department }}" readonly>
-              </div>
-            </div>
+    <div class="col-sm-3">
+      <div class="form-group">
+        <label class="control-label">Requestor Name</label>
+        <input type="text" id="requestor_name" name="requestor_name" class="form-control" value="{{ Auth::user()->name }}" readonly>
+      </div>
+    </div>
+    <!-- Dynamic fields -->
+    <div id="dynamicFields" class="col-md-12 row"></div>
 
-			<div class="col-sm-4">
-              <div class="form-group">
-                <label class="control-label">Requestor Name</label>
-               <input type="text" id="requestor_name" name="requestor_name" class="form-control" value="{{ Auth::user()->name }}" readonly>
-              </div>
-            </div>
-								
-							
-   			<div class="col-sm-12">
-              <div class="form-group">
-                <label class="control-label">Purpose</label>
-               <textarea type="text" id="purpose"  class="form-control"name="purpose" rows="5" placeholder="Input your purpose 255 characters only..." required></textarea>
-              </div>
-            </div>
-     
-            <div class="col-sm-12">
-              <div class="form-group">
-                <input type="button" name="btnSubmit" id="btnSubmit"  class="btn btn-success" value="Submit">
-              </div>
-            </div>
-          </div>
-        </form>
+    
+
+    
+
+    <div class="col-sm-12">
+      <div class="form-group">
+        <input type="button" name="btnSubmit" id="btnSubmit" class="btn btn-success" value="Submit">
+      </div>
+    </div>
+  </div>
+</form>
+
                                 </div>
              </div>
         </div>
     </div>
 </div>
-
-
 <script>
-    // Initialize Choices.js on the select element
-    const userSelect = new Choices('#item_name', {
-        searchEnabled: true,      // Enable search
-        itemSelectText: '',       // Remove "Press to select" text
-        shouldSort: true,        // Keep original order
-        placeholder: true,        // Enable placeholder
-        searchPlaceholderValue: 'Search item...', // Search box placeholder
+document.addEventListener('DOMContentLoaded', function() {
+
+    const typeRequest = document.getElementById('type_request');
+    const dynamicFields = document.getElementById('dynamicFields');
+    const buttonSubmit = document.getElementById('btnSubmit');
+    let choicesInstances = {}; // Track Choices instances
+
+    // === Handle dynamic fields on type change ===
+    typeRequest.addEventListener('change', async function () {
+        dynamicFields.innerHTML = ''; // Clear previous fields
+
+        if (!this.value) return;
+
+        try {
+            const response = await fetch(`/fields?type=${this.value}`);
+            const data = await response.json();
+            dynamicFields.innerHTML = data.html;
+
+            setTimeout(() => {
+                const selectsToInit = [];
+
+                if(this.value === 'Borrow_Item') selectsToInit.push('item_name');
+                if(this.value === 'Repair_Request') selectsToInit.push('issue');
+                if(this.value === 'New_Intranet_Subsystem') selectsToInit.push('manager_email');
+                if(this.value === 'Change_Request_Intranet') selectsToInit.push('manager_email');
+
+                selectsToInit.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) {
+                        if(choicesInstances[id]) choicesInstances[id].destroy();
+
+                        choicesInstances[id] = new Choices(el, {
+                            searchEnabled: true,
+                            itemSelectText: '',
+                            shouldSort: true,
+                            placeholder: true,
+                            searchPlaceholderValue: 'Search...',
+                        });
+                    }
+                });
+            }, 50);
+
+        } catch (error) {
+            console.error('Error loading fields:', error);
+            dynamicFields.innerHTML = `<div class="col-sm-12 text-danger">Failed to load fields.</div>`;
+        }
     });
 
-document.addEventListener('DOMContentLoaded', function() {
-    let buttonSubmit = document.getElementById('btnSubmit');
-
-    buttonSubmit.addEventListener('click', async function(e) {
+    // === Handle form submission on button click ===
+    buttonSubmit.addEventListener('click', async function (e) {
         e.preventDefault();
 
-        // Show confirmation before submit
-        const result = await Swal.fire({
+        const form = document.getElementById('item_request_form');
+        const formData = new FormData(form);
+
+        const confirmResult = await Swal.fire({
             title: 'Are you sure?',
             text: "Do you want to submit this form?",
             icon: 'warning',
@@ -275,76 +289,76 @@ document.addEventListener('DOMContentLoaded', function() {
             cancelButtonText: 'Cancel'
         });
 
-        if (result.isConfirmed) {
-            let form = document.getElementById('item_request_form');
-            let formData = new FormData(form);
+        if (!confirmResult.isConfirmed) {
+            Swal.fire('Cancelled', 'Your form was not submitted.', 'info');
+            return;
+        }
 
-            // Show loading
-            Swal.fire({
-                title: 'Submitting...',
-                text: 'Please wait while we process your request.',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
+        Swal.fire({
+            title: "Submitting...",
+            text: "Please wait while we process your request.",
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        try {
+            const response = await fetch("{{ route('it.request.insert') }}", {
+                method: "POST",
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
             });
 
-          try {
-    const response = await fetch(`{{ route('item.request.insert') }}`, {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: formData
-    });
+            let data;
+            try {
+                data = await response.json();
+            } catch {
+                data = { message: await response.text() };
+            }
 
-    if (response.status === 501) {
-        // Custom handling for "No Internet" case
-        const errData = await response.json();
-        Swal.fire({
-            icon: 'warning',
-            title: 'Internet Issue',
-            text: errData.message || 'SandenIntranet has no Intenet. Please try again later.'
-        });
-        return; // stop here, don't run success logic
-    }
+            Swal.close();
 
-    if (!response.ok) {
-        // Other non-200 statuses
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
+            if (response.status === 422) {
+                const message = Object.values(data.errors).flat().join(', ');
+                throw new Error(message);
+            }
 
-    const data = await response.json();
+            if (response.status === 501) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Internet Issue',
+                    text: data.message || 'No internet. Please try again later.'
+                });
+                return;
+            }
 
-    Swal.fire({
-        icon: 'success',
-        title: 'Submitted!',
-        text: data.message || 'Your form has been submitted successfully.',
-        confirmButtonText: 'OK'
-    }).then(() => {
-        window.location.reload();
-    });
+            if (!response.ok) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Submission Failed',
+                    text: data.message || 'An error occurred during submission.',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
 
-} catch (error) {
-    Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: error.message || 'Something went wrong. Please check all input fields.'
-    });
-}
+            Swal.fire({
+                icon: 'success',
+                title: 'Submitted!',
+                text: data.message || 'Your form has been submitted successfully.',
+                confirmButtonText: 'OK'
+            }).then(() => location.reload());
 
-        } else {
-            Swal.fire('Cancelled', 'Your form was not submitted.', 'info');
+        } catch (error) {
+            Swal.fire("Error", error.message || "Something went wrong. Please check all input fields.", "error");
         }
     });
+
 });
 
-
-
-
-
-
 </script>
+
 @endsection
 @endif

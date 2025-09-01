@@ -9,12 +9,13 @@ use App\Http\Controllers\MailController;
 use App\Http\Controllers\PolicyController;
 use App\Http\Controllers\PDFController;
 use App\Http\Controllers\SpecialAccessController;
-use App\Http\Controllers\ItemRequestController;
+use App\Http\Controllers\ITRequestController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\MpdfController;
 use App\Http\Controllers\QRPrintController;
 use App\Http\Controllers\VersionControlController;
+use App\Http\Controllers\RequestFieldController;
 Route::post('/qr-process', [QRPrintController::class, 'print'])->name('qr.print');
 /*
 |--------------------------------------------------------------------------
@@ -111,7 +112,9 @@ Route::delete('/special-access/features/delete/{id}', [SpecialAccessController::
 ->middleware('can:features.delete')->name('special-access.features.delete');
 });
 
-Route::post('/item_request/insert', [ItemRequestController::class, 'insert_request_item'])->name('item.request.insert');
+Route::post('/item_request/insert', [ITRequestController::class, 'it_request_insert'])->name('it.request.insert');
+Route::get('/fields', [RequestFieldController::class, 'getFields'])->name('fields');
+
 //FORM
 Route::prefix('Form')->group(function () {
 Route::get('/IT', [FormController::class, 'IT_Request_Form'])->name('IT.Request.Form');
@@ -120,15 +123,15 @@ Route::get('/Deposit', [FormController::class, 'Deposit_Form'])->name('Deposit_F
 Route::get('/LunchPass', [FormController::class, 'LunchPass_Form'])->name('LunchPass_Form');
 
 //Form Data
-Route::post('/item_request/view', [ItemRequestController::class, 'view_item_request_data'])->name('IT.Request.Data.view');
-Route::post('/item_request/FormData', [ItemRequestController::class, 'view_item_request_data'])->name('IT.Request.Form.Data');
+Route::post('/item_request/view', [ITRequestController::class, 'view_item_request_data'])->name('IT.Request.Data.view');
+Route::post('/item_request/FormData', [ITRequestController::class, 'view_item_request_data'])->name('IT.Request.Form.Data');
 
 });
 
 Route::prefix('FormData')->group(function () {
 //Form Data
-Route::get('/item_request/view', [ItemRequestController::class, 'view_item_request_data'])->name('IT.Request.Data.view');
-Route::get('/item_request/FormData', [ItemRequestController::class, 'fetch_all_data'])->name('IT.Request.Form.Data');
+Route::get('/item_request/view', [ITRequestController::class, 'view_item_request_data'])->name('IT.Request.Data.view');
+Route::get('/item_request/FormData', [ITRequestController::class, 'fetch_all_data'])->name('IT.Request.Form.Data');
 
 });
 
