@@ -40,6 +40,7 @@ class RequestFieldController extends Controller
                 <option value="Eset Anti Virus">Eset Anti Virus</option>
                 <option value="Design">Design (Website, Brochure, Video & Photo shoot, etc)</option>
                 <option value="Installation of Application">Installation of Application</option>
+                <option value="Corporate Website">Corporate Website</option>
                 <option value="Other">Other</option>
                 </select>
 
@@ -61,7 +62,19 @@ class RequestFieldController extends Controller
         <label class="control-label">Description of Request</label>
         <textarea id="description_of_request" class="form-control" name="description_of_request" rows="5" placeholder="Input your purpose 255 characters only..." required></textarea>
       </div>
-    </div>';
+    </div>
+         <div class="col-sm-12">
+    <label class="control-label">Attachments</label>
+    <div class="form-group">
+        <input 
+            type="file" 
+            name="attachments[]" 
+            multiple 
+            accept=".jpeg,.jpg,.png,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+        >
+    </div>
+</div>
+';
                 break;
 
             case 'Borrow_Item':
@@ -156,12 +169,35 @@ class RequestFieldController extends Controller
                 $html .= '</select>
                   </div>
                 </div>
+                  <div class="col-sm-6">
+                  <div class="form-group">
+                    <label class="control-label" for="priority">Importance</label>
+                   <select name="priority" id="priority" required>
+                     <option selected disabled">Choose</option>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    </select>
+                  </div>
+                </div>
                 <div class="col-sm-12">
                   <div class="form-group">
                     <label class="control-label">Purpose of Subsystem</label>
                     <textarea id="description_of_request" class="form-control" name="description_of_request" rows="5" placeholder="Input your purpose 255 characters only..." required></textarea>
                   </div>
-                </div>';
+                </div>
+                
+         <div class="col-sm-12">
+    <label class="control-label">Attachments</label>
+    <div class="form-group">
+        <input 
+            type="file" 
+            name="attachments[]" 
+            multiple 
+            accept=".jpeg,.jpg,.png,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+        >
+    </div>
+</div>';
                 break;
      case 'Change_Request_Intranet':
         $managers = User::where('position', 'like', '%Manager%')->get();

@@ -226,7 +226,6 @@ input[type="file"]::file-selector-button:active {
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-
     const typeRequest = document.getElementById('type_request');
     const dynamicFields = document.getElementById('dynamicFields');
     const buttonSubmit = document.getElementById('btnSubmit');
@@ -246,15 +245,15 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
                 const selectsToInit = [];
 
-                if(this.value === 'Borrow_Item') selectsToInit.push('item_name');
-                if(this.value === 'Repair_Request') selectsToInit.push('issue');
-                if(this.value === 'New_Intranet_Subsystem') selectsToInit.push('manager_email');
-                if(this.value === 'Change_Request_Intranet') selectsToInit.push('manager_email');
+                if (this.value === 'Borrow_Item') selectsToInit.push('item_name');
+                if (this.value === 'Repair_Request') selectsToInit.push('issue');
+                if (this.value === 'New_Intranet_Subsystem') selectsToInit.push('manager_email');
+                if (this.value === 'Change_Request_Intranet') selectsToInit.push('manager_email');
 
                 selectsToInit.forEach(id => {
                     const el = document.getElementById(id);
-                    if(el) {
-                        if(choicesInstances[id]) choicesInstances[id].destroy();
+                    if (el) {
+                        if (choicesInstances[id]) choicesInstances[id].destroy();
 
                         choicesInstances[id] = new Choices(el, {
                             searchEnabled: true,
@@ -278,7 +277,22 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
 
         const form = document.getElementById('item_request_form');
-        const formData = new FormData(form);
+        const fileInput = document.querySelector('input[name="attachments[]"]');
+        const maxFileSize = 10 * 1024 * 1024; // 10MB
+
+        // === File size validation ===
+        if (fileInput && fileInput.files.length > 0) {
+            for (let file of fileInput.files) {
+                if (file.size > maxFileSize) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'File Too Large',
+                        text: `File "${file.name}" exceeds the 10MB limit.`
+                    });
+                    return; // Stop submission
+                }
+            }
+        }
 
         const confirmResult = await Swal.fire({
             title: 'Are you sure?',
@@ -302,6 +316,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         try {
+            const formData = new FormData(form);
             const response = await fetch("{{ route('it.request.insert') }}", {
                 method: "POST",
                 headers: {
@@ -355,10 +370,9 @@ document.addEventListener('DOMContentLoaded', function() {
             Swal.fire("Error", error.message || "Something went wrong. Please check all input fields.", "error");
         }
     });
-
 });
-
 </script>
+
 
 @endsection
 @endif

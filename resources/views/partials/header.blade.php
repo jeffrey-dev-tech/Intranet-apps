@@ -69,7 +69,7 @@
           <li class="nav-item nav-category">web forms</li>
           <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#forms" role="button" aria-expanded="false" aria-controls="forms">
-              <i class="link-icon"  data-feather="layers"></i>
+        <i class="fa-brands fa-wpforms"></i>
               <span class="link-title">Forms</span>
               <i class="link-arrow" data-feather="chevron-down"></i>
             </a>
@@ -158,7 +158,7 @@
 
      		         @auth
 @if (in_array(auth()->user()->role, ['user_s3', 'users_s1','developer','users_s2','admin']))
-          <li class="nav-item nav-category">Data</li>
+          <!-- <li class="nav-item nav-category">Data</li> -->
           <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#form_data" role="button" aria-expanded="false" aria-controls="form_data">
               <i class="link-icon"  data-feather="layout"></i>
@@ -176,7 +176,7 @@
 
 	             @auth
   @if (in_array(auth()->user()->role, ['developer']))
-   <li class="nav-item nav-category">Admin</li>
+   <!-- <li class="nav-item nav-category">Admin</li> -->
 		      <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#tables" role="button" aria-expanded="false" aria-controls="tables">
               <i class="link-icon" data-feather="user"></i>
@@ -201,10 +201,10 @@
 
 	             @auth
 @if (in_array(auth()->user()->role, ['user_s3', 'users_s2','developer','users_s1','admin']))
-   <li class="nav-item nav-category">Docs</li>
+   <!-- <li class="nav-item nav-category">Docs</li> -->
 		      <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#docs" role="button" aria-expanded="false" aria-controls="docs">
-              <i class="link-icon" data-feather="hash"></i>
+          <i class="link-icon fa-solid fa-code-commit"></i>
               <span class="link-title">Documentation</span>
               <i class="link-arrow" data-feather="chevron-down"></i>
             </a>
@@ -215,6 +215,40 @@
 			 <li class="nav-item">
                 	<a href="{{ route('versions.view') }}" class="nav-link">Version Control</a>
                 </li>
+        </ul>
+            </div>
+          </li>
+
+		  
+		   @endif
+@endauth
+
+  @auth
+@if (in_array(auth()->user()->role, ['user_s3', 'users_s2','developer','users_s1','admin']))
+   <!-- <li class="nav-item nav-category">•••</li> -->
+		      <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#activity_events" role="button" aria-expanded="false" aria-controls="activity_events">
+            <i class="link-icon fa-solid fa-person-running"></i>
+              <span class="link-title">Fitness Challenge</span>
+              <i class="link-arrow" data-feather="chevron-down"></i>
+            </a>
+		
+            <div class="collapse" id="activity_events">
+
+        <ul class="nav sub-menu">
+			 <li class="nav-item">
+                	<a href="{{ route('activities.create_view') }}" class="nav-link">Create</a>
+                </li>
+				 <li class="nav-item">
+                	<a href="{{ route('activities.team_registration') }}" class="nav-link">Register</a>
+                </li>
+				 <li class="nav-item">
+                	<a href="{{ route('teams.index') }}" class="nav-link">Teams</a>
+                </li>
+				<li class="nav-item">
+                	<a href="{{ route('activities.log-form') }}" class="nav-link">Submission</a>
+                </li>
+				
         </ul>
             </div>
           </li>
@@ -411,6 +445,28 @@
 								</div>
 							</div>
 						</li> -->
+<li class="nav-item dropdown nav-notifications">
+    <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button"
+       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i data-feather="bell"></i>
+        <div class="indicator d-none" id="notif-indicator">
+            <div class="circle"></div>
+        </div>
+    </a>
+    <div class="dropdown-menu" aria-labelledby="notificationDropdown" style="width: 320px;">
+        <div class="dropdown-header d-flex align-items-center justify-content-between">
+            <p class="mb-0 font-weight-medium" id="notif-count">Loading...</p>
+            <a href="javascript:;" class="text-muted">Clear all</a>
+        </div>
+        <!-- Scrollable notification list -->
+        <div class="dropdown-body" id="notif-list" style="max-height: 300px; overflow-y: auto;">
+            <p class="text-center text-muted m-2">Loading...</p>
+        </div>
+    </div>
+</li>
+
+
+
 						<li class="nav-item dropdown nav-profile">
 							<a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 							<i class="fas fa-user"></i>
@@ -466,4 +522,110 @@
 						</li>
 					</ul>
 				</div>
-			</nav> @endif
+			</nav> 
+<div class="modal fade" id="requestModal" tabindex="-1" role="dialog" aria-labelledby="requestModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="requestModalLabel">IT Request Details</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="requestModalBody">
+        <p class="text-center text-muted">Loading...</p>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+async function loadNotifications() {
+    try {
+        const response = await fetch("{{ route('notifications.index') }}", {
+            credentials: 'same-origin',
+            headers: { 'Accept': 'application/json' }
+        });
+
+        const data = await response.json();
+
+        const notifCount = document.getElementById("notif-count");
+        const indicator = document.getElementById("notif-indicator");
+        const list = document.getElementById("notif-list");
+
+        notifCount.textContent = `${data.count || 0} New Notifications`;
+        list.innerHTML = "";
+
+        if (data.count > 0) {
+            indicator.classList.remove("d-none");
+
+            // 🔹 Config for notification types
+            const notificationConfig = {
+                "IT Request Approval": {
+                    icon: "check-circle",
+                    url: id => `/approvals/${id}`,
+                    label: "IT Request Approval"
+                },
+                "IT Request": {
+                    icon: "file-text",
+                    url: id => `/requests/${id}`,
+                    label: "Request Pending"
+                },
+                "Fitness Challenge": {
+                    icon: "activity",
+                    url: logId => `{{ route('approvalForm.activity', ':log_id') }}`.replace(':log_id', logId),
+                    label: "Fitness Challenge Approval"
+                }
+            };
+
+            data.notifications.forEach(notif => {
+                const item = document.createElement("a");
+                item.className = "dropdown-item";
+                item.target = "_blank"; // 🔥 Open in new tab
+                item.rel = "noopener noreferrer"; // 🔐 Security best practice
+
+                // 🔹 Use config if available, else fallback
+                const config = notificationConfig[notif.type] || {
+                    icon: "bell",
+                    url: "#",
+                    label: notif.type || "Notification"
+                };
+
+                // 🔹 Use log_id for Fitness Challenge, id for others
+                item.href = config.url(notif.log_id || notif.id);
+
+                item.innerHTML = `
+                    <div class="icon">
+                        <i data-feather="${config.icon}"></i>
+                    </div>
+                    <div class="content">
+                        <p>${notif.title}</p>
+                        <p class="sub-text text-muted">${config.label}</p>
+                    </div>
+                `;
+
+                list.appendChild(item);
+            });
+
+            if (window.feather) feather.replace();
+
+        } else {
+            indicator.classList.add("d-none");
+            list.innerHTML = `<p class="text-center text-muted m-2">No pending notifications</p>`;
+        }
+    } catch (error) {
+        console.error("Error loading notifications:", error);
+        document.getElementById("notif-list").innerHTML = `<p class="text-center text-danger m-2">Error loading notifications</p>`;
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadNotifications();
+});
+</script>
+
+
+
+
+			
+			
+			@endif

@@ -67,5 +67,11 @@ class User extends Authenticatable
     {
         return $this->features()->whereIn('name', $features)->count() === count($features);
     }
+public function teams()
+{
+    return $this->belongsToMany(Team::class, 'team_user', 'user_id', 'team_id')
+                ->withPivot('role', 'progress_value', 'joined_at');
+}
+
 
 }

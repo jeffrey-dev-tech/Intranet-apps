@@ -16,6 +16,11 @@ use App\Http\Controllers\MpdfController;
 use App\Http\Controllers\QRPrintController;
 use App\Http\Controllers\VersionControlController;
 use App\Http\Controllers\RequestFieldController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ActivitiesController;
+use App\Http\Controllers\TeamsController;
+use App\Http\Controllers\GeocodeController;
+use App\Http\Controllers\FormActivityController;
 Route::post('/qr-process', [QRPrintController::class, 'print'])->name('qr.print');
 /*
 |--------------------------------------------------------------------------
@@ -112,7 +117,7 @@ Route::delete('/special-access/features/delete/{id}', [SpecialAccessController::
 ->middleware('can:features.delete')->name('special-access.features.delete');
 });
 
-Route::post('/item_request/insert', [ITRequestController::class, 'it_request_insert'])->name('it.request.insert');
+Route::post('/IT_REQUEST/insert', [ITRequestController::class, 'it_request_insert'])->name('it.request.insert');
 Route::get('/fields', [RequestFieldController::class, 'getFields'])->name('fields');
 
 //FORM
@@ -123,16 +128,59 @@ Route::get('/Deposit', [FormController::class, 'Deposit_Form'])->name('Deposit_F
 Route::get('/LunchPass', [FormController::class, 'LunchPass_Form'])->name('LunchPass_Form');
 
 //Form Data
-Route::post('/item_request/view', [ITRequestController::class, 'view_item_request_data'])->name('IT.Request.Data.view');
-Route::post('/item_request/FormData', [ITRequestController::class, 'view_item_request_data'])->name('IT.Request.Form.Data');
+
 
 });
 
 Route::prefix('FormData')->group(function () {
 //Form Data
-Route::get('/item_request/view', [ITRequestController::class, 'view_item_request_data'])->name('IT.Request.Data.view');
-Route::get('/item_request/FormData', [ITRequestController::class, 'fetch_all_data'])->name('IT.Request.Form.Data');
+Route::get('/IT_REQUEST/view', [ITRequestController::class, 'view_IT_REQUEST_data'])->name('IT.Request.Data.view');
+Route::get('/IT_REQUEST/FormData', [ITRequestController::class, 'fetch_all_data'])->name('IT.Request.Form.Data');
+Route::get('/IT_REQUEST/Reference_data/{reference_no}',  [ITRequestController::class, 'referenceData'])->name('it_request.reference_data');
+Route::post('/IT_REQUEST/Approval/{reference_no}', [ITRequestController::class, 'storeApproval'])
+    ->name('it_request.approval.store');
+// routes/web.php
+Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
 
 });
+
+// Route::get('/gps', function () {
+//     return view('gps');
+// });
+
+// Route::get('/reverse-geocode', [GeocodeController::class, 'reverse']);
+
+Route::prefix('activities')->group(function () {
+Route::post('/', [ActivitiesController::class, 'store'])->name('activities.store');
+Route::get('/create', [ActivitiesController::class, 'showForm'])->name('activities.create_view')->middleware('can:activities.create_view');
+Route::get('/statistics', [ActivitiesController::class, 'statistics_view'])->name('activities.statistics_view');
+  Route::get('/team-registration', [ActivitiesController::class, 'registration_view'])->name('activities.team_registration');
+Route::get('/list', [ActivitiesController::class, 'getActivity'])->name('activities.list');
+Route::get('/select-fields', [ActivitiesController::class, 'getFields'])->name('activities.getFields');
+Route::get('/form-log', [ActivitiesController::class, 'Form_Logs'])->name('activities.log-form');
+Route::get('/listActivity', [FormActivityController::class, 'listActivity'])->name('activities.listActivity');
+Route::get('/findPendingLevel/{activity_id}/{user_id}', [FormActivityController::class, 'findPendingLevel'])->name('activities.findPendingLevel');
+Route::post('/submission/store', [FormActivityController::class, 'store'])->name('submission.store');
+Route::post('/activity-log/update-status', [ActivitiesController::class, 'updateStatus'])
+    ->name('activityLog.updateStatus');
+});
+
+Route::post('/teams', [TeamsController::class, 'store'])->name('teams.store');
+Route::get('/teams', [TeamsController::class, 'index'])->name('teams.index');
+Route::get('/teams/activity/approval/{log_id}', [TeamsController::class, 'approval_view'])->name('approvalForm.activity');
+
+Route::get('/teams/activity-log/{log_id}', [TeamsController::class, 'select_log_id'])
+    ->name('activityLog.data');
+Route::get('/teams/list', [TeamsController::class, 'list'])->name('teams.list');
+Route::get('/teams/activity-logs', [TeamsController::class, 'activityLogslist'])
+    ->name('teams.activity_logs');
+Route::get('/teams/check-name', [TeamsController::class, 'checkName'])->name('teams.checkName');
+Route::get('/teams/activitiesList', [TeamsController::class, 'listActivity'])->name('teams.activitiesList');
+
+Route::get('/teams/user-pending-status', [TeamsController::class, 'checkUserPendingStatus'])->name('teams.checkUserPendingStatus');
+// routes/web.php
+Route::get('/teams/{team}/check-size', [TeamsController::class, 'checkTeamSize'])->name('teams.checkSize');
+Route::get('/teams/by-invite/{code}', [TeamsController::class, 'getByInvite'])
+     ->where('code', '[A-Za-z0-9\-]+');
 
 });

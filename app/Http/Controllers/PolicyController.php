@@ -50,7 +50,7 @@ public function policy_tbl(Request $request)
                     $data = Policy::where('department', $department)->get();
                 } elseif ($userRole == 'users_s2') {
                     $data = Policy::where('department', $department)
-                                ->where('file_type', 'non_confidential')
+                                ->where('control_type', 'non_confidential')
                                 ->get();
                 }
     

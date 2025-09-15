@@ -114,7 +114,8 @@ Km. 54 National Highway, Calamba 4027 Laguna</p>
 <script src="{{ asset('assets/vendors/core/core.js') }}"></script>
 <script src="{{ asset('assets/vendors/owl.carousel/owl.carousel.min.js') }}"></script>
 <!-- endinject -->
-
+<script src="{{ asset('assets/vendors/jquery-steps/jquery.steps.min.js') }}"></script>
+<script src="{{ asset('assets/js/wizard.js') }}"></script>
 <!-- PDF.js -->
 <script src="{{ asset('assets/js/pdf.min.js') }}"></script>
 <script src="{{ asset('assets/js/pdf.worker.min.js') }}"></script>
