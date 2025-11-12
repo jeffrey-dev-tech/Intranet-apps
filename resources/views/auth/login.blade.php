@@ -60,7 +60,8 @@
                 <div class="col-md-4 pr-md-0">
                   <div class="auth-left-wrapper">
                     <div class="sm-logo-sanden">
-                    <img src="img/sm-logo.png" alt="">
+                 <img src="{{ asset('img/sm-logo.jpg') }}" alt="">
+
                     </div>
                        
                   </div>
@@ -68,8 +69,12 @@
                 <div class="col-md-8 pl-md-0">
                   <div class="auth-form-wrapper px-4 py-5">
                     <a href="#" class="noble-ui-logo d-block mb-2">Sanden Cold Chain System Philippines Inc.<span></span></a>
-                    <h5 class="text-muted font-weight-normal mb-4">Welcome back! Log in to your account.</h5>
-                  
+                    <h5 class="text-muted font-weight-normal mb-4">Login your Account</h5>
+                  @if(session('message'))
+    <div class="alert alert-info">
+        {{ session('message') }}
+    </div>
+@endif
                   <h5 class="alert-message">
                   
                   </h5>
@@ -80,15 +85,16 @@
     @endif
     <div class="form-group">
         <label for="Username">Username</label>
-        <input type="text" class="form-control" id="email" placeholder="email" name="email">
+        <input type="text" class="form-control" id="email" placeholder="Email" name="email">
     </div>
     <div class="form-group">
         <label for="password">Password</label>
         <input type="password" class="form-control" id="password" name="password" placeholder="Password">
     </div>
-    <div class="mt-3">
+     <div class="mt-3">
         <button class="btn btn-primary text-white" id="loginbtn" type="submit">Login</button>
     </div>
+    <!-- <p class="alert-message" style="font-weight: 700;">Under Maintenance</p> -->
 </form>
 
                   </div>

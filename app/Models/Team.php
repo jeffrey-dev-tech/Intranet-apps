@@ -21,10 +21,10 @@ class Team extends Model
     ];
 
     // Relationship: Team belongs to Activity
-    public function activity()
-    {
-        return $this->belongsTo(Activity::class);
-    }
+public function activity()
+{
+    return $this->belongsTo(Activity::class, 'activity_id');
+}
 
     // Relationship: Team belongs to ChallengeLevel
     public function level()

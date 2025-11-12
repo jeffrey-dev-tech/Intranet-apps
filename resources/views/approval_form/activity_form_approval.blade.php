@@ -52,7 +52,7 @@
                                     <table border="1" cellpadding="8" cellspacing="0" width="95%" style="border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; color: #333;">
                                         <tr>
                                             <td colspan="2" align="center" style="background-color: #ffffff;">
-                                                <h2>Fitness Challenge</h2>
+                                                <h2>Wellness Program</h2>
                                             </td>
                                         </tr>
                                         <tr>
@@ -67,6 +67,10 @@
                                             <td style="font-weight: bold; background-color: #f9f9f9;">Level</td>
                                             <td id="levelCell"></td>
                                         </tr>
+                                            <tr>
+                                            <td style="font-weight: bold; background-color: #f9f9f9;">Name</td>
+                                            <td id="submitterName"></td>
+                                        </tr>
                                         <tr>
                                             <td style="font-weight: bold; background-color: #f9f9f9;">Progress Value</td>
                                             <td id="progressCell"></td>
@@ -75,6 +79,10 @@
                                             <td style="font-weight: bold; background-color: #f9f9f9;">Other Information</td>
                                             <td id="otherCell"></td>
                                         </tr>
+                                        <tr>
+    <td style="font-weight: bold; background-color: #f9f9f9;">Log ID</td>
+    <td>{{ $log_id }}</td>
+</tr>
 <tr id="approvalRow" style="display: none;">
     <td colspan="2" align="center" style="padding: 20px;">
         <div class="form-group">
@@ -138,6 +146,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('levelCell').textContent = log.level_number || 'N/A';
         document.getElementById('progressCell').textContent = `${log.progress_value || 'N/A'} ${log.unit || ''}`;
         document.getElementById('otherCell').textContent = log.other_informations || 'N/A';
+        document.getElementById('submitterName').textContent = log.user_name || 'N/A';
 
         // Show approval row only for user 69/119 AND pending logs
 const userId = @json(auth()->user()->id);

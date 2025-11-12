@@ -20,6 +20,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'password_changed',
     ];
 
     /**
@@ -45,32 +46,50 @@ class User extends Authenticatable
     /**
      * Relationship to special access features
      */
- public function features()
-    {
-        return $this->belongsToMany(Feature::class, 'special_access_users', 'user_id', 'feature_id');
-    }
+public function features()
+{
+return $this->belongsToMany(Feature::class, 'special_access_users', 'user_id', 'feature_id');
+}
 
-    // Check if user has a specific feature
-    public function hasFeature($featureName)
-    {
-        return $this->features()->where('name', $featureName)->exists();
-    }
+// Check if user has a specific feature
+public function hasFeature($featureName)
+{
+return $this->features()->where('name', $featureName)->exists();
+}
 
-    // Check if user has any feature from a list
-    public function hasAnyFeature(array $features)
-    {
-        return $this->features()->whereIn('name', $features)->exists();
-    }
+// Check if user has any feature from a list
+public function hasAnyFeature(array $features)
+{
+return $this->features()->whereIn('name', $features)->exists();
+}
 
-    // Check if user has all features from a list
-    public function hasAllFeatures(array $features)
-    {
-        return $this->features()->whereIn('name', $features)->count() === count($features);
-    }
+// Check if user has all features from a list
+public function hasAllFeatures(array $features)
+{
+return $this->features()->whereIn('name', $features)->count() === count($features);
+}
 public function teams()
 {
-    return $this->belongsToMany(Team::class, 'team_user', 'user_id', 'team_id')
-                ->withPivot('role', 'progress_value', 'joined_at');
+return $this->belongsToMany(Team::class, 'team_user', 'user_id', 'team_id')
+->withPivot('role', 'progress_value', 'joined_at');
+}
+
+public function submissions()
+{
+return $this->hasMany(Submission::class, 'user_id');
+}
+
+// In User.php
+public function getEmailForMailing()
+{
+return filter_var($this->email, FILTER_VALIDATE_EMAIL)
+? $this->email
+: 'mis.scp@sanden-rs.com';
+}
+
+public function head()
+{
+return $this->belongsTo(DepartmentHead::class, 'head_id');
 }
 
 

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Team Registration')
+@section('title', 'Submission Logs')
 
 @section('content')
 <style>
@@ -24,23 +24,39 @@ input[type="file"]::file-selector-button { border-radius: 4px; padding: 0 16px; 
 input[type="file"]::file-selector-button:hover { background-color: #f3f4f6; }
 input[type="file"]::file-selector-button:active { background-color: #e5e7eb; }
 </style>
+<style>
 
+.ranking-heading {
+  display: flex;                 /* arrange items side by side */
+  align-items: center;           /* vertically center image + text */
+  gap: 10px;                     /* space between logo and text */
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0;
+  font-family: "Atlanta College", sans-serif;
+
+}
+
+
+
+</style>
 <div class="page-content">
   <nav class="page-breadcrumb">
     <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="#">Fitness Challenge</a></li>
-      <li class="breadcrumb-item active" aria-current="page">Log Form</li>
+      <li class="breadcrumb-item"><a href="#">Wellness Program</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Submission</li>
     </ol>
   </nav>
 
   <div class="row">
     <div class="col-md-8 grid-margin stretch-card mx-auto">
       <div class="card">
+           <img class="ranking-heading" src="{{asset('img/wellness-2.png')}}" alt="">
         <div class="card-body">
-          <div class="sanden-logo">
-            <img src="{{ asset('img/wellness.png') }}" alt="sanden-logo">
-          </div>
-          <h6 class="card-title" style="text-align: center; font-size:x-large;">Fitness Challenge Log Form</h6>
+
+                  
+          <h6 class="card-title" style="text-align: center; font-size:x-large;">Wellness Program Log Form</h6>
 
           <form id="formLog" action="{{ route('submission.store') }}" method="POST">
             @csrf
@@ -92,7 +108,13 @@ input[type="file"]::file-selector-button:active { background-color: #e5e7eb; }
                 <span class="input-group-text" id="last_progress_unit"></span>
               </div>
             </div>
-
+<div class="mb-3">
+    <label class="form-label">Required Value</label>
+    <div class="input-group">
+        <input type="number" id="required_value" class="form-control" readonly>
+        <span class="input-group-text" id="required_unit"></span>
+    </div>
+</div>
             <!-- Department -->
             <div class="mb-3">
               <label class="form-label">Department:</label>
@@ -104,7 +126,18 @@ input[type="file"]::file-selector-button:active { background-color: #e5e7eb; }
               <label class="form-label">Email:</label>
               <input type="text" class="form-control" name="email" value="{{ auth()->user()->email }}" required readonly>
             </div>
-
+         
+         <div class="col-sm-12">
+    <label class="control-label">Attachments</label>
+    <div class="form-group">
+        <input 
+            type="file" 
+            name="attachments[]" 
+            multiple 
+            accept=".jpeg,.jpg,.png,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+        required>
+    </div>
+</div>
             <button type="submit" class="btn btn-success">Submit</button>
           </form>
         </div>
@@ -112,8 +145,6 @@ input[type="file"]::file-selector-button:active { background-color: #e5e7eb; }
     </div>
   </div>
 </div>
-
-
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -125,13 +156,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const progressUnit = document.getElementById('progress_unit');
     const lastProgressInput = document.getElementById('last_progress_value');
     const lastProgressUnit = document.getElementById('last_progress_unit');
+    const requiredValueInput = document.getElementById('required_value');
+    const requiredUnit = document.getElementById('required_unit');
     const submitButton = document.querySelector('#formLog button[type="submit"]');
     const formLog = document.getElementById('formLog');
     const userId = "{{ auth()->id() }}";
     const submitUrl = "{{ route('submission.store') }}";
 
-    // Disable submit initially
-    submitButton.disabled = true;
+
 
     // Load activities
     fetch("{{ route('activities.listActivity') }}")
@@ -147,45 +179,7 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .catch(err => console.error('Error loading activities:', err));
 
-    // Handle activity change
-    activitySelect.addEventListener('change', async function () {
-        const activityId = this.value;
-
-        // Reset fields first
-        resetFields();
-
-        if (!activityId) {
-            submitButton.disabled = true;
-            return;
-        }
-
-        let url = "{{ route('activities.findPendingLevel', ['activity_id' => ':activity_id', 'user_id' => ':user_id']) }}"
-            .replace(':activity_id', activityId)
-            .replace(':user_id', userId);
-
-        try {
-            const res = await fetch(url);
-            const data = await res.json();
-
-            const { team_name, pending_level, display_level, progress_value, unit, team_id } = data;
-
-            teamNameInput.value = team_name || '';
-            pendingLevelInput.value = pending_level || '';
-            displayLevelInput.value = display_level || '';
-            lastProgressInput.value = progress_value || '';
-            lastProgressUnit.textContent = unit || '';
-            progressUnit.textContent = unit || '';
-            document.getElementById('team_id').value = team_id || '';
-
-            // 🔥 Disable submit if a team already exists
-            submitButton.disabled = !!team_name;
-        } catch (err) {
-            console.error('Error fetching pending level:', err);
-            submitButton.disabled = true;
-        }
-    });
-
-    // Reset helper
+    // Reset fields helper
     function resetFields() {
         teamNameInput.value = '';
         pendingLevelInput.value = '';
@@ -194,13 +188,76 @@ document.addEventListener('DOMContentLoaded', function () {
         lastProgressUnit.textContent = '';
         progressInput.value = '';
         progressUnit.textContent = '';
+        requiredValueInput.value = '';
+        requiredUnit.textContent = '';
         document.getElementById('team_id').value = '';
+       
     }
+
+    // Check if progress already meets required value
+    // function checkAlreadyMet() {
+    //     const lastProgress = parseFloat(lastProgressInput.value) || 0;
+    //     const requiredValue = parseFloat(requiredValueInput.value) || 0;
+
+    //     if (requiredValue > 0 && lastProgress >= requiredValue) {
+    //         submitButton.disabled = true;
+    //         Swal.fire({
+    //             icon: 'info',
+    //             title: 'Already Met!',
+    //             text: 'You have already reached the required value for this level.',
+    //             confirmButtonText: 'OK'
+    //         });
+    //     } else {
+    //         submitButton.disabled = false;
+    //     }
+    // }
+
+    // Handle activity change
+    activitySelect.addEventListener('change', async function () {
+        const activityId = this.value;
+
+        resetFields();
+        if (!activityId) return;
+
+        const url = "{{ route('activities.findPendingLevel', ['activity_id' => ':activity_id', 'user_id' => ':user_id']) }}"
+            .replace(':activity_id', activityId)
+            .replace(':user_id', userId);
+
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+            if (!data || Object.keys(data).length === 0) return;
+
+            const { team_name, pending_level, display_level, progress_value, unit, team_id, per_member_required } = data;
+
+            // Fill fields
+            teamNameInput.value = team_name || '';
+            pendingLevelInput.value = pending_level || '';
+            displayLevelInput.value = display_level || '';
+            lastProgressInput.value = progress_value ?? 0;
+            lastProgressUnit.textContent = unit || '';
+            progressUnit.textContent = unit || '';
+            document.getElementById('team_id').value = team_id || '';
+
+            requiredValueInput.value = per_member_required ?? 0;
+            requiredUnit.textContent = unit || '';
+
+            // Check if already met
+            // checkAlreadyMet();
+
+        } catch (err) {
+            console.error('Error fetching pending level:', err);
+            submitButton.disabled = true;
+        }
+    });
+
+    // Optional: dynamically check if typed progress exceeds required value
+    // progressInput.addEventListener('input', checkAlreadyMet);
 
     // AJAX form submission
     formLog.addEventListener('submit', async function (e) {
         e.preventDefault();
-        submitButton.disabled = true;
+       
 
         const formData = new FormData(formLog);
 
@@ -239,12 +296,12 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             formLog.reset();
             resetFields();
-            submitButton.disabled = true;
         } else {
             submitButton.disabled = false;
         }
     });
 });
 </script>
+
 
 @endsection

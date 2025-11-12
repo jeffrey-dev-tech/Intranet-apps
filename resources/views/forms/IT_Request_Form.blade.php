@@ -169,6 +169,8 @@ input[type="file"]::file-selector-button:active {
 									</div>
 									<hr>
 		   <form id="item_request_form" >
+
+
   <div class="row">
     <div class="col-sm-3">
       <div class="form-group">
@@ -179,8 +181,7 @@ input[type="file"]::file-selector-button:active {
           <option value="Borrow_Item">Borrow Item</option>
           <option value="Purchase_Item">Purchase New Item</option>
           <option value="Project_Request">Project Request</option>
-          <option value="New_Intranet_Subsystem">New Intranet Subsystem</option>
-          <option value="Change_Request_Intranet">Change Request Intranet</option>
+          <option value="Intranet_Request">Intranet Request</option>
         </select>
       </div>
     </div>
@@ -208,12 +209,31 @@ input[type="file"]::file-selector-button:active {
     <div id="dynamicFields" class="col-md-12 row"></div>
 
     
-
-    
-
+<style>
+  .message-disabled{
+    justify-content: center;
+    color: red;
+    margin-left: 12px;
+  }
+</style>
+       <div class="col-sm-12">
+    <label class="control-label">Attachments</label>
+    <div class="form-group">
+        <input 
+            type="file" 
+            name="attachments[]" 
+            multiple 
+            accept=".jpeg,.jpg,.png,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+        >
+    </div>
+</div>
+<div class="message-disabled">
+    <h6>Temporary Disabled</h6>
+</div>
     <div class="col-sm-12">
       <div class="form-group">
-        <input type="button" name="btnSubmit" id="btnSubmit" class="btn btn-success" value="Submit">
+        <input type="button" name="btnSubmit" id="btnSubmit" class="btn btn-success" value="Submit" disabled>
+          
       </div>
     </div>
   </div>
@@ -247,8 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 if (this.value === 'Borrow_Item') selectsToInit.push('item_name');
                 if (this.value === 'Repair_Request') selectsToInit.push('issue');
-                if (this.value === 'New_Intranet_Subsystem') selectsToInit.push('manager_email');
-                if (this.value === 'Change_Request_Intranet') selectsToInit.push('manager_email');
+                if (this.value === 'Intranet_Request') selectsToInit.push('manager_email');
 
                 selectsToInit.forEach(id => {
                     const el = document.getElementById(id);

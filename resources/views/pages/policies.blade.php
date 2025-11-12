@@ -1,7 +1,7 @@
 
 @extends('layouts.app')
 
-@section('title', 'Policies')
+@section('title', 'Documents Upload')
 
 @section('content')
 <style>
@@ -88,7 +88,7 @@ input[type="file"]::file-selector-button:active {
 										<img src="img/Sanden_Logo_SCP2_.png" alt="sanden-logo">
 										<div class="title-form">
                       		<img src="img/policy.png" alt="sanden-logo">
-											<h6 class="card-title" style="font-size:25px;">Policies Upload Page</h6>
+											<h6 class="card-title" style="font-size:25px;">Documents Upload Page</h6>
 										</div>
                     
 									</div>
@@ -103,6 +103,9 @@ input[type="file"]::file-selector-button:active {
           <option value="HR">HR</option>
           <option value="ADM">ADM</option>
           <option value="SCM">SCM</option>
+          <option value="MIS">MIS</option>
+          <option value="FIN">FIN</option>
+          <option value="PUR">PUR</option>
         </select>
       </div>
     </div>
@@ -129,25 +132,31 @@ input[type="file"]::file-selector-button:active {
     </div>
    <div class="col-sm-4">
       <div class="form-group">
-        <label class="control-label">Control Type</label>
-        <select name="control_type" id="control_type">
-          <option disabled selected>Choose Control Type</option>
-          <option value="Uncontrolled">Uncontrolled</option>
-          <option value="Controlled">Controlled</option>
-s
+        <label class="access-label">Access Level</label>
+        <select name="access_level" id="access_level">
+          <option disabled selected>Choose Level</option>
+           <option value="1">Staff</option>
+          <option value="2">Supervisor</option>
+          <option value="3">Manager</option>
+          <option value="4">Top Management</option>
         </select>
       </div>
     </div>
-     <div class="col-sm-4">
-      <div class="form-group">
-        <label class="control-label">File Type</label>
-        <select name="file_type" id="file_type">
-          <option disabled>Choose File type</option>
-          <option value="confidential">Confidential</option>
-          <option value="non_confidential">Non Confidential</option>
-        </select>
-      </div>
-    </div>
+
+    <div class="col-sm-4">
+  <div class="form-group">
+    <label class="control-label">Category</label>
+    <select name="category_id" id="category_id" class="form-control">
+      <option disabled selected>Choose Category</option>
+      @foreach ($categories as $category)
+        <option value="{{ $category->id }}">
+          {{ $category->name }}
+        </option>
+      @endforeach
+    </select>
+  </div>
+</div>
+
     <div class="col-sm-4">
       <div class="form-group">
         <label class="control-label">File Name</label>
@@ -246,6 +255,11 @@ document.getElementById("polices_form").addEventListener("submit", async functio
     });
 
     try {
+    console.log("FormData contents:");
+for (const [key, value] of formData.entries()) {
+  console.log(key, value);
+}
+
         const response = await fetch("{{ route('upload.policies') }}", {
             method: "POST",
             
@@ -276,15 +290,26 @@ document.getElementById("polices_form").addEventListener("submit", async functio
             return;
         }
 
-        if (!response.ok) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Upload Failed',
-                text: data.message || 'An error occurred during the upload.',
-                confirmButtonText: 'OK'
-            });
-            return;
-        }
+     if (!response.ok) {
+    let errorText = 'An error occurred during the upload.';
+
+    if (response.status === 422 && data.errors) {
+        // Combine all error messages
+        errorText = Object.values(data.errors)
+            .flat()
+            .join('\n'); // Join multiple messages with line breaks
+    } else if (data.message) {
+        errorText = data.message;
+    }
+
+    Swal.fire({
+        icon: 'error',
+        title: 'Upload Failed',
+        text: errorText,
+        confirmButtonText: 'OK'
+    });
+    return;
+}
 
         Swal.fire({
             icon: 'success',

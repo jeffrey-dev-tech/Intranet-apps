@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Session\TokenMismatchException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -27,4 +28,15 @@ class Handler extends ExceptionHandler
             //
         });
     }
+
+ public function render($request, Throwable $exception)
+{
+    if ($exception instanceof TokenMismatchException) {
+        // Session expired or repeated logout
+        return redirect()->route('login')
+            ->with('message', 'Your session has expired or you are already logged out.');
+    }
+
+    return parent::render($request, $exception);
+}
 }

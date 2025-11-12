@@ -8,8 +8,8 @@
     <div class="page-content">
     	<nav class="page-breadcrumb">
 					<ol class="breadcrumb">
-						<li class="breadcrumb-item"><a href="#">Data</a></li>
-						<li class="breadcrumb-item active" aria-current="page">Item Request</li>
+						<li class="breadcrumb-item"><a href="#">Form Data</a></li>
+						<li class="breadcrumb-item active" aria-current="page">IT Request</li>
 					</ol>
 				</nav>
     <div class="row">
@@ -29,7 +29,7 @@
         <li class="nav-item">
             <a class="nav-link" id="repair_request-tab" data-toggle="tab" href="#repair_request" role="tab" aria-controls="repair_request" aria-selected="false">
                 <div class="d-flex flex-row flex-lg-column flex-xl-row align-items-center">
-                    <i data-feather="phone-call" class="icon-sm mr-sm-2 mr-lg-0 mr-xl-2 mb-md-1 mb-xl-0"></i>
+               <i class="fa-solid fa-wrench mr-sm-2 mr-lg-0 mr-xl-2 mb-md-1 mb-xl-0"></i>
                     <p class="d-none d-sm-block">Repair Request</p>
                 </div>
             </a>
@@ -37,7 +37,7 @@
           <li class="nav-item">
             <a class="nav-link" id="project_request-tab" data-toggle="tab" href="#project_request" role="tab" aria-controls="project_request" aria-selected="false">
                 <div class="d-flex flex-row flex-lg-column flex-xl-row align-items-center">
-                    <i data-feather="phone-call" class="icon-sm mr-sm-2 mr-lg-0 mr-xl-2 mb-md-1 mb-xl-0"></i>
+                 <i class="fas fa-project-diagram mr-sm-2 mr-lg-0 mr-xl-2 mb-md-1 mb-xl-0" ></i>
                     <p class="d-none d-sm-block">Project Request</p>
                 </div>
             </a>
@@ -45,7 +45,7 @@
         <li class="nav-item">
             <a class="nav-link" id="Intranet_request-tab" data-toggle="tab" href="#Intranet_request" role="tab" aria-controls="Intranet_request" aria-selected="false">
                 <div class="d-flex flex-row flex-lg-column flex-xl-row align-items-center">
-                    <i data-feather="users" class="icon-sm mr-sm-2 mr-lg-0 mr-xl-2 mb-md-1 mb-xl-0"></i>
+                    <i class="fa-solid fa-globe icon-sm mr-sm-2 mr-lg-0 mr-xl-2 mb-md-1 mb-xl-0"></i>
                     <p class="d-none d-sm-block">Intranet Request</p>
                 </div>
             </a>
@@ -54,7 +54,7 @@
           <li class="nav-item">
             <a class="nav-link" id="purchase_request-tab" data-toggle="tab" href="#purchase_request" role="tab" aria-controls="purchase_request" aria-selected="false">
                 <div class="d-flex flex-row flex-lg-column flex-xl-row align-items-center">
-                    <i data-feather="users" class="icon-sm mr-sm-2 mr-lg-0 mr-xl-2 mb-md-1 mb-xl-0"></i>
+         <i class="fa-solid fa-cart-shopping icon-sm mr-sm-2 mr-lg-0 mr-xl-2 mb-md-1 mb-xl-0"></i>
                     <p class="d-none d-sm-block">Purchase Item</p>
                 </div>
             </a>
@@ -198,57 +198,13 @@
 }
 </style> 
 <!-- Bootstrap 4 Modal -->
-
-<div class="modal fade" id="referenceModal" tabindex="-1" role="dialog" aria-labelledby="referenceModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      
-      <!-- Modal Header -->
-      <div class="modal-header bg-info">
-        <h5 class="modal-title text-white" id="referenceModalLabel">IT Request Details</h5>
-        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-
-      <!-- Modal Body -->
-      <div class="modal-body">
-        <!-- Dynamic Table -->
-        <table class="table table-bordered">
-          <tbody id="referenceTableBody">
-            <!-- Populated dynamically -->
-          </tbody>
-        </table>
-
-
-      </div>
-
-      <!-- Modal Footer -->
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary" id="saveStatusBtn">Save</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-    <script src="{{ asset('assets/js/jquery.js') }}"></script>
-
+<script src="{{ asset('assets/js/jquery.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    // Define which columns to show per tab
-    const columnsPerTab = {
-        borrow: ['reference_no', 'requestor_name', 'department', 'item_name', 'date_needed', 'plan_return_date', 'status'],
-        repair: ['reference_no','requestor_name', 'department', 'issue', 'status'],
-        intranet: ['reference_no','requestor_name', 'type_request', 'description_of_request', 'status'],
-        project: ['reference_no','requestor_name', 'type_request', 'description_of_request', 'status'],
-        purchase: ['reference_no','requestor_name', 'type_request', 'description_of_request', 'status']
-    };
+    let currentRefNo = null; // store selected reference number globally
 
-    // Generic function to render table
+    // --- Generic function to render tables ---
     function renderTable(containerId, tableId, tableData, columns) {
         let tableHtml = `<table id="${tableId}" class="table table-striped table-hover table-bordered text-center"><thead class="thead-dark"><tr>`;
         tableHtml += `<th>#</th>`;
@@ -261,11 +217,28 @@ document.addEventListener('DOMContentLoaded', function () {
             tableHtml += `<tr>`;
             tableHtml += `<td>${index + 1}</td>`; // Incremental ID
             columns.forEach(col => {
-                if (col === 'status') {
-                    tableHtml += `<td>${item[col] === "Pending" ? "<span class='badge badge-warning'>Pending</span>" : "<span class='badge badge-success'>Done</span>"}</td>`;
-                } else {
-                    tableHtml += `<td>${item[col] || ''}</td>`;
-                }
+             if (col === 'status') {
+    let statusBadge = '';
+    switch(item[col]) {
+        case 'Pending':
+            statusBadge = "<span class='badge badge-warning'>Pending</span>";
+            break;
+        case 'Approved':
+            statusBadge = "<span class='badge badge-primary'>Approved</span>";
+            break;
+        case 'Completed':
+            statusBadge = "<span class='badge badge-success'>Completed</span>";
+            break;
+        case 'Rejected':
+            statusBadge = "<span class='badge badge-danger'>Rejected</span>";
+            break;
+        default:
+            statusBadge = `<span class='badge badge-secondary'>${item[col]}</span>`;
+    }
+    tableHtml += `<td>${statusBadge}</td>`;
+} else {
+    tableHtml += `<td>${item[col] || ''}</td>`;
+}
             });
             tableHtml += `
                 <td>
@@ -274,13 +247,12 @@ document.addEventListener('DOMContentLoaded', function () {
                             •••
                         </button>
                         <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop1">
-                            <button 
-                                class="view_btn btn btn-sm btn-success" 
-                                data-reference="${item.reference_no}" 
-                                data-toggle="modal" 
-                                data-target="#referenceModal">
-                                <i data-feather="eye"></i>
-                            </button>
+                 <a 
+  href="/FormData/it-request/approval/${item.reference_no}" 
+  target="_blank" 
+  class="view_btn btn btn-sm btn-success">
+  <i data-feather="eye"></i>
+</a>
                         </div>
                     </div>
                 </td>
@@ -290,7 +262,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         tableHtml += `</tbody></table>`;
         document.getElementById(containerId).innerHTML = tableHtml;
-
         feather.replace();
 
         $(`#${tableId}`).DataTable({
@@ -300,137 +271,22 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Fetch data and populate tables
+    // --- Fetch and render tables ---
     fetch("{{ route('IT.Request.Form.Data') }}")
     .then(response => response.json())
     .then(data => {
-        renderTable('BorrowRequestTbl', 'BorrowTable', data.filter(d => d.type_request === 'Borrow_Item'), columnsPerTab.borrow);
-        renderTable('RepairRequestTbl', 'RepairTable', data.filter(d => d.type_request === 'Repair_Request'), columnsPerTab.repair);
-        renderTable('ProjectRequestTbl', 'ProjectTable', data.filter(d => d.type_request === 'Project_Request'), columnsPerTab.project);
-        renderTable('PurchaseRequestTbl', 'PurchaseTable', data.filter(d => d.type_request === 'Purchase_Request'), columnsPerTab.project);
-        renderTable('IntranetRequestTbl', 'IntranetTable', data.filter(d => d.type_request === 'New_Intranet_Subsystem' || d.type_request === 'Change_Request_Intranet'), columnsPerTab.intranet);
+        renderTable('BorrowRequestTbl', 'BorrowTable', data.filter(d => d.type_request === 'Borrow_Item'), ['reference_no','requestor_name','department','item_name','date_needed','plan_return_date','status']);
+        renderTable('RepairRequestTbl', 'RepairTable', data.filter(d => d.type_request === 'Repair_Request'), ['reference_no','requestor_name','department','issue','status']);
+        renderTable('ProjectRequestTbl', 'ProjectTable', data.filter(d => d.type_request === 'Project_Request'), ['reference_no','requestor_name','type_request','description_of_request','status']);
+        renderTable('PurchaseRequestTbl', 'PurchaseTable', data.filter(d => d.type_request === 'Purchase_Item'), ['reference_no','requestor_name','type_request','description_of_request','status']);
+        renderTable('IntranetRequestTbl', 'IntranetTable', data.filter(d => d.type_request === 'Intranet_Request'), ['reference_no','requestor_name','type_request','description_of_request','status']);
     })
     .catch(error => console.error('Error fetching item request data:', error));
 
-    // 🔹 Load IT request details into modal
-    document.addEventListener('click', async function(event) {
-        const button = event.target.closest('.view_btn');
-        if (!button) return;
-
-        const refNo = button.getAttribute('data-reference');
-
-        try {
-            const url = "{{ route('it_request.reference_data', ['reference_no' => 'PLACEHOLDER']) }}".replace('PLACEHOLDER', encodeURIComponent(refNo));
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`Error: ${response.status}`);
-            const data = await response.json();
-
-            let rows = '';
-            for (const [key, value] of Object.entries(data)) {
-                if (key !== 'approvals') {
-                    rows += `
-                        <tr>
-                            <th style="width: 40%; white-space: normal;">${key.replace(/_/g, ' ').toUpperCase()}</th>
-                            <td colspan="2" style="white-space: normal; word-wrap: break-word; text-align: left;">
-                                ${value ?? ''}
-                            </td>
-                        </tr>
-                    `;
-                }
-            }
-
-            if (data.approvals && data.approvals.length > 0) {
-                rows += `
-                    <tr class="bg-light text-center" style="white-space: normal;">
-                        <th>Approver</th>
-                        <th>Date Approved</th>
-                        <th>Status / Remarks</th>
-                    </tr>
-                `;
-                data.approvals.forEach(app => {
-                    rows += `
-                        <tr>
-                            <td style="white-space: normal;">${app.approved_by}</td>
-                            <td style="white-space: normal;">${app.date_accomplished}</td>
-                            <td style="white-space: normal; word-wrap: break-word;">${app.status} - ${app.remarks ?? ''}</td>
-                        </tr>
-                    `;
-                });
-            }
-
-            // Form fields inside modal body
-            rows += `
-                <tr>
-                    <td colspan="3">
-                        <form id="statusRemarksForm">
-                            <hr>
-                            <div class="form-group">
-                                <label for="statusSelect"><strong>Change Status</strong></label>
-                                <select id="statusSelect" class="form-control" name="status">
-                                    <option selected disabled></option>
-                                    <option value="Approved">Approved</option>
-                                    <option value="Pending">Pending</option>
-                                    <option value="Completed">Completed</option>
-                                    <option value="Rejected">Rejected</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="remarksTextarea"><strong>Remarks</strong></label>
-                                <textarea id="remarksTextarea" class="form-control" name="remarks" rows="3" placeholder="Enter remarks here..."></textarea>
-                            </div>
-                        </form>
-                    </td>
-                </tr>
-            `;
-
-            document.getElementById('referenceTableBody').innerHTML = rows;
-
-            $('#referenceModal').modal('show');
-
-        } catch (error) {
-            console.error(error);
-            document.getElementById('referenceTableBody').innerHTML = `
-                <tr><td colspan="3" class="text-danger">Failed to fetch details for ${refNo}</td></tr>
-            `;
-        }
-    });
-
-    // 🔹 Save button inside modal footer
-    const saveBtn = document.getElementById('saveStatusBtn');
-    if (saveBtn) {
-        saveBtn.addEventListener('click', function() {
-            const status = document.getElementById('statusSelect').value;
-            const remarks = document.getElementById('remarksTextarea').value;
-
-            if (!status) {
-                alert('Please select a status.');
-                return;
-            }
- if (!remarks) {
-                alert('Input Remarks.');
-                return;
-            }
-            console.log('Saving status:', status, 'Remarks:', remarks);
-
-            // Example: send data to server
-            /*
-            fetch('/update-status', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ status, remarks })
-            })
-            .then(res => res.json())
-            .then(data => console.log(data))
-            .catch(err => console.error(err));
-            */
-
-            // Close modal after save
-        
-        });
-    }
 
 });
 </script>
+
 
 
 

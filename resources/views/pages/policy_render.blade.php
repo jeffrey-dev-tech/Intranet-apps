@@ -17,7 +17,7 @@
 							<div class="card-body">
 
 	                  <div class="sanden-logo">
-										<img src="img/Sanden_Logo_SCP2_.png" alt="sanden-logo">
+										<img src="{{ asset('img/Sanden_Logo_SCP2_.png') }}" alt="sanden-logo">
                     <hr>
 										<div class="title-form">
 											<h6 class="card-title" style="font-size:25px;">Electronic Document Management System (@php echo $department @endphp)</h6>
@@ -209,21 +209,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     <td>${item.department}</td>
                     <td>${item.upload_date}</td>
                     <td>${item.doc_type}</td>
-                    <td>
+                    <td style='text-align:center;'>
    
                         <button class="approved_btn" type="button"
                             onclick="loadFile('${item.filename}', '${item.department}')"
                             >
                             <i class="fas fa-eye"></i>
                         </button>
-                                     <button class="approved_btn" type="button"
-                            onclick="download_file('${item.filename}', '${item.department}')"
-                           >
-                            <i class="fas fa-download"></i>
-                        </button>
+                                     
 `;
 
-            if (result.userRole === 'admin' || result.userRole === 'developer' || result.userRole === 'users_s1') {
+            if (result.userRole === '5' || result.userRole === '6' || result.userRole === '2') {
                 tableHtml += `
                         <button class="done_btn modal_update_btn" type="button"
                             data-target="#exampleModal" data-toggle="modal" data-id="${item.id}" data-department="${item.department}"
@@ -234,7 +230,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         <button class="disapproved_btn" type="button" onclick="deleteFile('${item.filename}', '${item.department}')">
                             <i class="fas fa-trash"></i>
-                        </button>`;
+                        </button>
+                        <button class="approved_btn" type="button"
+                            onclick="download_file('${item.filename}', '${item.department}')"
+                           >
+                            <i class="fas fa-download"></i>
+                        </button>
+                        
+                        `;
+                        
             }
 
             tableHtml += `</td></tr>`;

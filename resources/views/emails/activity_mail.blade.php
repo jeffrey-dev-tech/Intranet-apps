@@ -86,26 +86,45 @@ to 79 Manila Line: (02) 8-898- 5110
         </td>
     </tr>
 
-    <tr>
-        <td style="font-weight: bold; background-color: #f9f9f9;">Team</td>
+
+    <tr> 
+        <td style="font-weight: bold; background-color: #ffffff;">Team</td>
         <td>{{ $team_name }}</td>
     </tr>
     <tr>
-        <td style="font-weight: bold; background-color: #f9f9f9;">Activity Name</td>
+        <td style="font-weight: bold; background-color: #ffffff;">Activity Name</td>
         <td>{{ $activity_name }}</td>
     </tr>
     <tr>
-        <td style="font-weight: bold; background-color: #f9f9f9;">Level</td>
+        <td style="font-weight: bold; background-color: #ffffff;">Level</td>
         <td>{{ $activity_level }}</td>
     </tr>
     <tr>
-        <td style="font-weight: bold; background-color: #f9f9f9;">Invitation Code</td>
-        <td>{{ $invitation_code }}</td>
+        <td style="font-weight: bold; background-color: #ffffff;">Uploader</td>
+        <td>{{ $uploader_name }}</td>
     </tr>
+    <tr>
+        <td style="font-weight: bold; background-color: #ffffff;">Department</td>
+        <td>{{ $department }}</td>
+    </tr>
+    <tr>
+        <td style="font-weight: bold; background-color: #ffffff;">Progress Value</td>
+        <td>{{ $progress_value }}</td>
+    </tr>
+    <tr>
+        <td style="font-weight: bold; background-color: #ffffff;">Other Info</td>
+        <td>{{ $other_info }}</td>
+    </tr>
+    <tr>
+        <td style="font-weight: bold; background-color: #ffffff;">Log ID</td>
+        <td>{{ $log_id }}</td>
+    </tr>
+
+
 
 <tr>
     <td colspan="2" align="center" style="padding: 20px;">
-        <a href="https://sandenintranet.local/activities/team-registration" 
+        <a href="https://intranet.sanden.net//teams/activity/approval/{{ $log_id }}" 
            style="
                background-color: #007bff;
                color: #ffffff;
@@ -116,7 +135,7 @@ to 79 Manila Line: (02) 8-898- 5110
                display: inline-block;
                font-family: Arial, sans-serif;
            ">
-           Join Now!
+           Visit
         </a>
     </td>
 </tr>

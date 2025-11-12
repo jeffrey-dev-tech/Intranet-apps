@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Models\Event;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -25,39 +26,67 @@ class CalendarController extends Controller
 
 public function destroy($id)
 {
-    $event = Event::find($id);
-    if ($event) {
+    try {
+        $event = Event::findOrFail($id); // throws exception if not found
         $event->delete();
         return response()->json(['status' => 'success']);
+    } catch (ModelNotFoundException $e) {
+        return response()->json(['status' => 'error', 'message' => 'Event not found'], 404);
     }
-    return response()->json(['status' => 'error'], 404);
 }
+
 
     /**
      * Store a new event
      */
-    public function store(Request $request)
-    {
-        // Validate input
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'agenda' => 'required|string|max:255',
-            'start' => 'required|date',
-            'end' => 'nullable|date|after_or_equal:start',
-        ]);
+public function store(Request $request)
+{
+    // Validate input
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'agenda' => 'required|string|max:255',
+        'start' => 'required|date',
+        'end' => 'nullable|date|after_or_equal:start',
+        'meeting_room' => 'required_if:agenda,Room|string|max:255',
+    ]);
 
-        // Create event
-        Event::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'agenda' => $request->agenda,
-            'pic' => auth()->user()->email,
-            'start' => $request->start,
-            'end' => $request->end,
-        ]);
+    // Convert to backend timezone (e.g., Asia/Manila)
+    $start = Carbon::parse($request->start)->setTimezone(config('app.timezone'));
+    $end = $request->end
+        ? Carbon::parse($request->end)->setTimezone(config('app.timezone'))
+        : $start->copy()->addHour(); // default 1-hour meeting
 
-        return response()->json(['status' => 'success']);
+    // ✅ Check for overlapping bookings
+    if ($request->agenda === 'Room') {
+        $conflict = Event::where('agenda', 'Room')
+            ->where('meeting_room', $request->meeting_room)
+            ->where(function ($query) use ($start, $end) {
+                $query->where('start', '<', $end)
+                      ->where('end', '>', $start);
+            })
+            ->exists();
+
+        if ($conflict) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'This meeting room is already booked during the selected time range.'
+            ], 422);
+        }
     }
+
+    // ✅ Create event
+    Event::create([
+        'title' => $request->title,
+        'description' => $request->description,
+        'agenda' => $request->agenda,
+        'meeting_room' => $request->agenda === 'Room' ? $request->meeting_room : null,
+        'pic' => auth()->user()->email,
+        'start' => $start,
+        'end' => $end,
+    ]);
+
+    return response()->json(['status' => 'success']);
+}
 
 
 public function getHolidayJson()

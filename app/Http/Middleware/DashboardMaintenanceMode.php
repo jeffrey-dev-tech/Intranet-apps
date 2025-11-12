@@ -5,31 +5,26 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use App\Models\MaintenanceMode;
 class DashboardMaintenanceMode
 {
     public function handle(Request $request, Closure $next)
     {
-        $maintenanceRoutes = [
-            'computer.inventory',
-            
-            // Add other route names here
-        ];
+        $routeName = $request->route()?->getName();
 
-        $routeName = $request->route() ? $request->route()->getName() : null;
+        if ($routeName) {
+            $maintenance = MaintenanceMode::where('route_name', $routeName)
+                ->where('enabled', true)
+                ->exists();
 
-        // Check if partial maintenance mode is ON and the route is in maintenance list
-        if (
-            env('PARTIAL_MAINTENANCE', false) &&
-            $routeName &&
-            in_array($routeName, $maintenanceRoutes)
-        ) {
-            // Allow developer role to bypass maintenance
-            if (Auth::check() && Auth::user()->role === 'developer') {
-                return $next($request);
+            if ($maintenance) {
+                // Developer bypass
+                if (Auth::check() && Auth::user()->role === '6') {
+                    return $next($request);
+                }
+
+                return response()->view('errors.dashboard-maintenance', [], 503);
             }
-
-            return response()->view('errors.dashboard-maintenance', [], 503);
         }
 
         return $next($request);

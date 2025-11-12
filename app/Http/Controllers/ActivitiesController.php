@@ -70,8 +70,45 @@ public function store(Request $request)
     return redirect()->back()->with('success', 'Activity and levels created successfully!');
 }
 
+public function updateLevel(Request $request, $id)
+{
+    $request->validate([
+        'level_active' => 'required|integer',
+        'status' => 'required|in:active,inactive',
+    ]);
+
+    $activity = Activity::findOrFail($id);
+    $activity->level_active = $request->level_active;
+    $activity->status = $request->status;
+    $activity->save();
+
+    return redirect()->back()->with('success', 'Activity updated successfully!');
+}
+
+public function activityList() {
+    // Fetch all activities
+    $activities = Activity::all(); // SELECT * FROM activities
+
+    // Pass activities to the view
+    return view('activities.activityList', compact('activities'));
+}
 
 
+
+  public function destroy($id)
+    {
+        // Find the activity by ID
+        $activity = Activity::find($id);
+
+        if (!$activity) {
+            return redirect()->back()->with('error', 'Activity not found.');
+        }
+
+        // Delete the activity
+        $activity->delete();
+
+        return redirect()->back()->with('success', 'Activity deleted successfully.');
+    }
      public function registration_view(){
         return view('activities.teams_registration');
     }
@@ -82,72 +119,46 @@ public function store(Request $request)
 
 public function getActivity()
 {
-    // Get all activities with their levels
-    $allActivities = Activity::with('levels')->get();
-
-    // Get all teams in one query, grouped by activity_id
-    $allTeams = Team::all()->groupBy('activity_id');
+    // Get all activities with their challenge levels
+    $allActivities = Activity::with('challengeLevels')->get();
 
     $activityOptions = '<option selected disabled>Choose Activity</option>';
     $levelsOptions = [];
-    $progressInfo = []; // <-- Extra info per activity
+    $progressInfo = [];
 
     foreach ($allActivities as $activity) {
+        // Build activity dropdown
         $activityOptions .= '<option value="' . $activity->id . '">' . $activity->name . '</option>';
 
+        // Build levels dropdown (only up to level_active)
         $levelHtml = '<option selected disabled>Choose Level</option>';
-        $levels = $activity->levels->sortBy('level_number');
-        $teams = $allTeams->get($activity->id, collect());
-
-        $unlockedCount = 0;
-        $pendingLevel = null;
-        $unlockNext = true;
-
-        // If no teams exist yet for this activity, only show Level 1
-        if ($teams->isEmpty()) {
-            $firstLevel = $levels->first();
-            if ($firstLevel) {
-                $levelHtml .= '<option value="' . $firstLevel->id . '">' . $firstLevel->level_number . '</option>';
-                $unlockedCount = 1;
-            }
-            $levelsOptions[$activity->id] = $levelHtml;
-            $progressInfo[$activity->id] = [
-                'unlockedLevelsCount' => $unlockedCount,
-                'pendingLevel' => $pendingLevel
-            ];
-            continue;
-        }
-
-        // Unlock levels based on pending/completed status
-        foreach ($levels as $level) {
-            $pending = $teams->where('level_id', $level->id)
-                             ->where('status', 'pending')
-                             ->isNotEmpty();
-
-            if (!$unlockNext) break;
-
-            $levelHtml .= '<option value="' . $level->id . '">' . $level->level_number . '</option>';
-            $unlockedCount++;
-
-            if ($pending) {
-                $pendingLevel = $level->level_number;
-                $unlockNext = false;
+        foreach ($activity->challengeLevels as $level) {
+            if ($level->level_number <= $activity->level_active) {
+                $levelHtml .= '<option value="' . $level->id . '">' . $level->level_number . '</option>';
+                // if you have a "name" column: $level->name
             }
         }
 
+        // Store level options for this activity
         $levelsOptions[$activity->id] = $levelHtml;
+
+        // Optional progress info
         $progressInfo[$activity->id] = [
-            'unlockedLevelsCount' => $unlockedCount,
-            'pendingLevel' => $pendingLevel
+            'unlockedLevelsCount' => $activity->level_active,
+            'activeLevels' => $activity->challengeLevels
+                                ->where('level_number', '<=', $activity->level_active)
+                                ->pluck('level_number')
+                                ->toArray()
         ];
     }
 
     return response()->json([
         'html' => $activityOptions,
         'levelsHtml' => $levelsOptions,
-        'progressInfo' => $progressInfo // <-- NEW field
+        'progressInfo' => $progressInfo
     ]);
 }
+
 
 
 public function updateStatus(Request $request)
@@ -160,29 +171,139 @@ public function updateStatus(Request $request)
     DB::beginTransaction();
 
     try {
-        $log = Submission::where('log_id', $request->log_id)->firstOrFail();
+        Log::info('Starting updateStatus process', [
+            'log_id' => $request->log_id,
+            'status' => $request->status
+        ]);
+
+        $log = Submission::with('team.users', 'level')
+            ->where('log_id', $request->log_id)
+            ->firstOrFail();
+
+        // Preserve original progress_value (before overwriting it)
+        $originalProgress = $log->getOriginal('progress_value');
+
+        Log::info('Fetched submission', [
+            'log_id' => $log->log_id,
+            'user_id' => $log->user_id,
+            'team_id' => $log->team_id,
+            'activity_id' => $log->activity_id,
+            'level_id' => $log->level_id,
+            'progress_value_original' => $originalProgress,
+            'status' => $log->status
+        ]);
+
+        if ($request->status === 'approved') {
+            // Team size
+            $teamSize = $log->team?->users->count() ?? 1;
+
+            // Required progress per user
+            $perMemberRequired = ($log->level?->required_value ?? 0) / max($teamSize, 1);
+            Log::info('Per-member required value', [
+                'level_id' => $log->level_id,
+                'required_value' => $log->level?->required_value,
+                'team_size' => $teamSize,
+                'per_member_required' => $perMemberRequired
+            ]);
+
+            // Sum all approved submissions for this user (exclude current)
+            $currentApprovedSum = Submission::where('user_id', $log->user_id)
+                ->where('team_id', $log->team_id)
+                ->where('activity_id', $log->activity_id)
+                ->where('level_id', $log->level_id)
+                ->where('status', 'approved')
+                ->where('id', '!=', $log->id)
+                ->sum('progress_value');
+
+            Log::info('Current approved sum (excluding this submission)', [
+                'current_approved_sum' => $currentApprovedSum
+            ]);
+
+            // Remaining allowed progress
+            $remaining = max($perMemberRequired - $currentApprovedSum, 0);
+            Log::info('Remaining allowed progress', ['remaining' => $remaining]);
+
+            // ✅ Use original value to calculate allowed & overflow
+            $allowedProgress = min($originalProgress, $remaining);
+            $overflow = max($originalProgress - $allowedProgress, 0);
+
+            $log->progress_value = $allowedProgress;
+            $log->progress_value_exceed = $overflow;
+
+            Log::info('Calculated overflow', [
+                'original_progress' => $originalProgress,
+                'allowed_progress' => $allowedProgress,
+                'overflow' => $overflow
+            ]);
+
+            // ======== Check if team is completed ========
+            $existingTeamProgress = Submission::where('team_id', $log->team_id)
+                ->where('activity_id', $log->activity_id)
+                ->where('level_id', $log->level_id)
+                ->where('status', 'approved')
+                ->where('id', '!=', $log->id)
+                ->sum('progress_value');
+
+            $totalTeamProgress = $existingTeamProgress + $log->progress_value;
+            $totalRequired = $log->level?->required_value ?? 0;
+
+            Log::info('Total team progress including current submission', [
+                'team_id' => $log->team_id,
+                'existingTeamProgress' => $existingTeamProgress,
+                'currentProgress' => $log->progress_value,
+                'totalTeamProgress' => $totalTeamProgress,
+                'required_value' => $totalRequired
+            ]);
+
+            if ($totalTeamProgress >= $totalRequired && $log->team && $log->team->status !== 'completed') {
+                $log->team->status = 'completed';
+                $log->team->save();
+
+                Log::info('Team marked as completed', [
+                    'team_id' => $log->team->id,
+                    'status' => $log->team->status
+                ]);
+            }
+        } else {
+              $log->progress_value = $originalProgress;
+
+    // Optionally, keep overflow as is or reset to 0
+    $log->progress_value_exceed = 0; // or max($originalProgress - allowed, 0)
+        }
+
+        // Update submission status
         $log->status = $request->status;
         $log->save();
 
+        Log::info('Submission successfully updated', [
+            'log_id' => $log->log_id,
+            'user_id' => $log->user_id,
+            'progress_value' => $log->progress_value,
+            'overflow' => $log->progress_value_exceed,
+            'status' => $log->status
+        ]);
+
         DB::commit();
         return response()->json(['success' => true]);
+
     } catch (\Exception $e) {
-    DB::rollBack();
-    Log::error('Update Status Failed', [
-        'log_id' => $request->log_id,
-        'status' => $request->status,
-        'error' => $e->getMessage(),
-        'trace' => $e->getTraceAsString()
-    ]);
+        DB::rollBack();
+        Log::error('Update Status Failed', [
+            'log_id' => $request->log_id,
+            'status' => $request->status,
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
 
-    return response()->json([
-        'success' => false,
-        'message' => 'Failed to update status',
-        'error' => $e->getMessage()
-    ], 500);
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to update status',
+            'error' => $e->getMessage()
+        ], 500);
+    }
 }
 
-}
+
 
 public function Form_Logs()
 {

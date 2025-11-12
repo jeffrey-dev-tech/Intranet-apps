@@ -21,25 +21,45 @@
   margin-bottom: 10px;
 }
 </style>
+
+<style>
+
+.ranking-heading {
+  display: flex;                 /* arrange items side by side */
+  align-items: center;           /* vertically center image + text */
+  gap: 10px;                     /* space between logo and text */
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0;
+  font-family: "Atlanta College", sans-serif;
+
+}
+.ranking-heading h3 {
+  text-align: center;                 /* keep aspect ratio */
+}
+
+
+</style>
 <div class="page-content">
     <nav class="page-breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="#">Fitness Challenge</a></li>
+            <li class="breadcrumb-item"><a href="#">Wellness Program</a></li>
             <li class="breadcrumb-item active" aria-current="page">Registration</li>
         </ol>
     </nav>
 
     <div class="row">
         <div class="col-md-8 grid-margin stretch-card mx-auto">
+            
             <div class="card">
+                     
+                     <img class="ranking-heading" src="{{asset('img/Q1 - Lets Win Together.jpg')}}" alt="">
+               
                 <div class="card-body">
-                    
-							   	<div class="sanden-logo">
-										<img src="{{asset('img/wellness.png')}}" alt="sanden-logo">
-										
-                    
-									</div>
-                    <h6 class="card-title" style="text-align: center; font-size:x-large;">Fitness Challenge Registration</h6>
+           
+						
+                    <h6 class="card-title" style="text-align: center; font-size:x-large;">Wellness Program Registration</h6>
 
                     <form id="teamForm" action="{{ route('teams.store') }}" method="POST">
                         @csrf
@@ -82,53 +102,88 @@ document.addEventListener('DOMContentLoaded', function () {
     const inputsContainer = document.getElementById('inputs_html');
     const teamForm = document.getElementById('teamForm');
 
-    // 🔹 Load activity & level fields
-   function loadFields(type) {
-    fetch(`{{ route('activities.getFields') }}?type=${type}`)
-        .then(res => res.json())
-        .then(data => {
-            inputsContainer.innerHTML = data.html;
+    // 🔹 Create a placeholder for error messages
+    let warningMessage = document.createElement('div');
+    warningMessage.id = "pendingWarning";
+    warningMessage.style.color = "red";
+    warningMessage.style.marginTop = "10px";
+    warningMessage.style.fontWeight = "bold";
+    teamForm.appendChild(warningMessage);
 
-            if (type === 'leader') {
-                fetch("{{ route('activities.list') }}")
-                    .then(res => res.json())
-                    .then(data => {
-                        const activitySelect = document.getElementById('activity_id');
-                        const levelSelect = document.getElementById('level_id');
-                        const levelsHtml = data.levelsHtml;
+    // 🔹 Utility: check if user is in a pending team
+    async function checkPendingStatus(showAlert = true) {
+        try {
+            const res = await fetch(`{{ route('teams.checkUserPendingStatus') }}`);
+            if (res.status === 403) {
+                const status = await res.json();
 
-                        activitySelect.innerHTML = data.html;
+                if (status.hasPending && status.pending_teams.length > 0) {
+                    let teamsList = status.pending_teams.map(t =>
+                        `<strong>${t.team_name}</strong>`
+                    ).join('');
 
-                        activitySelect.addEventListener('change', async function () {
-                            const activityId = this.value;
-                            levelSelect.innerHTML = levelsHtml[activityId] || '<option selected disabled>Choose Level</option>';
-
-                            // 🔥 Check if user has pending status
-                            try {
-                                const res = await fetch(`{{ route('teams.checkUserPendingStatus') }}`);
-                                const status = await res.json();
-
-                                if (status.hasPending) {
-                                    Swal.fire({
-                                        title: 'Pending Team Found',
-                                        html: `You already have a pending status in team <strong>${status.team_name}</strong> (Progress: ${status.progress_value}%).`,
-                                        icon: 'warning',
-                                        showCancelButton: false,
-                                        confirmButtonText: 'Okay',
-                                    }).then((result) => {
-                                        if (result.isConfirmed) {
-                                            window.location.reload(true); // 🔥 Force reload
-                                        }
-                                    });
-                                }
-                            } catch (error) {
-                                console.error('Error fetching pending status:', error);
-                            }
+                    if (showAlert) {
+                        Swal.fire({
+                            title: 'Registration Blocked',
+                            html: `You cannot register while you are already in pending teams:<br>${teamsList}`,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
                         });
-                    });
+                    }
+
+                    // 🚨 Disable submit button
+                    const submitButton = teamForm.querySelector('button[type="submit"]');
+                    if (submitButton) submitButton.disabled = true;
+
+                    // 🚨 Show warning below form
+                    warningMessage.innerHTML =
+                        `⚠️ You cannot register or join a team until your pending team(s) are resolved:<br><ul>${teamsList}</ul>`;
+
+                    return true; // means blocked
+                }
             }
-        });
-}
+        } catch (error) {
+            console.error('Error fetching pending status:', error);
+        }
+
+        // ✅ Clear warning if no block
+        warningMessage.innerHTML = "";
+        const submitButton = teamForm.querySelector('button[type="submit"]');
+        if (submitButton) submitButton.disabled = false;
+
+        return false; // not blocked
+    }
+
+    function loadFields(type) {
+        fetch(`{{ route('activities.getFields') }}?type=${type}`)
+            .then(res => res.json())
+            .then(data => {
+                inputsContainer.innerHTML = data.html;
+
+                if (type === 'leader') {
+                    fetch("{{ route('activities.list') }}")
+                        .then(res => res.json())
+                        .then(data => {
+                            const activitySelect = document.getElementById('activity_id');
+                            const levelSelect = document.getElementById('level_id');
+                            const levelsHtml = data.levelsHtml;
+
+                            activitySelect.innerHTML = data.html;
+
+                            activitySelect.addEventListener('change', function () {
+                                const activityId = this.value;
+                                levelSelect.innerHTML = levelsHtml[activityId] || '<option selected disabled>Choose Level</option>';
+
+                                // 🔥 Always check pending status after activity selection
+                                checkPendingStatus();
+                            });
+                        });
+                }
+
+                // 🔥 Run pending check once fields are loaded
+                checkPendingStatus();
+            });
+    }
 
     if (roleType.value) loadFields(roleType.value);
     roleType.addEventListener('change', function () {
@@ -138,6 +193,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // 🔹 Handle form submit
     teamForm.addEventListener('submit', async function (e) {
         e.preventDefault();
+
+        // ✅ Double-check pending status before submitting
+        const blocked = await checkPendingStatus(false);
+        if (blocked) return; // ⛔ stop submission
 
         // Confirm registration first
         const confirm = await Swal.fire({
@@ -154,7 +213,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const formData = new FormData(teamForm);
 
         try {
-            // Show loading while waiting for backend
             Swal.fire({
                 title: 'Processing...',
                 html: 'Please wait while we register your team.',
@@ -169,24 +227,20 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             const data = await response.json();
-            Swal.close(); // Close loading
+            Swal.close();
 
             if (data.status === 'success') {
-                if (data.invite_code) {
-                    await Swal.fire({
-                        title: 'Team Created!',
-                        html: `Invite Code: <strong>${data.invite_code}</strong>`,
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    });
-                } else {
-                    await Swal.fire({
-                        title: 'Success',
-                        text: data.message,
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    });
-                }
+                const messageHtml = data.invite_code
+                    ? `Invite Code: <strong>${data.invite_code}</strong>`
+                    : data.message;
+
+                await Swal.fire({
+                    title: 'Success',
+                    html: messageHtml,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+
                 if (data.redirect) window.location.href = data.redirect;
             } else {
                 Swal.fire({

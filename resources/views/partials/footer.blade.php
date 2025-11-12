@@ -102,7 +102,7 @@ document.getElementById('changePasswordForm').addEventListener('submit', functio
 </script>
 <!-- partial:../../partials/_footer.html -->
 			<footer class="footer d-flex flex-column flex-md-row align-items-center justify-content-between">
-				<p class="text-muted text-center text-md-left">Sanden Intranet Apps v.1.0.0.0- MIS </p>
+				<p class="text-muted text-center text-md-left">Sanden Intranet Apps v.2.0.0.0 - MIS </p>
 				<p class="text-muted text-center text-md-left mb-0 d-none d-md-block">05 Makiling Drive, Carmelray Industrial Park II,
 Km. 54 National Highway, Calamba 4027 Laguna</p>
 			</footer>@endif
@@ -137,5 +137,9 @@ Km. 54 National Highway, Calamba 4027 Laguna</p>
 	<script src="{{ asset('assets/vendors/fullcalendar/main.min.js') }}"></script>
 	<script src="{{ asset('assets/js/fullcalendar.js') }}"></script> -->
 	<!-- end custom js for this page -->
+  @livewireScripts
+
+
+
 </body>
 </html>

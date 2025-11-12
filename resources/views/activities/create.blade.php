@@ -6,8 +6,7 @@
 <div class="page-content">
   <nav class="page-breadcrumb">
     <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="#"></a></li>
-      <li class="breadcrumb-item" aria-current="page">Fitness Challenge</li>
+      <li class="breadcrumb-item"><a href="#">Wellness Program</a></li>
       <li class="breadcrumb-item active" aria-current="page">Create Fitness Sports</li>
     </ol>
   </nav>

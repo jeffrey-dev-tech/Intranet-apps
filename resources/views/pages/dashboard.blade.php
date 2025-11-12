@@ -4,8 +4,7 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    <style>
- 
+<style>
 .two-columns {
   display: grid;
   grid-template-columns: 1fr 1fr; /* Two equal columns */
@@ -21,13 +20,13 @@
     text-shadow: 2px 2px 5px rgba(136, 151, 137, 0.73); /* Subtle shadow for contrast */
     margin: 20px 0;
   }
+
 .quote-container {
   border-radius: 20px;
   max-width: 850px;
   border-radius: 15px;
-  
-
 }
+
 .carousel-item img {
     width: 100%;
     height: 600px; /* Set desired carousel height */
@@ -77,6 +76,25 @@ width:98%;
 width:700px;
 
 }
+.eight h1 {
+  text-align:center;
+ 
+  text-transform:uppercase;
+  font-size:26px; letter-spacing:1px;
+  
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-rows: 16px 0;
+  grid-gap: 22px;
+}
+
+.eight h1:after,.eight h1:before {
+  content: " ";
+  display: block;
+  border-bottom: 2px solid #ccc;
+  background-color:white;
+}
+
 
 
 
@@ -106,6 +124,62 @@ width:100%;
 }
 
 </style>
+
+
+<style>
+
+.ranking-heading {
+  display: flex;                 /* arrange items side by side */
+  align-items: center;           /* vertically center image + text */
+  gap: 10px;                     /* space between logo and text */
+  background:rgb(86 139 255);
+  padding: 12px;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0;
+  font-family: "Atlanta College", sans-serif;
+
+}
+.ranking-heading-2 {
+  display: flex;                 /* arrange items side by side */
+  align-items: center;           /* vertically center image + text */
+  gap: 10px;                     /* space between logo and text */
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0;
+  font-family: "Atlanta College", sans-serif;
+
+}
+.ranking-heading img {
+  height: 100px;                  /* make logo smaller */
+  width: auto;                   /* keep aspect ratio */
+}
+
+.ranking-heading h3 {
+  text-align: center;                 /* keep aspect ratio */
+}
+
+
+</style>
+<style>
+  #teamRanking {
+    font-size: 13px;       /* smaller font */
+    width: 100%;           /* shrink to fit content */
+  }
+
+  #teamRanking th, 
+  #teamRanking td {
+    padding: 4px 8px;      /* reduce padding */
+    white-space: nowrap;   /* prevent wrapping */
+  }
+
+  #teamRanking th {
+    font-weight: 600;      /* still keep headers readable */
+  }
+</style>
+
 <div class="page-content">
         <div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
           <div>
@@ -114,23 +188,69 @@ width:100%;
         </div>
 
                
-        <div class="row" style="border-radius: 20px;">
-          <div class="col-12 col-xl-12 grid-margin stretch-card">
+        <div class="row">
+          <div class="col-4 col-xl-4 grid-margin stretch-card box">
             <div class="card overflow-hidden">
-              <div class="card-body" style="background:#0683d5;">
+                <div class="ranking-heading">
+
+  <h4 >Holidays</h4>
+
+    </div>
+              <div class="card-body" >
              
-            <div class="quote-container">
+  
+    
 
-<h3 class="quote-title">ANNOUNCEMENTS</h3>
-<table id="holidayTable" class="table"></table>
 
-        </div>
+ <div class="table-responsive">
+<table id="holidayTable" class="table">
+    <thead>
+        <tr>
+            <th>Events</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Data will be populated via JS -->
+    </tbody>
+</table>
+ </div>
+        
 
-                <div class="flot-wrapper">
-                </div>
               </div>
             </div>
           </div>
+
+            <div class="col-8 col-xl-8 grid-margin stretch-card box" >
+  <div class="card overflow-hidden">
+    
+    <!-- Orange bar at top of card -->
+   <img class="ranking-heading-2" src="{{asset('img/Q1 - Lets Win Together.jpg')}}" alt="">
+    
+    <div class="card-body">
+      <div class="table-responsive">
+        <table id="teamRanking" class="table-hover" >
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Team</th>
+              <th>Activity</th>
+              <th>Unit</th>
+              <th>Level</th>
+              <th>Total Progress</th>
+              <th>Progress %</th>
+              <th>Date Accomplished</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+
 
 
         </div>
@@ -197,40 +317,19 @@ width:100%;
             <li data-target="#anniversarycarousel" data-slide-to="1"></li>
       
         </ol>
-        <div class="carousel-inner">
-           <div class="carousel-item  active">
-                <img src="{{ asset('img/Anniv/ikida.gif') }}" class="d-block w-100 carousel-image" alt="...">
-                <div class="carousel-caption d-none d-md-block">
-                    {{-- <h3 style="color:white; text-shadow: 2px 2px 5px green;">Happy Birthday</h3> --}}
-                    {{-- <p>September 10</p> --}}
-                </div>
-            </div>
-               <div class="carousel-item  ">
-                <img src="{{ asset('img/Anniv/larry.gif') }}" class="d-block w-100 carousel-image" alt="...">
-                <div class="carousel-caption d-none d-md-block">
-                    {{-- <h3 style="color:white; text-shadow: 2px 2px 5px green;">Happy Birthday</h3> --}}
-                    {{-- <p>September 10</p> --}}
-                </div>
-            </div>
+   <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        @php
+            // Get all images from the directory (GIF, PNG, JPG, JPEG)
+            $images = glob(public_path('img/Carousel/*.{gif,png,jpg,jpeg,JPG,JPEG,PNG,GIF}'), GLOB_BRACE);
+        @endphp
 
-          
-            <!-- <div class="carousel-item ">
-                <img src="{{ asset('img/Birthday/Anniv_Jeffrey.png') }}" class="d-block w-100 carousel-image" alt="...">
-                <div class="carousel-caption d-none d-md-block">
-                    {{-- <h3 style="color:white; text-shadow: 2px 2px 5px green;">Happy Anniversary</h3>
-                    <p>September 10</p> --}}
-                </div>
-            </div> -->
-           
-        
-            <!--<div class="carousel-item">
-                <img src="{{ asset('img/Dashboard/announcement.png') }}" class="d-block w-100 carousel-image" alt="...">
-                <div class="carousel-caption d-none d-md-block">
-                    {{-- <h3 style="color:white; text-shadow: 2px 2px 5px green;">Happy Birthday</h3> --}}
-                    
-                </div>
-            </div> -->
-        </div>
+        @foreach ($images as $index => $image)
+            <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                <img src="{{ asset('img/Carousel/' . basename($image)) }}" class="d-block w-100 carousel-image" alt="Image {{ $index + 1 }}">
+            </div>
+        @endforeach
+    </div>
         <a class="carousel-control-prev" href="#anniversarycarousel" role="button" data-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
             <span class="sr-only">Previous</span>
@@ -264,12 +363,33 @@ width:100%;
                 <option selected disabled>Choose agenda</option>
                 <option value="Events">Events</option>
                 <option value="Visitors">Visitors</option>
-               @if(Auth::check() && Auth::user()->email === 'jeffrey.salagubang.js@sanden-rs.com')
-            <option value="Holiday">Holiday</option>
-              @endif
+                 <option value="Room">Room</option>
+          @php
+    $allowedEmails = [
+        'jeffrey.salagubang.js@sanden-rs.com',
+        'neil.olivera.no@sanden-rs.com',
+        'gerryca.joves.gj@sanden-rs.com',
+        'merrie.pundano.mp@sanden-rs.com',
+        'euvy.marable.df@sanden-rs.com'
+    ];
+@endphp
+
+@if(Auth::check() && in_array(Auth::user()->email, $allowedEmails))
+    <option value="Holiday">Holiday</option>
+@endif
                 <option value="Training & Seminars">Training & Seminars</option>
               </select>
           </div>
+          <div class="form-group" id="meeting-room-group" style="display: none;">
+  <label class="col-form-label">Select Meeting Room:</label>
+  <select name="meeting_room" id="meeting_room">
+    <option selected disabled>Choose room</option>
+  <option value="conference_room_1f">Conference Room (1st Floor)</option>
+  <option value="meeting_room_1_2f_right">Meeting Room 1 (2nd Floor Right side)</option>
+  <option value="meeting_room_2_3f_right">Meeting Room 2 (3rd Floor Right side)</option>
+  <!-- <option value="audit_room_3f_left">Audit Room (3rd Floor Left side)</option> -->
+  </select>
+</div>
           <div class="form-group">
               <label class="col-form-label">Start Date:</label>
               <input type="datetime-local" name="start" class="form-control" required>
@@ -286,14 +406,14 @@ width:100%;
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary">Save Event</button>
+        <button type="submit" class="btn btn-primary">Save Agenda</button>
       </div>
     </form>
   </div>
 </div>
 <!-- View Event Modal -->
 <div class="modal fade" id="viewEventModal" tabindex="-1" role="dialog" aria-labelledby="eventModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
+<div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="eventModalLabel">Agenda Details</h5>
@@ -302,40 +422,64 @@ width:100%;
         </button>
       </div>
       <div class="modal-body">
-        <table class="table table-bordered">
-          <tbody>
-            <tr>
-              <th scope="row">Title</th>
-              <td><span id="eventTitle"></span></td>
-            </tr>
-             <tr>
-              <th scope="row">Agenda Type</th>
-              <td><span id="eventAgenda"></span></td>
-            </tr>
-            <tr>
-              <th scope="row">Start</th>
-              <td><span id="eventStart"></span></td>
-            </tr>
-            <tr>
-              <th scope="row">End</th>
-              <td><span id="eventEnd"></span></td>
-            </tr>
-            <tr>
-              <th scope="row">Description</th>
-              <td><span id="eventDescription"></span></td>
-            </tr>
-          </tbody>
-        </table>
+        <!-- ✅ Responsive Table Wrapper -->
+  <div class="table-responsive">
+  <table class="table table-bordered w-100" style="table-layout: auto;">
+    <tbody>
+      <tr>
+        <th scope="row">Title</th>
+        <td><span id="eventTitle"></span></td>
+      </tr>
+      <tr>
+        <th scope="row">Agenda Type</th>
+        <td><span id="eventAgenda"></span></td>
+      </tr>
+      <tr id="meetingRoomRow" style="display: none;">
+        <th scope="row">Meeting Room</th>
+        <td><span id="eventMeetingRoom"></span></td>
+      </tr>
+      <tr>
+        <th scope="row">Start</th>
+        <td><span id="eventStart"></span></td>
+      </tr>
+      <tr>
+        <th scope="row">End</th>
+        <td><span id="eventEnd"></span></td>
+      </tr>
+      <tr>
+        <th scope="row">Description</th>
+       <td>
+  <span id="eventDescription" style="white-space: normal; word-wrap: break-word; overflow-wrap: anywhere;">
+    
+  </span>
+</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+        <!-- /Responsive Table Wrapper -->
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger" id="deleteEventBtn">Delete</button>
+       @if(in_array(auth()->id(), [100, 63, 101]))
+          <button type="button" class="btn btn-danger" id="deleteEventBtn">Delete</button>
+        @endif
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
 </div>
 
+<style>
+  #eventDescription {
+    white-space: normal;    /* allows text to wrap */
+    word-wrap: break-word;  /* breaks long words if needed */
+    overflow-wrap: anywhere; /* modern alternative for breaking long strings */
+  }
 
+  td {
+    white-space: normal; /* ensure table cell allows wrapping */
+  }
+</style>
 <hr>
 <style>
     .fc-event-title {
@@ -346,58 +490,79 @@ width:100%;
         display: block !important;
     }
 </style>
+
+
 <script>
-// Hintayin na matapos ma-load ang buong HTML document bago patakbuhin ang script
 document.addEventListener('DOMContentLoaded', function () {
 
-    // Kumuha ng data mula sa API endpoint para sa mga holidays
+
+    // Initialize DataTable
+const table = $('#holidayTable').DataTable({
+    processing: true,
+    serverSide: false, // fetching all data via API
+    paging: true,      // enable pagination
+    pageLength: 5,     // show 5 rows per page
+    lengthChange: false, // disable changing the page length dropdown
+    searching: true,
+    ordering: true,
+    info: false,        // hides "Showing X to Y of Z entries"
+    columns: [
+        { data: 'title', title: 'Holidays' },
+        { data: 'formatted_date', title: 'Date' }
+    ]
+});
+
+    // Fetch events from API
     fetch('{{ route('api.holidays') }}')
-        .then(response => response.json()) // I-convert ang response sa JSON format
-        .then(holidays => {
-            const table = document.getElementById('holidayTable'); // Hanapin ang table element sa HTML
-            table.innerHTML = ''; // Linisin muna ang laman ng table
+        .then(response => response.json())
+        .then(events => {
+            console.log(events);
 
-            // Kung walang holiday na nakuha
-            if (holidays.length === 0) {
-                const row = document.createElement('tr'); // Gumawa ng bagong row
-                row.innerHTML = '<td colspan="6" class="text-center">No holidays found</td>'; // Mensahe kung walang holiday
-                table.appendChild(row); // Idagdag ang row sa table
-            } else {
-                // I-loop ang holidays kada 6 na entry bawat row
-                for (let i = 0; i < holidays.length; i += 6) {
-                    const row = document.createElement('tr'); // Gumawa ng bagong row
-                    const group = holidays.slice(i, i + 6); // Kumuha ng grupo ng hanggang 6 holidays
-
-                    group.forEach(holiday => {
-                        const td = document.createElement('td'); // Gumawa ng bagong cell
-
-                        const date = new Date(holiday.start); // I-convert ang petsa mula sa API
-                        const options = { month: 'short', day: '2-digit' }; // Format ng petsa
-                        const formattedDate = date.toLocaleDateString('en-US', options).replace(',', '').replace(' ', '-'); // Format ng petsa: MMM-DD
-
-                        // Ipasok ang title at formatted date sa cell
-                        td.innerHTML = `<p class="quote-text">${holiday.title} - ${formattedDate}</p>`;
-                        row.appendChild(td); // Idagdag ang cell sa row
-                    });
-
-                    table.appendChild(row); // Idagdag ang row sa table
-                }
+            if (!Array.isArray(events) || events.length === 0) {
+                table.clear().draw();
+                table.row.add({ title: 'No events found', formatted_date: '' }).draw();
+                return;
             }
+
+            // Sort events by start date ascending
+            events.sort((a, b) => new Date(a.start) - new Date(b.start));
+
+            // Format dates for display
+            const formattedEvents = events.map(event => {
+                const date = new Date(event.start);
+                const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: '2-digit' })
+                    .replace(',', '')
+                    .replace(' ', '-');
+
+                return {
+                    title: event.title,
+                    formatted_date: formattedDate
+                };
+            });
+
+            // Load data into DataTable
+            table.clear();
+            table.rows.add(formattedEvents).draw();
         })
         .catch(error => {
-            // Kung may error sa pagkuha ng data
-            console.error('Error fetching holidays:', error);
-            const row = document.createElement('tr'); // Gumawa ng bagong row para sa error
-            row.innerHTML = '<td colspan="6">Error loading holidays</td>'; // Mensahe ng error
-            document.getElementById('holidayTable').appendChild(row); // Idagdag ang row sa table
+            console.error('Error fetching events:', error);
+            table.clear();
+            table.row.add({ title: 'Error loading events', formatted_date: '' }).draw();
         });
+
+
+
+
+
 });
 
 
+
 </script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    var calendarEl = document.getElementById('calendar');
+var calendarEl = document.getElementById('calendar');
 var calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'dayGridMonth',
     headerToolbar: {
@@ -406,36 +571,93 @@ var calendar = new FullCalendar.Calendar(calendarEl, {
         right: 'dayGridMonth,timeGridWeek,timeGridDay'
     },
     events: '{{ route("calendar.events") }}', // Fetch events from backend
-    dayMaxEventRows: true, // ✅ Enable "+ more" link for month view
-    dayMaxEvents: true,    // ✅ Alternative for different views
+    dayMaxEventRows: true,
+    dayMaxEvents: true,
+
     eventClick: function(info) {
         info.jsEvent.preventDefault();
 
         fetch('{{ route("calendar.show", ":id") }}'.replace(':id', info.event.id))
             .then(response => response.json())
-            .then(data => {
-                document.getElementById('eventTitle').textContent = data.title;
-                document.getElementById('eventStart').textContent = data.start;
-                      document.getElementById('eventAgenda').textContent = data.agenda;
-                document.getElementById('eventEnd').textContent = data.end ? data.end : 'N/A';
-                document.getElementById('eventDescription').textContent = data.description ? data.description : 'No description';
-                document.getElementById('deleteEventBtn').setAttribute('data-id', info.event.id);
-                $('#viewEventModal').modal('show');
+          .then(data => {
+    // Format function for date/time with AM/PM
+    function formatDateTime(dateString) {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        return date.toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+    }
+
+    // Basic info
+    document.getElementById('eventTitle').textContent = data.title;
+    document.getElementById('eventAgenda').textContent = data.agenda;
+    document.getElementById('eventStart').textContent = formatDateTime(data.start);
+    document.getElementById('eventEnd').textContent = data.end ? formatDateTime(data.end) : 'N/A';
+    document.getElementById('eventDescription').textContent = data.description ? data.description : 'No description';
+
+    // Meeting Room handling
+ if (data.agenda === 'Room' && data.meeting_room) {
+    let meetingRoomLabel = '';
+
+    // Manually map each meeting room value
+    if (data.meeting_room === 'conference_room_1f') {
+        meetingRoomLabel = 'Conference Room (1st Floor)';
+    } else if (data.meeting_room === 'meeting_room_1_2f_right') {
+        meetingRoomLabel = 'Meeting Room 1 (2nd Floor Right side)';
+    } else if (data.meeting_room === 'meeting_room_2_3f_right') {
+        meetingRoomLabel = 'Meeting Room 2 (3rd Floor Right side)';
+    } else {
+        meetingRoomLabel = data.meeting_room; // fallback in case value doesn’t match
+    }
+
+    document.getElementById('eventMeetingRoom').textContent = meetingRoomLabel;
+    document.getElementById('meetingRoomRow').style.display = '';
+} else {
+    document.getElementById('meetingRoomRow').style.display = 'none';
+}
+
+    // Set delete button ID
+const deleteBtn = document.getElementById('deleteEventBtn');
+if (deleteBtn) {
+    deleteBtn.setAttribute('data-id', info.event.id);
+}
+
+    // Show modal
+    $('#viewEventModal').modal('show');
+})
+
+            .catch(error => {
+                console.error('Error fetching event:', error);
+                Swal.fire('Error!', 'Failed to load event details.', 'error');
             });
     }
 });
 
-
-    calendar.render();
+calendar.render();
 
     // Handle form submit with fetch
 
+    const agendaSelect = document.getElementById('agenda');
+  const meetingRoomGroup = document.getElementById('meeting-room-group');
+
+  agendaSelect.addEventListener('change', function() {
+    if (this.value === 'Room') {
+      meetingRoomGroup.style.display = 'block';
+    } else {
+      meetingRoomGroup.style.display = 'none';
+    }
+  });
 document.getElementById('eventForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
     let formData = new FormData(this);
 
-    // Confirm before submitting
     Swal.fire({
         title: 'Are you sure?',
         text: "Do you want to create this event?",
@@ -446,34 +668,69 @@ document.getElementById('eventForm').addEventListener('submit', function(e) {
         confirmButtonText: 'Yes, create it!'
     }).then((result) => {
         if (result.isConfirmed) {
+
+            // Show loading spinner
+            Swal.fire({
+                title: 'Creating Event...',
+                text: 'Please wait while we save your event.',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
             fetch('{{ route("calendar.store") }}', {
                 method: 'POST',
                 headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
                 body: formData
             })
-            .then(response => response.json())
-            .then(data => {
+            .then(async response => {
+                const data = await response.json().catch(() => null);
+
+                Swal.close(); // Always close loading alert
+
+                if (!response.ok) {
+                    // Laravel validation error or custom response
+                    if (response.status === 422 && data) {
+                        // Validation errors (like missing fields or room conflict)
+                        if (data.errors) {
+                            const messages = Object.values(data.errors).flat().join('<br>');
+                            Swal.fire({
+                                title: 'Validation Error',
+                                html: messages,
+                                icon: 'warning'
+                            });
+                        } else if (data.message) {
+                            Swal.fire('Warning', data.message, 'warning');
+                        } else {
+                            Swal.fire('Error!', 'Validation failed.', 'error');
+                        }
+                    } else {
+                        Swal.fire('Error!', 'Something went wrong on the server.', 'error');
+                    }
+                    return; // stop here
+                }
+
+                // Success
                 if (data.status === 'success') {
-                    $('#eventModal').modal('hide'); // Close modal
+                    $('#eventModal').modal('hide');
                     document.getElementById('eventForm').reset();
                     calendar.refetchEvents();
-Swal.fire({
-    title: 'Created!',
-    text: 'Your event has been added.',
-    icon: 'success',
-    timer: 2000,
-    showConfirmButton: false
-}).then(() => {
-    location.reload();
-});
-                } else {
-                    Swal.fire('Error!', 'Something went wrong.', 'error');
+
+                    Swal.fire({
+                        title: 'Created!',
+                        text: 'Your event has been added successfully.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.reload();
+                    });
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
+                Swal.close();
                 Swal.fire('Error!', 'Unable to create event.', 'error');
             });
         }
@@ -532,7 +789,93 @@ document.getElementById('deleteEventBtn').addEventListener('click', function () 
 
 });
 </script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const url = "{{ route('team.ranking') }}";
 
+  (async () => {
+    try {
+      const res = await fetch(url, { headers: { 'Accept': 'application/json' }});
+      if (!res.ok) {
+        const text = await res.text();
+        console.error('Team ranking fetch failed:', res.status, text);
+        document.querySelector("#teamRanking tbody").innerHTML =
+          '<tr><td colspan="8" class="text-center text-danger">Error loading ranking</td></tr>';
+        return;
+      }
+
+      const data = await res.json();
+      const tbody = document.querySelector("#teamRanking tbody");
+      tbody.innerHTML = "";
+
+      if (!Array.isArray(data) || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center">No ranking data</td></tr>';
+        return;
+      }
+
+      data.sort((a, b) => (b.total_progress ?? 0) - (a.total_progress ?? 0));
+
+      let rank = 1;
+for (const row of data) {
+  // Determine medal icon or plain rank number
+  let rankDisplay = "";
+  if (rank === 1) rankDisplay = `<img src="{{ asset('img/rank-icon/1st.png') }}" alt="Rank 1" width="20">`;
+  else if (rank === 2) rankDisplay = `<img src="{{ asset('img/rank-icon/2nd.png') }}" alt="Rank 2" width="20">`;
+  else if (rank === 3) rankDisplay = `<img src="{{ asset('img/rank-icon/3rd.png') }}" alt="Rank 3" width="20">`;
+  else rankDisplay = rank; // plain number for 4th, 5th, etc.
+
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td>${rankDisplay}</td>
+    <td>${row.team_name ?? 'N/A'}</td>
+    <td>${row.activity_name ?? 'N/A'}</td>
+    <td>${row.unit ?? 'N/A'}</td>
+    <td>Level ${row.level_number ?? 'N/A'}</td>
+    <td>${row.total_progress ?? 0}</td>
+    <td>${row.progress_percentage ? row.progress_percentage.toFixed(2) + '%' : '0%'}</td>
+    <td>${row.completed_at ? new Date(row.completed_at).toLocaleString() : 'No date'}</td>
+  `;
+
+  tbody.appendChild(tr);
+  rank++; // increment rank at the end
+}
+
+
+      // Initialize DataTable
+      $('#teamRanking').DataTable({
+        paging: true,
+        searching: true,
+        ordering: true,
+        info: false, 
+        order: [[5, 'desc']], // sort by "Total Progress"
+        pageLength: 3,
+        destroy: true
+      });
+    } catch (err) {
+      console.error('Error fetching team ranking:', err);
+      document.querySelector("#teamRanking tbody").innerHTML =
+        '<tr><td colspan="8" class="text-center text-danger">Error loading ranking</td></tr>';
+    }
+  })();
+});
+
+</script>
+<script src="{{asset('assets/js/anime.min.js')}}"></script>
+{{-- 
+  <script>
+    // Animate multiple elements on page load
+    window.addEventListener('load', () => {
+      anime({
+        targets: '.box',
+        opacity: [0, 1],           // Fade in
+        translateY: [50, 0],       // Move up
+        scale: [0.8, 1],           // Pop effect
+        duration: 1000,
+        easing: 'easeOutExpo',
+        delay: anime.stagger(200)  // Stagger by 200ms for each box
+      });
+    });
+  </script> --}}
 
 
 @endsection

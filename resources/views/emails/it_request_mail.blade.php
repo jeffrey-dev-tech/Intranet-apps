@@ -104,10 +104,6 @@ to 79 Manila Line: (02) 8-898- 5110
                     <td style="font-weight: bold; background-color: #ffffff;">Issue</td>
                     <td>{{ $request_data['issue'] ?? 'N/A' }}</td>
                 </tr>
-                <tr>
-                    <td style="font-weight: bold; background-color: #ffffff;">Priority</td>
-                    <td>{{ $request_data['priority'] ?? 'N/A' }}</td>
-                </tr>
                   <tr>
                     <td style="font-weight: bold; background-color: #ffffff;">Description of Request</td>
                     <td>{{ $request_data['description_of_request'] ?? 'N/A' }}</td>
@@ -133,15 +129,12 @@ to 79 Manila Line: (02) 8-898- 5110
                     <td style="font-weight: bold; background-color: #ffffff;">Planned Return Date</td>
                     <td>{{ $request_data['plan_return_date'] ?? 'N/A' }}</td>
                 </tr>
-                <tr>
-                    <td style="font-weight: bold; background-color: #ffffff;">Priority</td>
-                    <td>{{ $request_data['priority'] ?? 'N/A' }}</td>
-                </tr>
+             
                    <tr>
                     <td style="font-weight: bold; background-color: #ffffff;">Description of Request</td>
                     <td>{{ $request_data['description_of_request'] ?? 'N/A' }}</td>
                 </tr>
-            @elseif($type_request === 'New_Intranet_Subsystem')
+            @elseif($type_request === 'Intranet_Request')
                 <tr>
                     <td style="font-weight: bold; background-color: #ffffff;">Reference #</td>
                     <td>{{ $reference_no ?? 'N/A' }}</td>
@@ -151,18 +144,15 @@ to 79 Manila Line: (02) 8-898- 5110
                     <td>{{ $request_data['requestor_name']?? 'N/A' }}</td>
                 </tr>
                 <tr>
-                    <td style="font-weight: bold; background-color: #ffffff;">Subsystem Title</td>
-                    <td>{{ $request_data['subsystem_title'] ?? 'N/A' }}</td>
-                </tr>
-                <tr>
-                    <td style="font-weight: bold; background-color: #ffffff;">Priority</td>
-                    <td>{{ $request_data['priority'] ?? 'N/A' }}</td>
+                    <td style="font-weight: bold; background-color: #ffffff;">Type</td>
+                    <td>{{ $request_data['intranet_request_type'] ?? 'N/A' }}</td>
                 </tr>
                    <tr>
                     <td style="font-weight: bold; background-color: #ffffff;">Description of Request</td>
                     <td>{{ $request_data['description_of_request'] ?? 'N/A' }}</td>
                 </tr>
-            @elseif($type_request === 'Change_Request_Intranet')
+
+                    @elseif($type_request === 'Purchase_Item')
                 <tr>
                     <td style="font-weight: bold; background-color: #ffffff;">Reference #</td>
                     <td>{{ $reference_no ?? 'N/A' }}</td>
@@ -172,17 +162,18 @@ to 79 Manila Line: (02) 8-898- 5110
                     <td>{{ $request_data['requestor_name']?? 'N/A' }}</td>
                 </tr>
                 <tr>
-                    <td style="font-weight: bold; background-color: #ffffff;">Change Request</td>
-                    <td>{{ $request_data['change_request_intranet'] ?? 'N/A' }}</td>
+                    <td style="font-weight: bold; background-color: #ffffff;">Type</td>
+                    <td>{{ $request_data['type_request'] ?? 'N/A' }}</td>
                 </tr>
-               <tr>
-                    <td style="font-weight: bold; background-color: #ffffff;">Priority</td>
-                    <td>{{ $request_data['priority'] ?? 'N/A' }}</td>
+                 <tr>
+                    <td style="font-weight: bold; background-color: #ffffff;">Item Name</td>
+                    <td>{{ $request_data['purchase_item_name'] ?? 'N/A' }}</td>
                 </tr>
                    <tr>
                     <td style="font-weight: bold; background-color: #ffffff;">Description of Request</td>
                     <td>{{ $request_data['description_of_request'] ?? 'N/A' }}</td>
                 </tr>
+         
             @else
                 <tr>
                     <td style="font-weight: bold; background-color: #ffffff;" colspan="2" align="center">
@@ -190,6 +181,25 @@ to 79 Manila Line: (02) 8-898- 5110
                     </td>
                 </tr>
             @endif
+
+            
+<tr>
+    <td colspan="2" align="center" style="padding: 20px;">
+        <a href="https://intranet.sanden.net/FormData/it-request/approval/{{ $reference_no }}" 
+           style="
+               background-color: #007bff;
+               color: #ffffff;
+               padding: 12px 24px;
+               text-decoration: none;
+               font-weight: bold;
+               border-radius: 5px;
+               display: inline-block;
+               font-family: Arial, sans-serif;
+           ">
+           Visit
+        </a>
+    </td>
+</tr>
         </table>
     </td>
 </tr>

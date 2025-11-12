@@ -4,12 +4,30 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Policy;
+use App\Models\CategoryEdms;
 use phpseclib3\Net\SFTP;
 use Illuminate\Support\Facades\Auth;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
+
 class PolicyController extends Controller
 {
+
+
+public function getCategoryData()
+{
+    // Example: Fetch category and its related documents
+    $category = CategoryEdms::all();
+
+    return [
+        'category_id'   => $category->id,
+        'category_name' => $category->name,
+    ];
+}
+
+
   public function getData(Request $request)
 {
     $department = $request->input('department'); // e.g., HR
@@ -38,14 +56,23 @@ class PolicyController extends Controller
 
     return response()->json(['filename' => $nextFilename]);
 }
+public function categorytbl()
+{
+    $userRole = Auth::user()->role; // sample: 1,2,3,4,5
+    $allowedLevels = range(1, $userRole);
 
+    $results = CategoryEdms::withCount(['policies' => function ($query) use ($allowedLevels) {
+        $query->whereIn('access_level', $allowedLevels);
+    }])->get();
 
+    return view('edms.category', compact('results'));
+}
 
 public function policy_tbl(Request $request)
 {
     $department = trim($request->input('department', 'No department')); // ✅ correct for POST
 
-                    $userRole = Auth::user()->role;
+                $userRole = Auth::user()->role;
                 if ($userRole == 'user_s3' || $userRole == 'developer' || $userRole == 'users_s1' || $userRole =='admin' ) {
                     $data = Policy::where('department', $department)->get();
                 } elseif ($userRole == 'users_s2') {
@@ -61,75 +88,182 @@ public function policy_tbl(Request $request)
 ]);
 }
 
+public function document_tbl(Request $request)
+{
+    $category_id = trim($request->input('category_id', 'No Category ID')); 
+    $userRole = Auth::user()->role; // sample value is 1,2,3,4,5
+    $userID = Auth::user()->id;
+    // Get all access levels up to the user's role
+    $allowedLevels = range(1, $userRole);
+    $allowedLevelsTop = range(1, 4);
+    $userIDs = [63, 45];
+    if(in_array($userID, $userIDs)){ // neil and gerryca
+    $data = Policy::where('category_id', $category_id)
+                  ->whereIn('access_level',$allowedLevelsTop)
+                  ->get();
+    }else{
+        $data = Policy::where('category_id', $category_id)
+                  ->whereIn('access_level', $allowedLevels)
+                  ->get();
+    }
+
+
+    
+
+    return response()->json([
+        'userRole' => $userRole,
+        'allowedLevels' => $allowedLevels,
+        'data'     => $data
+    ]);
+}
+
+
+
 
 public function upload_sftp_sql(Request $request)
 {
-    // ✅ Validate request
-    $request->validate([
-        'fileToUpload' => 'required|file|mimes:pdf|max:100240', // Must be PDF
-        'department'   => 'required|string',
-        'label_name'   => 'required|string|max:255',
-        'filename'     => 'required|string|max:255',
-        'file_type'     => 'required|string|max:255',
-        'doc_type'     => 'required|string|max:255',
-        'control_type' => 'required|string|max:255',
+    $requestId = uniqid('upload_', true); // 🔑 Unique ID to trace request in logs
+
+    Log::info("🚀 upload_sftp_sql started", [
+        'request_id' => $requestId,
+        'ip'         => $request->ip(),
+        'user_agent' => $request->header('User-Agent'),
     ]);
-    $request->headers->set('Accept', 'application/json');
-    // ✅ Sanitize and prepare values
-    $department = preg_replace('/[^a-zA-Z0-9_-]/', '', $request->input('department'));
-    $label = basename($request->input('label_name'));
-    $rawFilename = $request->input('filename');
-    $filename = Str::endsWith($rawFilename, '.pdf') ? $rawFilename : $rawFilename . '.pdf';
-    $doc_type =  $request->input('doc_type');
-    $control_type =  $request->input('control_type');
-    $file_type =  $request->input('file_type');
-    $file = $request->file('fileToUpload');
 
-    // ✅ SFTP config
-    $sftp_host = env('SFTP_HOST');
-    $sftp_port = env('SFTP_PORT');
-    $sftp_user = env('SFTP_USER');
-    $sftp_pass = env('SFTP_PASS');
-    $base_remote_path = env('SFTP_BASE_PATH');
-
-    DB::beginTransaction();
     try {
-        // ✅ Connect to SFTP
-        $sftp = new SFTP($sftp_host, $sftp_port);
-        if (!$sftp->login($sftp_user, $sftp_pass)) {
-            throw new Exception('SFTP login failed.');
+        // ✅ Validate request
+        try {
+            $request->validate([
+                'fileToUpload' => 'required|file|mimetypes:application/pdf,application/x-pdf,application/octet-stream,binary/octet-stream|mimes:pdf|max:10000', // 10 MB
+                'department'   => 'required|string',
+                'label_name'   => 'required|string|max:255',
+                'filename'     => 'required|string|max:255',
+                'doc_type'     => 'required|string|max:255',
+                'access_level' => 'required|integer',
+                'category_id'  => 'required|integer|exists:category_tbl,id', // ✅ Added validation
+            ], [
+                'fileToUpload.required' => 'Please select a file to upload.',
+                'fileToUpload.file' => 'The uploaded file is invalid.',
+                'fileToUpload.mimetypes' => 'Only PDF files are allowed.',
+                'fileToUpload.mimes' => 'The file must be a PDF.',
+                'fileToUpload.max' => 'The file size may not exceed 10 MB.',
+                'department.required' => 'Please select a department.',
+                'label_name.required' => 'Please enter a label name.',
+                'filename.required' => 'Please enter a file name.',
+                'category_id.required' => 'Please select a category.',
+                'category_id.exists' => 'The selected category does not exist.',
+            ]);
+        } catch (ValidationException $ve) {
+            Log::error("❌ Validation failed", [
+                'request_id' => $requestId,
+                'errors'     => $ve->errors(),
+            ]);
+            return response()->json(['errors' => $ve->errors()], 422);
         }
 
-        $remoteDir = "$base_remote_path/$department";
-        $remoteFilePath = "$remoteDir/$filename";
+        $request->headers->set('Accept', 'application/json');
 
-        // ✅ Check if department folder exists
-        if (!$sftp->is_dir($remoteDir)) {
-            throw new Exception("Department folder '$department' does not exist.");
-        }
+        // ✅ Sanitize and prepare values
+        $department   = preg_replace('/[^a-zA-Z0-9_-]/', '', $request->input('department'));
+        $label        = basename($request->input('label_name'));
+        $rawFilename  = $request->input('filename');
+        $filename     = Str::endsWith($rawFilename, '.pdf') ? $rawFilename : $rawFilename . '.pdf';
+        $doc_type     = $request->input('doc_type');
+        $access_level = $request->input('access_level');
+        $category_id  = (int) $request->input('category_id'); // ✅ Added
+        $file         = $request->file('fileToUpload');
 
-        // ✅ Upload file to SFTP
-        if (!$sftp->put($remoteFilePath, file_get_contents($file->getRealPath()))) {
-            throw new Exception('SFTP upload failed.');
-        }
-
-        // ✅ Save to DB
-        Policy::create([
-            'filename'   => $filename, // Use correct filename
-            'label'      => $label,
-            'department' => $department,
-            'file_type'  => $file_type,
-             'doc_type'  => $doc_type,
-             'control_type'  => $control_type,
-              'upload_date'  => now(),
+        Log::debug("📄 Prepared file metadata", [
+            'request_id'   => $requestId,
+            'department'   => $department,
+            'label'        => $label,
+            'filename'     => $filename,
+            'doc_type'     => $doc_type,
+            'access_level' => $access_level,
+            'category_id'  => $category_id, // ✅ Logged
+            'filesize'     => $file->getSize(),
         ]);
 
-        DB::commit(); // ✅ Commit after both SFTP and DB succeed
+        // ✅ SFTP config
+        $sftp_host = env('SFTP_HOST');
+        $sftp_port = env('SFTP_PORT');
+        $sftp_user = env('SFTP_USER');
+        $sftp_pass = env('SFTP_PASS');
+        $base_remote_path = env('SFTP_BASE_PATH');
 
-        return response()->json(['message' => 'File uploaded and saved successfully.']);
+        DB::beginTransaction();
+        try {
+            // ✅ Connect to SFTP
+            Log::info('🔌 Connecting to SFTP', [
+                'request_id' => $requestId,
+                'host'       => $sftp_host,
+                'port'       => $sftp_port,
+                'user'       => $sftp_user,
+            ]);
+
+            $sftp = new SFTP($sftp_host, $sftp_port);
+            if (!$sftp->login($sftp_user, $sftp_pass)) {
+                throw new Exception('SFTP login failed.');
+            }
+            Log::info('✅ SFTP login successful', ['request_id' => $requestId]);
+
+            $remoteDir      = "$base_remote_path/$department";
+            $remoteFilePath = "$remoteDir/$filename";
+
+            if (!$sftp->is_dir($remoteDir)) {
+                throw new Exception("Department folder '$department' does not exist.");
+            }
+
+            Log::info("📂 Remote directory exists", [
+                'request_id' => $requestId,
+                'remoteDir'  => $remoteDir
+            ]);
+
+            if (!$sftp->put($remoteFilePath, file_get_contents($file->getRealPath()))) {
+                throw new Exception('SFTP upload failed.');
+            }
+
+            Log::info("📤 File uploaded successfully", [
+                'request_id' => $requestId,
+                'path'       => $remoteFilePath,
+            ]);
+
+            // ✅ Save DB record with category_id
+            $policy = Policy::create([
+                'filename'      => $filename,
+                'label'         => $label,
+                'department'    => $department,
+                'doc_type'      => $doc_type,
+                'access_level'  => $access_level,
+                'category_id'   => $category_id,  // ✅ Added here
+                'upload_date'   => now(),
+            ]);
+
+            Log::info('🗄️ Policy saved to DB', [
+                'request_id' => $requestId,
+                'policy_id'  => $policy->id,
+            ]);
+
+            DB::commit();
+            Log::info('🎉 Transaction committed', ['request_id' => $requestId]);
+
+            return response()->json(['message' => 'File uploaded and saved successfully.']);
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error("❌ Transaction failed", [
+                'request_id' => $requestId,
+                'error'      => $e->getMessage(),
+                'trace'      => $e->getTraceAsString(),
+            ]);
+            return response()->json(['error' => '❌ ' . $e->getMessage()], 500);
+        }
     } catch (Exception $e) {
-        DB::rollBack(); // ✅ Rollback DB if error occurs
-        return response()->json(['error' => '❌ ' . $e->getMessage()], 500);
+        Log::critical("🔥 Unexpected system error in upload_sftp_sql", [
+            'request_id' => $requestId,
+            'error'      => $e->getMessage(),
+            'trace'      => $e->getTraceAsString(),
+        ]);
+        return response()->json(['error' => 'Unexpected server error'], 500);
     }
 }
 
@@ -144,18 +278,18 @@ public function update_sftp_sql(Request $request)
         'fileToUpload' => 'nullable|file|mimes:pdf|max:100240',
         'new_label'    => 'required|string|max:255',
         'filename'     => 'required|string|max:255',
-         'filetype'     => 'required|string|max:255',
-          'control_type'     => 'required|string|max:255',
-           'upload_date'  => now(),
+        'access_level'     => 'required|integer',
+         'category_id'     => 'required|integer',
+        'upload_date'  => now(),
     ]);
 
     $policy = Policy::findOrFail($request->id);
     $department = $policy->department;
 
     $label = basename($request->input('new_label'));
-    $filetype = $request->input('filetype');
     $rawFilename = $request->input('filename');
-     $control_type = $request->input('control_type');
+    $access_level = $request->input('access_level');
+      $category_id = $request->input('category_id');
     $filename = Str::endsWith($rawFilename, '.pdf') ? $rawFilename : $rawFilename . '.pdf';
 
     // SFTP config
@@ -194,8 +328,8 @@ public function update_sftp_sql(Request $request)
         $policy->update([
             'label'    => $label,
             'filename' => $filename,
-             'file_type' => $filetype,
-             'control_type' => $control_type,
+             'access_level' => $access_level,
+              'category_id' => $category_id,
 
         ]);
 
@@ -214,5 +348,16 @@ public function update_sftp_sql(Request $request)
             $department = $request->query('department', 'No department');
             return view('pages.policy_render', ['department' => $department]);
         }
-    
+
+public function document_render($category_id, $category_name)
+{
+
+   $results = CategoryEdms::all();
+  return view('edms.document_render', [
+        'category_id' => $category_id,
+        'category_name' => $category_name,
+        'categories' => $results
+    ]);
+}
+
 }

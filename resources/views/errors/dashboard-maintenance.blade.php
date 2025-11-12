@@ -8,14 +8,7 @@
         text-align: center;
         padding: 60px;
     }
-    h1 {
-        font-size: 2rem;
-        margin-bottom: 10px;
-    }
-    p {
-        font-size: 1.2rem;
-        margin-bottom: 20px;
-    }
+   
     .btn {
         display: inline-block;
         padding: 12px 24px;

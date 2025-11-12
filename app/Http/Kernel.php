@@ -71,6 +71,7 @@ class Kernel extends HttpKernel
     'role' => \App\Http\Middleware\RoleMiddleware::class,
     'prevent-back-history' => \App\Http\Middleware\PreventBackHistory::class,
     'dashboard.maintenance' => \App\Http\Middleware\DashboardMaintenanceMode::class,
+    'password.changed' => \App\Http\Middleware\EnsurePasswordChanged::class,
 ];
     
 }

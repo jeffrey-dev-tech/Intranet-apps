@@ -14,9 +14,14 @@ class Policy extends Model
         'filename',
         'label',
         'department',
-        'file_type',
         'doc_type',
-        'control_type',
-         'upload_date',
+        'category_id',
+        'access_level',
+        'upload_date',
     ];
+
+      public function category()
+    {
+        return $this->belongsTo(CategoryEdms::class, 'category_id', 'id');
+    }
 }

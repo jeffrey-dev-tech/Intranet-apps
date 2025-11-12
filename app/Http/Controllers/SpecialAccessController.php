@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Feature;
+use App\Models\MaintenanceMode;
 use Illuminate\Support\Facades\DB;
 class SpecialAccessController extends Controller
 {
@@ -43,6 +44,13 @@ class SpecialAccessController extends Controller
         $user->features()->attach($request->feature_id);
 
         return response()->json(['message' => 'Features Assigned and saved successfully.']);
+    }
+
+    public function maintenance_form()
+    {
+
+        $results = MaintenanceMode::all();
+        return view('special_access.maintenance',compact('results'));
     }
 
     /**

@@ -10,19 +10,20 @@ class ItRequest extends Model
     protected $table = 'it_request_tbl';
 
    protected $fillable = [
-        'type_request',
+      'type_request',
         'requestor_name',
         'department',
         'requestor_email',
         'description_of_request',
         'issue',
-        'priority',
+        'Level_Request',
+        'attachment_name',
         'item_name',
         'date_needed',
         'plan_return_date',
         'purchase_item_name',
         'project_details',
-        'subsystem_title',
+        'intranet_request_type',
         'manager_email',
         'change_request_intranet',
     ];
@@ -42,8 +43,7 @@ private static function generateReferenceNo($typeRequest)
         'Borrow_Item' => 'BI',
         'Purchase_Item' => 'PI',
         'Project_Request' => 'PR',
-        'New_Intranet_Subsystem' => 'NIS',
-        'Change_Request_Intranet' => 'CRI',
+        'Intranet_Request' => 'IR',
     ];
 
     $prefix = $prefixMap[$typeRequest] ?? 'GEN';

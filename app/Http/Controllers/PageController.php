@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\CategoryEdms;
 
 class PageController extends Controller
 {
@@ -24,6 +25,11 @@ class PageController extends Controller
     {
         return view('pages.version_control');
     }
+        public function dropball()
+    {
+        return view('dropball.dropball');
+    }
+
 
     // app/Http/Controllers/PageController.php
 
@@ -36,13 +42,24 @@ public function login()
     return view('auth.login'); // or whatever your login blade is
 }
 
-    public function policies(Request $request)
-    {
-    $department = $request->query('department'); // or request('department')
+public function getCategoryData()
+{
+    $categories = CategoryEdms::all();
 
-    // Example: if you want to load a model
-    // $dept = Department::where('slug', $department)->firstOrFail();
+    // You can return the entire collection directly
+    return $categories;
+}
 
-    return view('pages.policies', ['department' => $department]);
-    }
+
+
+public function policies(Request $request)
+{
+    $categories = $this->getCategoryData();
+    $department = $request->query('department');
+
+    return view('pages.policies', [
+        'department' => $department,
+        'categories' => $categories
+    ]);
+}
 }

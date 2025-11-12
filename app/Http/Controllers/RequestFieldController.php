@@ -46,34 +46,13 @@ class RequestFieldController extends Controller
 
                   </div>
                 </div>
-                   <div class="col-sm-6">
-                  <div class="form-group">
-                    <label class="control-label" for="priority">Importance</label>
-                   <select name="priority" id="priority" required>
-                     <option selected disabled">Choose</option>
-                    <option value="Low">Low</option>
-                    <option value="Medium">Medium</option>
-                    <option value="High">High</option>
-                    </select>
-                  </div>
-                </div>
+                  
                 <div class="col-sm-12">
       <div class="form-group">
         <label class="control-label">Description of Request</label>
         <textarea id="description_of_request" class="form-control" name="description_of_request" rows="5" placeholder="Input your purpose 255 characters only..." required></textarea>
       </div>
     </div>
-         <div class="col-sm-12">
-    <label class="control-label">Attachments</label>
-    <div class="form-group">
-        <input 
-            type="file" 
-            name="attachments[]" 
-            multiple 
-            accept=".jpeg,.jpg,.png,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
-        >
-    </div>
-</div>
 ';
                 break;
 
@@ -147,86 +126,30 @@ class RequestFieldController extends Controller
     </div>';
                 break;
 
-            case 'New_Intranet_Subsystem':
-        $managers = User::where('position', 'like', '%Manager%')->get();
-
-
+            case 'Intranet_Request':
                 $html = '
-                <div class="col-sm-3">
+                <div class="col-sm-4">
                   <div class="form-group">
-                    <label class="control-label" for="subsystem_title">Subsystem Title</label>
-                    <input type="text" class="form-control" name="subsystem_title" id="subsystem_title" placeholder="Input Sub System Details" required>
+                    <label class="control-label" for="intranet_request_type">Type</label>
+                   <select name="intranet_request_type" id="intranet_request_type" required>
+                    <option selected disabled>Choose Type</option>
+                    <option value="New Intranet">New Intranet</option>
+                    <option value="Change Request">Change Request</option>
+                   </select>
                   </div>
                 </div>
-                <div class="col-sm-6">
-                  <div class="form-group">
-                    <label class="control-label" for="manager_email">Select Manager</label>
-                    <select name="manager_email" id="manager_email" class="form-control">
-                      <option value="">-- Select Manager --</option>';
-                foreach ($managers as $manager) {
-                    $html .= '<option value="' . $manager->email . '">' . $manager->name . '</option>';
-                }
-                $html .= '</select>
-                  </div>
-                </div>
-                  <div class="col-sm-6">
-                  <div class="form-group">
-                    <label class="control-label" for="priority">Importance</label>
-                   <select name="priority" id="priority" required>
-                     <option selected disabled">Choose</option>
-                    <option value="Low">Low</option>
-                    <option value="Medium">Medium</option>
-                    <option value="High">High</option>
-                    </select>
-                  </div>
-                </div>
+          
                 <div class="col-sm-12">
                   <div class="form-group">
-                    <label class="control-label">Purpose of Subsystem</label>
+                    <label class="control-label">Purpose of Request</label>
                     <textarea id="description_of_request" class="form-control" name="description_of_request" rows="5" placeholder="Input your purpose 255 characters only..." required></textarea>
                   </div>
                 </div>
                 
-         <div class="col-sm-12">
-    <label class="control-label">Attachments</label>
-    <div class="form-group">
-        <input 
-            type="file" 
-            name="attachments[]" 
-            multiple 
-            accept=".jpeg,.jpg,.png,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
-        >
-    </div>
-</div>';
+  ';
                 break;
-     case 'Change_Request_Intranet':
-        $managers = User::where('position', 'like', '%Manager%')->get();
-                $html = '
-                <div class="col-sm-3">
-                  <div class="form-group">
-                    <label class="control-label" for="subsystem_title">Sub System Name</label>
-                    <input type="text" class="form-control" name="change_request_intranet" id="change_request_intranet" placeholder="Input the Name of Subsystem"required>
-                  </div>
-                </div>
-                  <div class="col-sm-6">
-                  <div class="form-group">
-                    <label class="control-label" for="manager_id">Select Manager</label>
-                    <select name="manager_id" id="manager_id" class="form-control">
-                      <option value="">-- Select Manager --</option>';
-                foreach ($managers as $manager) {
-                    $html .= '<option value="' . $manager->email . '">' . $manager->name . '</option>';
-                }
-                $html .= '</select>
-                  </div>
-                </div>
-              <div class="col-sm-12">
-      <div class="form-group">
-        <label class="control-label">Details of Request</label>
-        <textarea id="description_of_request" class="form-control" name="description_of_request" rows="5" placeholder="Input your request 255 characters only..." required></textarea>
-      </div>
-    </div>';
-    
-                break;         
+
+   
 
             default:
                 $html = '';

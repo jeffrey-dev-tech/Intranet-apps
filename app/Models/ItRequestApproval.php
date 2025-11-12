@@ -29,4 +29,5 @@ class ItRequestApproval extends Model
     {
         return $this->belongsTo(ITRequest::class, 'reference_no', 'reference_no');
     }
+
 }

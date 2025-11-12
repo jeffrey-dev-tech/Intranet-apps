@@ -14,6 +14,8 @@ class Activity extends Model
         'description',
         'unit',
         'level_count',
+        'status',
+         'level_active',
     ];
 
     // Relationship: Activity has many challenge levels
@@ -27,4 +29,9 @@ class Activity extends Model
     {
         return $this->hasMany(Team::class);
     }
+    public function challengeLevels()
+{
+    return $this->hasMany(ChallengeLevel::class, 'activity_id');
+}
+    
 }
