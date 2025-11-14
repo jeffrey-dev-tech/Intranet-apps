@@ -17,6 +17,7 @@
 	<!-- endinject -->
   <!-- Layout styles -->  
 	<link rel="stylesheet" href="{{asset('assets/css/sanden/style.css')}}">
+  <link rel="stylesheet" href="{{asset('assets/css/sanden/snowEffect.css')}}">
   <!-- End layout styles -->
   <link rel="shortcut icon" href="{{asset('img/sm-logo.png')}}" />
 </head>
@@ -49,6 +50,24 @@
         100% { transform: translateX(0); }
     }
 </style>
+ <!-- 
+<script>
+    window.addEventListener("load", function() {
+      document.querySelector(".main").classList.add("loaded");
+    });
+  </script>
+<div class="main">
+	<div class="initial-snow">
+<div class="snow" style="color: skyblue;">&#10052;</div>
+<div class="snow" style="color: skyblue;">&#10052;</div>
+<div class="snow" style="color: skyblue;">&#10052;</div>
+<div class="snow" style="color: skyblue;">&#10052;</div>
+<div class="snow" style="color: skyblue;">&#10052;</div>
+<div class="snow" style="color: skyblue;">&#10052;</div>
+<div class="snow" style="color: skyblue;">&#10052;</div>
+<div class="snow" style="color: skyblue;">&#10052;</div>
+	</div>
+</div> -->
 	<div class="main-wrapper">
 		<div class="page-wrapper full-page">
 			<div class="page-content d-flex align-items-center justify-content-center">

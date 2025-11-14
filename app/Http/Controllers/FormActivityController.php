@@ -123,7 +123,7 @@ public function store(Request $request)
         }
 
         // --- Email details ---
-        $to = ['jeffrey.salagubang.js@sanden-rs.com'];
+        $to = ['neil.olivera.no@sanden-rs.com'];
         $cc = [];
         $bcc = [];
         $subject = "New Activity Submission - {$submission->activity_name}";

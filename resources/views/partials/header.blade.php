@@ -186,6 +186,10 @@
 				<li class="nav-item">
                 	<a href="{{ route('maintenance.form') }}" class="nav-link">Maintenance Mode</a>
                 </li>
+				</li>
+					<li class="nav-item">
+                	<a href="{{ route('vpn.page') }}" class="nav-link">VPN</a>
+                </li>
         </ul>
             </div>
           </li>

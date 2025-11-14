@@ -1,5 +1,5 @@
 <?php
-use Illuminate\Support\Facades\Log;
+
 $routeFiles = [
     'auth.php',
     'dashboard.php',
