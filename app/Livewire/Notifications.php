@@ -41,7 +41,7 @@ class Notifications extends Component
 
         // Wellness Program (optional)
         $fitness = collect();
-        if (in_array($user->id, [69, 119]) ) {
+        if (in_array($user->id, [63, 100]) ) {
             $fitness = Submission::where('status', 'pending')
                 ->orderBy('created_at', 'desc')
                 ->get()

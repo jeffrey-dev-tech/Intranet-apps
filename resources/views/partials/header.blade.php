@@ -167,7 +167,7 @@
 @endauth
 
 	@auth
-  @if (in_array(auth()->user()->role, ['6','5']))
+ @if (in_array(auth()->user()->role, ['6','5']) || auth()->user()->id == 50)
    <!-- <li class="nav-item nav-category">Admin</li> -->
 		      <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#tables" role="button" aria-expanded="false" aria-controls="tables">
@@ -255,7 +255,29 @@
   </li>
 @endif
 @endauth
+@auth
+@if (in_array(auth()->user()->role, ['6']))
+   <!-- <li class="nav-item nav-category">Docs</li> -->
+		      <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#pcvs" role="button" aria-expanded="false" aria-controls="pcvs">
+          <i class="link-icon fa-solid fa-gift"></i>
+              <span class="link-title">PCV</span>
+              <i class="link-arrow" data-feather="chevron-down"></i>
+            </a>
+		
+            <div class="collapse" id="pcvs">
 
+        <ul class="nav sub-menu">
+			 <li class="nav-item">
+                	<a href="{{ route('voucher_form') }}" class="nav-link">Voucher</a>
+                </li>
+        </ul>
+            </div>
+          </li>
+
+		  
+		   @endif
+@endauth
 
 		         {{-- @auth
 @if (in_array(auth()->user()->role, ['user_s3', '1','6','users_s2','admin']))

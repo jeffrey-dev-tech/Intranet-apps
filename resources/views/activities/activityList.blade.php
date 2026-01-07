@@ -55,7 +55,7 @@
 </td>
 
 
-                            <td>{{ $activity->description }}</td>
+                       <td class="text-wrap" style="max-width:300px;">{{ $activity->description }}</td>
                             <td>{{ $activity->level_active ?? 'Not Set' }}</td>
                             <td>
                                 <!-- Delete Button -->

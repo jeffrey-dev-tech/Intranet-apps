@@ -225,7 +225,7 @@ width:100%;
   <div class="card overflow-hidden">
     
     <!-- Orange bar at top of card -->
-   <img class="ranking-heading-2" src="{{asset('img/Q1 - Lets Win Together.jpg')}}" alt="">
+   <img class="ranking-heading-2" src="{{asset('img/Q1 - Lets Win Together1.jpg')}}" alt="">
     
     <div class="card-body">
       <div class="table-responsive">
@@ -568,7 +568,7 @@ var calendar = new FullCalendar.Calendar(calendarEl, {
     headerToolbar: {
         left: 'prev,next today',
         center: 'title',
-        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
     },
     events: '{{ route("calendar.events") }}', // Fetch events from backend
     dayMaxEventRows: true,

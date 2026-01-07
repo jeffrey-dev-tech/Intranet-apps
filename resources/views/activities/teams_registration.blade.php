@@ -51,51 +51,77 @@
 
     <div class="row">
         <div class="col-md-8 grid-margin stretch-card mx-auto">
-            
-            <div class="card">
-                     
-                     <img class="ranking-heading" src="{{asset('img/Q1 - Lets Win Together.jpg')}}" alt="">
-               
-                <div class="card-body">
-           
-						
-                    <h6 class="card-title" style="text-align: center; font-size:x-large;">Wellness Program Registration</h6>
 
-                    <form id="teamForm" action="{{ route('teams.store') }}" method="POST">
-                        @csrf
-
-                        <!-- Role select -->
-                        <div class="mb-3">
-                            <label class="form-label">Register as:</label>
-                            <select name="role_type" id="roleType" class="form-select" required>
-                                <option value="">Select...</option>
-                                <option value="leader">Team Leader</option>
-                                <option value="member">Join a Team</option>
-                            </select>
-                        </div>
-
-                        <!-- Dynamic fields container -->
-                        <div id="inputs_html"></div>
-
-                        <!-- Common inputs -->
-                        <div class="mb-3">
-                            <label class="form-label">Department:</label>
-                            <input type="text" class="form-control" name="department" value="{{ auth()->user()->department }}" required readonly>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Email:</label>
-                            <input type="text" class="form-control" name="email" value="{{ auth()->user()->email }}" required readonly>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">Register</button>
-                    </form>
-
+            @if($today->lt($registrationStart))
+                <!-- Before registration starts -->
+                <div class="card">
+                      <img class="ranking-heading" src="{{asset('img/Q1 - Lets Win Together1.jpg')}}" alt="">
+                    <div class="card-body text-center">
+                     <h6 class="card-title text-center" style="font-size:x-large;">Wellness Program Registration</h6>
+                        <p class="text-warning">
+                            Registrations will open on {{ $registrationStart->format('F j, Y') }}.
+                        </p>
+                    </div>
                 </div>
-            </div>
+            @elseif($today->gt($registrationEnd))
+                <!-- After registration ends -->
+                <div class="card">
+                       <img class="ranking-heading" src="{{asset('img/Q1 - Lets Win Together1.jpg')}}" alt="">
+                    <div class="card-body text-center">
+                       <h6 class="card-title text-center" style="font-size:x-large;">Wellness Program Registration</h6>
+                        <p class="text-danger">
+                            Registrations have closed on {{ $registrationEnd->format('F j, Y') }}.
+                        </p>
+                    </div>
+                </div>
+            @else
+                <!-- Registration is open: show form -->
+                <div class="card">
+      <img class="ranking-heading" src="{{asset('img/Q1 - Lets Win Together1.jpg')}}" alt="">
+                    <div class="card-body">
+                        <h6 class="card-title text-center" style="font-size:x-large;">Wellness Program Registration</h6>
+
+                        <form id="teamForm" action="{{ route('teams.store') }}" method="POST">
+                            @csrf
+
+                            <!-- Role select -->
+                            <div class="mb-3">
+                                <label class="form-label">Register as:</label>
+                                <select name="role_type" id="roleType" class="form-select" required>
+                                    <option value="">Select...</option>
+                                    <option value="leader">Team Leader</option>
+                                    <option value="member">Join a Team</option>
+                                </select>
+                            </div>
+
+                            <!-- Dynamic fields container -->
+                            <div id="inputs_html"></div>
+
+                            <!-- Common inputs -->
+                            <div class="mb-3">
+                                <label class="form-label">Department:</label>
+                                <input type="text" class="form-control" name="department" value="{{ auth()->user()->department }}" required readonly>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Email:</label>
+                                <input type="text" class="form-control" name="email" value="{{ auth()->user()->email }}" required readonly>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Register</button>
+                        </form>
+
+                        <p class="text-success mt-3 text-center">
+                            Registrations are open until {{ $registrationEnd->format('F j, Y') }}. Hurry up!
+                        </p>
+                    </div>
+                </div>
+            @endif
+
         </div>
     </div>
 </div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const roleType = document.getElementById('roleType');

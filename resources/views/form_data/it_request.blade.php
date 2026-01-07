@@ -97,14 +97,6 @@
   animation: pulse 1s infinite alternate;
 }
 
-@keyframes pulse {
-  from {
-    opacity: 0.6;
-  }
-  to {
-    opacity: 1;
-  }
-}
 
 .view_btn{
 

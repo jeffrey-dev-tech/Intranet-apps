@@ -17,6 +17,14 @@
                 <div class="card-body">
                     <h6 class="card-title">VPN Accounts</h6>
                     <div class="table-responsive">
+                        <div class="mb-2">
+<!-- Button trigger modal -->
+<button class="btn btn-primary" data-toggle="modal" data-target="#createModal">
+    CREATE <i class="fa fa-plus"></i>
+</button>
+
+                        </div>
+          
                         <table id="vpn_tbl" class="table table-bordered">
                             <thead>
                                 <tr>
@@ -73,11 +81,48 @@
                         <button id="send_vpn_emails" class="btn btn-success mt-3">
     <i class="fa fa-envelope"></i> Send VPN Emails
 </button>
+<button id="delete_selected" class="btn btn-danger mt-3">
+    <i class="fa fa-trash"></i>  Delete Selected
+</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <form id="createUserForm" class="modal-content">
+
+      <div class="modal-header" >
+        <h5 class="modal-title" id="createModalLabel">Create User</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Username -->
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" name="username" class="form-control" placeholder="Username" required>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" class="form-control" placeholder="Email" required>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+
+    </form>
+  </div>
 </div>
 
 <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -201,8 +246,53 @@ $('#generate_passwords').on('click', function() {
     });
 });
 
+$('#delete_selected').on('click', function() {
+    var checkedValues = Object.keys(selectedUserIds).filter(key => selectedUserIds[key]);
 
-    // ------------------------------
+    if (checkedValues.length === 0) {
+        Swal.fire('No users selected', 'Please select at least one VPN account.', 'warning');
+        return;
+    }
+
+    Swal.fire({
+        title: 'Delete selected VPN accounts?',
+        text: `This will delete ${checkedValues.length} account(s).`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Deleting...',
+                text: 'Please wait.',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            $.ajax({
+                url: "{{ route('vpn.bulk_delete') }}",
+                type: 'POST',
+                data: { ids: checkedValues },
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                success: function() {
+                    Swal.fire('Deleted!', `${checkedValues.length} VPN account(s) removed.`, 'success');
+                    // Remove rows
+                    checkedValues.forEach(id => {
+                        $(`input.row_checkbox[value='${id}']`).closest('tr').remove();
+                    });
+                    // Reset selection
+                    selectedUserIds = {};
+                    $('#select_all').prop('checked', false).prop('indeterminate', false);
+                },
+                error: function() {
+                    Swal.fire('Error', 'Failed to delete VPN accounts.', 'error');
+                }
+            });
+        }
+    });
+});
+
     // Send Emails Button
     // ------------------------------
   $('#send_vpn_emails').on('click', function() {
@@ -269,6 +359,60 @@ $('#generate_passwords').on('click', function() {
     });
 });
 
+  $("#createUserForm").on("submit", function (e) {
+        e.preventDefault();
+
+        let form = $(this);
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to save this VPN account?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Yes, save it!",
+            cancelButtonText: "Cancel"
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+
+                $.ajax({
+                    url: "{{ route('vpn.store') }}",
+                    type: "POST",
+                    data: form.serialize(),
+                    headers: {
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
+                    },
+                    success: function (res) {
+                        if (res.success) {
+
+                            Swal.fire({
+                                title: "Saved!",
+                                text: res.message,
+                                icon: "success",
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+
+                            $("#createModal").modal("hide");
+                            form[0].reset();
+
+                            // Reload table if needed
+                            // loadVpnAccounts();
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            title: "Error!",
+                            text: "Something went wrong while saving.",
+                            icon: "error"
+                        });
+                    }
+                });
+
+            }
+        });
+
+    });
 
 });
 

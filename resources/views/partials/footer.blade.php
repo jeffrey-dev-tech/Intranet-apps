@@ -103,7 +103,7 @@ document.getElementById('changePasswordForm').addEventListener('submit', functio
 <!-- partial:../../partials/_footer.html -->
 			<footer class="footer d-flex flex-column flex-md-row align-items-center justify-content-between">
 				<p class="text-muted text-center text-md-left">Sanden Intranet Apps v.2.0.0.0 - MIS </p>
-				<p class="text-muted text-center text-md-left mb-0 d-none d-md-block">05 Makiling Drive, Carmelray Industrial Park II,
+				<p class="text-muted text-center text-md-left mb-0 d-none d-md-block">105 Makiling Drive, Carmelray Industrial Park II,
 Km. 54 National Highway, Calamba 4027 Laguna</p>
 			</footer>@endif
 			<!-- partial -->

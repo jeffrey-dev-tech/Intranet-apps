@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class TeamUser extends Pivot
 {
-        public $timestamps = false; // <--- disable timestamps
+    public $timestamps = false; // <--- disable timestamps
     protected $table = 'team_user';
 
     protected $fillable = [

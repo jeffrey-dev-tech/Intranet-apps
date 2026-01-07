@@ -11,6 +11,8 @@ Route::get('/maintenance-mode', [SpecialAccessController::class, 'maintenance_fo
 Route::get('/vpn-accounts', [VpnController::class, 'vpn_page'])->name('vpn.page');
 Route::post('/vpn-pass-gen', [VpnController::class, 'generatepass'])->name('vpn.generate');
 Route::post('/vpn-send-mail', [VpnController::class, 'vpn_send_mail'])->name('vpn.send_mail');
+Route::post('/vpn/store', [VpnController::class, 'store'])->name('vpn.store');
+Route::post('/vpn/bulk-delete', [VpnController::class, 'bulkDelete'])->name('vpn.bulk_delete');
 Route::post('/special-access/assign', [SpecialAccessController::class, 'store'])->middleware('can:features.assign')->name('special.access.assign');
 Route::post('/special-access/add-feature', [SpecialAccessController::class, 'store_feature_tbl'])->name('special.access.addFeature');
 Route::delete('/special-access/remove/{user}/{feature}', [SpecialAccessController::class, 'destroy'])->name('special.access.removeFeature');

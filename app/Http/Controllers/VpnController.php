@@ -108,7 +108,13 @@ public function vpn_send_mail(Request $request)
 public function emailExpiredList()
 {
     // Find all VPN accounts with passwords older than 30 days
-    $expiredVpns = Vpn::where('updated_at', '<=', now()->subDays(30))->get();
+    $expiredVpns = Vpn::whereDate('updated_at', '<=', now()->subDays(30)->toDateString())->get();
+
+    // Do NOT send email if no expired accounts
+    if ($expiredVpns->isEmpty()) {
+        Log::info("No expired VPN accounts found. Email not sent.");
+        return;
+    }
 
     // Prepare email body using a view
     $body = view('emails.vpn_expired_list', [
@@ -116,7 +122,7 @@ public function emailExpiredList()
     ])->render();
 
     // Send email to yourself
-    $to = ['jeffrey.salagubang.js@sanden-rs.com']; // must be an array
+    $to = ['mis.scp@sanden-rs.com']; // must be an array
     $subject = 'VPN Accounts with Expired Passwords';
 
     try {
@@ -131,25 +137,72 @@ public function emailExpiredList()
 
 
 
+
     /**
      * Generate random 8-character password with at least 1 uppercase and 1 number
      */
-    private function generateRandomPassword($length = 8)
-    {
-        $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        $numbers = '0123456789';
-        $uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  private function generateRandomPassword($length = 8)
+{
+    $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    $numbers = '0123456789';
+    $uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $specialChars = '!@#$%^&*-_.'; // Add your desired special characters
 
-        $password = '';
-        // Ensure at least 1 number and 1 uppercase
-        $password .= $numbers[random_int(0, strlen($numbers) - 1)];
-        $password .= $uppercase[random_int(0, strlen($uppercase) - 1)];
+    $password = '';
+    // Ensure at least 1 number, 1 uppercase, and 1 special character
+    $password .= $numbers[random_int(0, strlen($numbers) - 1)];
+    $password .= $uppercase[random_int(0, strlen($uppercase) - 1)];
+    $password .= $specialChars[random_int(0, strlen($specialChars) - 1)];
 
-        // Fill the remaining length with random chars
-        for ($i = 2; $i < $length; $i++) {
-            $password .= $chars[random_int(0, strlen($chars) - 1)];
-        }
-
-        return str_shuffle($password);
+    // Fill the remaining length with random chars (including special characters)
+    $allChars = $chars . $specialChars;
+    for ($i = 3; $i < $length; $i++) {
+        $password .= $allChars[random_int(0, strlen($allChars) - 1)];
     }
+
+    return str_shuffle($password); // Shuffle to avoid predictable positions
+}
+
+ public function store(Request $request)
+    {
+        $request->validate([
+            'username' => 'required|string|max:255',
+            'email'    => 'required|email',
+        ]);
+
+        $vpn = Vpn::create([
+            'username' => $request->username,
+            'email'    => $request->email,
+            'password' => $this->generateRandomPassword(8),
+            'status'   => 'active',
+            'send_status' => 0,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'VPN user created successfully.',
+            'data' => $vpn
+        ]);
+    }
+
+    public function bulkDelete(Request $request)
+{
+    $ids = $request->ids; // array of VPN IDs
+
+    if (!$ids || count($ids) === 0) {
+        return response()->json([
+            'error' => true,
+            'message' => 'No VPN accounts selected'
+        ], 400);
+    }
+
+    // Delete selected VPN accounts
+    Vpn::whereIn('id', $ids)->delete();
+
+    return response()->json([
+        'success' => true,
+        'message' => count($ids) . ' VPN account(s) deleted'
+    ]);
+}
+
 }

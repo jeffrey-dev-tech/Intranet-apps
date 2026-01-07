@@ -12,11 +12,10 @@ use Illuminate\Support\Facades\Log;
 class ActivitiesController extends Controller
 {
   
-  
-     public function showForm()
-    {
-        return view('activities.create');
-    }
+public function showForm()
+{
+return view('activities.create');
+}
 
     /**
      * Store a new activity and its levels
@@ -109,8 +108,16 @@ public function activityList() {
 
         return redirect()->back()->with('success', 'Activity deleted successfully.');
     }
-     public function registration_view(){
-        return view('activities.teams_registration');
+   public function registration_view(){
+         // Define registration period
+    $registrationStart = \Carbon\Carbon::parse('2025-10-01');
+    $registrationEnd = \Carbon\Carbon::parse('2026-01-09');
+
+    return view('activities.teams_registration', [
+        'registrationStart' => $registrationStart,
+        'registrationEnd' => $registrationEnd,
+        'today' => now(),
+    ]);
     }
 
      public function statistics_view(){

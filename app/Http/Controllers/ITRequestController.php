@@ -33,6 +33,7 @@ public function isInternetAvailable()
 public function it_request_insert(Request $request)
 {
     try {
+   
         $type = $request->input('type_request');
         // --- Base validation ---
         $rules = [
@@ -41,6 +42,7 @@ public function it_request_insert(Request $request)
             'department' => 'required|string',
             'requestor_email' => 'required|email',
             'description_of_request' => 'required|string|max:1000',
+            'attachments' => 'sometimes|array',
             'attachments.*' => 'file|max:10240|mimes:jpeg,jpg,png,pdf,doc,docx,xls,xlsx,ppt,pptx',
         ];
 
@@ -73,20 +75,33 @@ public function it_request_insert(Request $request)
         Log::info('Validated IT Request data:', $validated);
 
         $user = Auth::user();
-        $userRole =  $user->role;
-        if (in_array($userRole, ['2', '3', '4', '5', '6'])) 
-        {
-        //supervisor,Manager,Management,Admin,developer
-        //Approver is IT
-        $initialApproverRole = 'MIS';
-        $initialApproverEmail = 'mis.scp@sanden-rs.com';
-        $initialApproverName = 'MIS';
-        }else{
-        // user role is 1 = staff
-        $initialApproverRole = $user->head->role ?? null;
-        $initialApproverEmail = $user->head->email ?? null;
-        $initialApproverName = $user->head->name ?? null;
+        $type = $request->input('type_request');
+
+        // Default approver
+        $initialApproverRole = null;
+        $initialApproverEmail = null;
+        $initialApproverName = null;
+
+        // Force MIS for Repair_Request and Borrow_Item
+        if (in_array($type, ['Repair_Request', 'Borrow_Item'])) {
+            $initialApproverRole = 'MIS';
+            $initialApproverEmail = 'mis.scp@sanden-rs.com';
+            $initialApproverName = 'MIS';
+        } else {
+            // For other requests, choose approver based on user role
+            if (in_array($user->role, ['2','3','4','5','6'])) {
+                // Supervisor/Manager/Admin/Developer
+                $initialApproverRole = 'MIS';
+                $initialApproverEmail = 'mis.scp@sanden-rs.com';
+                $initialApproverName = 'MIS';
+            } else {
+                // Regular staff: approver is head
+                $initialApproverRole = $user->head->role ?? null;
+                $initialApproverEmail = $user->head->email ?? null;
+                $initialApproverName = $user->head->name ?? null;
+            }
         }
+
 
         // ✅ SFTP config
    if ($request->hasFile('attachments')) {
@@ -174,7 +189,7 @@ $item = ItRequest::create($validated);
 
         // --- Prepare email ---
         $to = [$initialApproverEmail];
-        $cc = [];
+        $cc = [$user->getEmailForMailing()];
         $bcc = [];
         $subject = "IT Request: {$type}-{$item->reference_no}";
 
@@ -527,7 +542,7 @@ public function updateStatus($reference_no, Request $request)
                 ->update(['status' => ucfirst($status), 'updated_at' => now()]);
 
             $this->sendNotificationEmail(
-                ['jeffrey.salagubang.js@sanden-rs.com2'],
+                ['mis.scp@sanden-rs.com'],
                 "[IT Request {$reference_no}] - Senior Manager {$status}",
                 $itRequest,
                 $reference_no
@@ -583,7 +598,7 @@ public function updateStatus($reference_no, Request $request)
                 }
 
                 $this->sendNotificationEmail(
-                    ['jeffrey.salagubang.js@sanden-rs.com'],
+                    ['mis.scp@sanden-rs.com'],
                     "[IT Request Approval] {$reference_no} - MIS Review Needed",
                     $itRequest,
                     $reference_no
@@ -683,7 +698,7 @@ public function updateStatus($reference_no, Request $request)
                     }
 
                     $this->sendNotificationEmail(
-                        ['jeffrey.salagubang.js@sanden-rs.com'],
+                        ['fernan.dichoso.cj@sanden-rs.com'],
                         "[IT Request Approval] {$reference_no} - Senior Manager Review Needed",
                         $itRequest,
                         $reference_no

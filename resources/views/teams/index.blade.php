@@ -189,7 +189,7 @@ async function fetchTeams() {
     data.teams.forEach(team => {
     teamsTableBody.innerHTML += `
         <tr style="text-align:center;">
-            <td>${team.name}</td>
+            <td>${team.name.toUpperCase()}</td>
             <td>${team.activity_name ?? 'N/A'}</td>
             <td>
                 <span class="badge ${

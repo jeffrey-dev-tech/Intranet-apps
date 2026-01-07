@@ -1,0 +1,817 @@
+-- MySQL dump 10.13  Distrib 8.0.44, for Linux (x86_64)
+--
+-- Host: localhost    Database: sandenintradb
+-- ------------------------------------------------------
+-- Server version	8.0.44-0ubuntu0.22.04.1
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `activities`
+--
+
+DROP TABLE IF EXISTS `activities`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `activities` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `unit` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `level_count` int NOT NULL,
+  `status` enum('active','inactive','pending','done') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
+  `level_active` int DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `activities`
+--
+
+LOCK TABLES `activities` WRITE;
+/*!40000 ALTER TABLE `activities` DISABLE KEYS */;
+/*!40000 ALTER TABLE `activities` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `category_tbl`
+--
+
+DROP TABLE IF EXISTS `category_tbl`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `category_tbl` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `category_tbl`
+--
+
+LOCK TABLES `category_tbl` WRITE;
+/*!40000 ALTER TABLE `category_tbl` DISABLE KEYS */;
+INSERT INTO `category_tbl` VALUES (1,'POLICY AND PROCEDURE MANAGEMENT REGULATIONS'),(2,'CHECK MANUAL ON ANTISOCIAL FORCES'),(3,'EMPLOYMENT REGULATIONS'),(4,'ASSET MANAGEMENT REGULATIONS'),(5,'WHISTLEBLOWER REGULATIONS'),(6,'ACCOUNTING REGULATIONS'),(7,'ACCOUNTING POLICY'),(8,'CREDIT RISK MANAGEMENT REGULATIONS'),(9,'SALES MANAGEMENT REGULATIONS'),(10,'PROCUREMENT MANAGEMENT REGULATIONS'),(11,'QUALITY MANAGEMENT REGULATIONS'),(12,'BASIC REGULATIONS FOR EXECUTION OF DUTIES'),(13,'DETAILED REGULATIONS ON DIVISION OF RESPONSIBILITIES'),(14,'ORGANIZATIONAL REGULATIONS'),(15,'REGULATIONS FOR THE OPERATION OF COMMITTEES'),(16,'BOARD OF DIRECTORS REGULATIONS');
+/*!40000 ALTER TABLE `category_tbl` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `challenge_levels`
+--
+
+DROP TABLE IF EXISTS `challenge_levels`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `challenge_levels` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `activity_id` bigint unsigned NOT NULL,
+  `activity_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `level_number` int NOT NULL,
+  `required_value` double(8,2) NOT NULL,
+  `team_size` int NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `challenge_levels_activity_id_foreign` (`activity_id`),
+  CONSTRAINT `challenge_levels_activity_id_foreign` FOREIGN KEY (`activity_id`) REFERENCES `activities` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `challenge_levels`
+--
+
+LOCK TABLES `challenge_levels` WRITE;
+/*!40000 ALTER TABLE `challenge_levels` DISABLE KEYS */;
+/*!40000 ALTER TABLE `challenge_levels` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `department_heads`
+--
+
+DROP TABLE IF EXISTS `department_heads`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `department_heads` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `department` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `department_heads_email_unique` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `department_heads`
+--
+
+LOCK TABLES `department_heads` WRITE;
+/*!40000 ALTER TABLE `department_heads` DISABLE KEYS */;
+INSERT INTO `department_heads` VALUES (1,'Alcantara, Christian Katigbak','AFTER SALES','Manager','christian.alcantara.ut@sanden-rs.com',NULL,NULL),(2,'Alcos, Julieta Manumbas','South Luzon','Manager','julieta.alcos.qp@sanden-rs.com',NULL,NULL),(3,'Apigo, Julius Ubera','AFTER SALES','Manager','julius.apigo.dw@sanden-rs.com',NULL,NULL),(4,'Dela Cruz, Joyce Anne Ledda','RO-NL','Manager','joyce.delacruz.jb@sanden-rs.com',NULL,NULL),(5,'Delos Reyes, Mark Laguit','OFFICE OF THE PRESIDENT','Manager','mark.delosreyes.ir@sanden-rs.com',NULL,NULL),(6,'Dichoso, Fernan Hernandez','MANAGEMENT','Manager','fernan.dichoso.cj@sanden-rs.com',NULL,NULL),(7,'Galdones, Jordan Alafriz','RO-VISAYAS','Manager','jordan.galdones.wd@sanden-rs.com',NULL,NULL),(8,'Manalo, Billy Joel Canape','COLD CHAIN','Manager','billy.manalo.nq@sanden-rs.com',NULL,NULL),(9,'Maruggay, Almar Pudoc','COLD CHAIN','Manager','almar.maruggay.dd@sanden-rs.com',NULL,NULL),(10,'Palomillo, Emirlyn Quilatan','COLD CHAIN','Manager','Emirlyn.Palomillo.gi@sanden-rs.com',NULL,NULL),(11,'Rabandaban, Richie Calanog','FINANCE','Manager','richie.rabandaban.rr@sanden-rs.com',NULL,NULL),(12,'Villa, Ella-d Dizor','RO-MINDANAO','Manager','ella.villa.vo@sanden-rs.com',NULL,NULL),(13,'Cruz, Larry Cruz','MANAGEMENT','COO','larry.cruz.jz@sanden-rs.com',NULL,NULL),(14,'Mosquera, Sabrina Marfil','PROCUREMENT & IMPORTATION','Supervisor','sabrina.m.mosquera.sb@sanden-rs.com',NULL,NULL),(15,'Garcia, Mark Marlo Mingi','AFTER SALES','Supervisor','mark.garcia.mg@sanden-rs.com',NULL,NULL),(16,'Gonzales, Kane Cyril Rostata','Advertising & Marketing','Supervisor','kane.gonzales.kc@sanden-rs.com',NULL,NULL),(17,'Salazar, Monette Naparan','FINANCE','Supervisor','monette.salazar.ms@sanden-rs.com',NULL,NULL),(18,'Marable, Euvy Angelo Gerero','MIS','Supervisor','euvy.marable.df@sanden-rs.com',NULL,NULL),(19,'Oca, Benje Morales','COLD CHAIN','Supervisor','benje.oca.bo@sanden-rs.com',NULL,NULL),(20,'Barlan, Adel Paolo Delloson','COLD CHAIN','Supervisor','adel.barlan.ab@sanden-rs.com',NULL,NULL),(21,'Lat, Gerryca Syra Joves','HUMAN RESOURCE','Supervisor','gerryca.joves.gj@sanden-rs.com',NULL,NULL),(22,'Panambo, Clarence Davin','COLD CHAIN','Supervisor','clarence.panambo.bc@sanden-rs.com',NULL,NULL),(23,'Joven, Alvin Sara','SCM','Supervisor','alvin.joven.fi@sanden-rs.com',NULL,NULL),(24,'Balani, Nemicio Aquino','COLD CHAIN','Supervisor','nemicio.balani.wz@sanden-rs.com',NULL,NULL),(25,'Olivera, Neil Erzon Esquilon','ADMIN','Supervisor','neil.olivera.no@sanden-rs.com',NULL,NULL);
+/*!40000 ALTER TABLE `department_heads` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `departments`
+--
+
+DROP TABLE IF EXISTS `departments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `departments` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `departments`
+--
+
+LOCK TABLES `departments` WRITE;
+/*!40000 ALTER TABLE `departments` DISABLE KEYS */;
+INSERT INTO `departments` VALUES (1,'MANAGEMENT',NULL,NULL),(2,'SCM',NULL,NULL),(3,'PROCUREMENT & IMPORTATION',NULL,NULL),(4,'AFTER SALES',NULL,NULL),(5,'RO-VISAYAS',NULL,NULL),(6,'South Luzon',NULL,NULL),(7,'COLD CHAIN',NULL,NULL),(8,'ADMIN',NULL,NULL),(9,'RO-NL',NULL,NULL),(10,'RO-MINDANAO',NULL,NULL),(11,'OFFICE OF THE PRESIDENT',NULL,NULL),(12,'Advertising & Marketing',NULL,NULL),(13,'FINANCE',NULL,NULL),(14,'MIS',NULL,NULL),(15,'HUMAN RESOURCE',NULL,NULL);
+/*!40000 ALTER TABLE `departments` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `documents`
+--
+
+DROP TABLE IF EXISTS `documents`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `documents` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `filename` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `label` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `department` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `doc_type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `category_id` int NOT NULL,
+  `access_level` int NOT NULL,
+  `upload_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=93 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `documents`
+--
+
+LOCK TABLES `documents` WRITE;
+/*!40000 ALTER TABLE `documents` DISABLE KEYS */;
+INSERT INTO `documents` VALUES (1,'ADMPOL001.pdf','Safety Control Procedure','ADM','POL',1,1,'2025-10-29 16:00:00'),(2,'ADMPOL002.pdf','Emergency Preparedness and Response Procedure','ADM','POL',1,1,'2025-10-29 16:00:00'),(3,'ADMPOL003.pdf','Security Control Procedure','ADM','POL',1,1,'2025-10-29 16:00:00'),(4,'ADMPOL004.pdf','Permit to Work Control Work Instruction','ADM','POL',1,1,'2025-10-29 16:00:00'),(5,'ADMPOL005.pdf','Personal Protective Equipment Management','ADM','POL',1,1,'2025-10-29 16:00:00'),(6,'ADMPOL006.pdf','Health and Wellness','ADM','POL',1,1,'2025-10-29 16:00:00'),(7,'ADMPOL007.pdf','Ergonomic Management','ADM','POL',1,1,'2025-10-29 16:00:00'),(8,'ADMPOL008.pdf','Drug Free Work Place','ADM','POL',1,1,'2025-10-29 16:00:00'),(9,'ADMPOL009.pdf','Hepatitis B Program','ADM','POL',1,1,'2025-10-29 16:00:00'),(10,'ADMPOL010.pdf','PTB Prevention and Control Procedure','ADM','POL',1,1,'2025-10-29 16:00:00'),(11,'ADMPOL011.pdf','Pregnancy and Reproductive Health','ADM','POL',1,1,'2025-10-29 16:00:00'),(12,'ADMPOL012.pdf','HIV and AIDS Program','ADM','POL',1,1,'2025-10-29 16:00:00'),(13,'ADMPOL013.pdf','Breastfeeding Procedure','ADM','POL',1,1,'2025-10-29 16:00:00'),(14,'ADMPOL014.pdf','Occupational Health Requirements','ADM','POL',1,1,'2025-10-29 16:00:00'),(15,'ADMPOL025.pdf','Document Control','ADM','POL',1,1,'2025-10-29 16:00:00'),(16,'ADMPOL028.pdf','Crisis Management','ADM','POL',1,1,'2025-10-29 16:00:00'),(17,'ADMPOL029.pdf','Work Suspension Due to Calamity','ADM','POL',1,1,'2025-10-29 16:00:00'),(18,'MISPOL001.pdf','Network Information','MIS','POL',1,1,'2025-10-29 16:00:00'),(19,'MISPOL002.pdf','System Monitoring','MIS','POL',1,1,'2025-10-29 16:00:00'),(20,'MISPOL003.pdf','Back-up of Data','MIS','POL',1,1,'2025-10-29 16:00:00'),(21,'MISPOL007.pdf','Digital Data Privacy','MIS','POL',1,1,'2025-10-29 16:00:00'),(22,'MISPOL008.pdf','Software Liscensing','MIS','POL',1,1,'2025-10-29 16:00:00'),(23,'MISPOL009.pdf','CCTV Access and Usage','MIS','POL',1,1,'2025-10-29 16:00:00'),(24,'MISPOL010.pdf','IT Request Handling','MIS','POL',1,1,'2025-10-29 16:00:00'),(25,'ADMPOL035.pdf','Antisocial Force','ADM','POL',2,1,'2025-10-29 16:00:00'),(26,'ADMPOL015.pdf','Domestic Air Travel','ADM','POL',3,1,'2025-10-29 16:00:00'),(27,'ADMPOL016.pdf','Accommodation','ADM','POL',3,1,'2025-10-29 16:00:00'),(28,'ADMPOL017.pdf','Shuttle and Vehicle Request Guideline','ADM','POL',3,1,'2025-10-29 16:00:00'),(29,'ADMPOL018.pdf','Driver Authorization','ADM','POL',3,1,'2025-10-29 16:00:00'),(30,'ADMPOL019.pdf','Transportation Reimbursement','ADM','POL',3,1,'2025-10-29 16:00:00'),(31,'ADMPOL020.pdf','Staff House Accommodation','ADM','POL',3,2,'2025-10-29 16:00:00'),(32,'HRFRM002.pdf','Employee Movement Form','HR','FRM',3,4,'2025-10-29 16:00:00'),(33,'HRGDL001.pdf','Employee Movement','HR','GDL',3,3,'2025-10-29 16:00:00'),(34,'HRGDL002.pdf','Training Evaluation','HR','GDL',3,1,'2025-10-29 16:00:00'),(35,'HRGDL003.pdf','Leave Conversion','HR','GDL',3,1,'2025-10-29 16:00:00'),(36,'HRGDL004.pdf','Compensation Structure','HR','GDL',3,3,'2025-10-29 16:00:00'),(37,'HRGDL005.pdf','Wage Distortion','HR','GDL',3,1,'2025-10-29 16:00:00'),(38,'HRGDL006.pdf','Salary Increase','HR','GDL',3,1,'2025-10-29 16:00:00'),(39,'HRPOL001.pdf','Recruitment, Selection and Employment','HR','POL',3,1,'2025-10-29 16:00:00'),(40,'HRPOL002.pdf','Employee Performance Evaluation','HR','POL',3,1,'2025-10-29 16:00:00'),(41,'HRPOL003.pdf','Promotion','HR','POL',3,1,'2025-10-29 16:00:00'),(42,'HRPOL004.pdf','Payroll Administration','HR','POL',3,1,'2025-10-29 16:00:00'),(43,'HRPOL005.pdf','Meal Allowance and Per Diem','HR','POL',3,1,'2025-10-29 16:00:00'),(44,'HRPOL006.pdf','Retirement Plan','HR','POL',3,1,'2025-10-29 16:00:00'),(45,'HRPOL007.pdf','Retiree Consultancy Engangement','HR','POL',3,3,'2025-10-29 16:00:00'),(46,'HRPOL008.pdf','13th Month Pay','HR','POL',3,1,'2025-10-29 16:00:00'),(47,'HRPOL009.pdf','Bonus','HR','POL',3,1,'2025-10-29 16:00:00'),(48,'HRPOL010.pdf','Compensation Philisophy','HR','POL',3,1,'2025-10-29 16:00:00'),(49,'HRPOL011.pdf','Christmas Package','HR','POL',3,1,'2025-10-29 16:00:00'),(50,'HRPOL012.pdf','Rice Subsidy','HR','POL',3,1,'2025-10-29 16:00:00'),(51,'HRPOL013.pdf','Uniform Policy','HR','POL',3,1,'2025-10-29 16:00:00'),(52,'ADMPOL021.pdf','Company-Issued Mobile Device','ADM','POL',4,1,'2025-10-29 16:00:00'),(53,'ADMPOL022.pdf','Company-Issued Mobile Device Upgrade','ADM','POL',4,2,'2025-10-29 16:00:00'),(54,'ADMPOL033.pdf','Fixed Assets Management','ADM','POL',4,1,'2025-10-29 16:00:00'),(55,'ADMPOL034.pdf','Company Fleet Management','ADM','POL',4,1,'2025-10-29 16:00:00'),(56,'ADMPOL036.pdf','Gatepass','ADM','POL',4,1,'2025-10-29 16:00:00'),(57,'FINPOL004.pdf','Asset Management','FIN','POL',4,1,'2025-10-29 16:00:00'),(58,'FINPOL008.pdf','Material Board Review','FIN','POL',4,1,'2025-10-29 16:00:00'),(59,'FINPOL010.pdf','Inventory Counting','FIN','POL',4,1,'2025-10-29 16:00:00'),(60,'FINPOL012.pdf','Inventory Management - Physical Count','FIN','POL',4,1,'2025-10-29 16:00:00'),(61,'MISPOL004.pdf','Equipment Issuance, Assignment and Usage','MIS','POL',4,1,'2025-10-29 16:00:00'),(62,'MISPOL005.pdf','Technology Hardware Disposal','MIS','POL',4,2,'2025-10-29 16:00:00'),(63,'ADMPOL030.pdf','Whistle Blower','ADM','POL',5,1,'2025-10-29 16:00:00'),(64,'ADMPOL031.pdf','Credit Card Management','ADM','POL',6,2,'2025-10-29 16:00:00'),(65,'ADMPOL032.pdf','Arranged Loan','ADM','POL',6,2,'2025-10-29 16:00:00'),(66,'FINPOL001.pdf','Finance Disbursement Process','FIN','POL',6,1,'2025-10-29 16:00:00'),(67,'FINPOL002.pdf','Petty Cash Fund','FIN','POL',6,1,'2025-10-29 16:00:00'),(68,'FINPOL003.pdf','Cash Advance','FIN','POL',6,1,'2025-10-29 16:00:00'),(69,'FINPOL005.pdf','Cash and Check Collection Procedure','FIN','POL',6,1,'2025-10-29 16:00:00'),(71,'MISPOL006.pdf','SAP-ERP','MIS','POL',7,1,'2025-10-29 16:00:00'),(72,'FINPOL006.pdf','Credit Policy','FIN','POL',8,1,'2025-10-29 16:00:00'),(73,'FINPOL007.pdf','Promodiser Incentive','FIN','POL',9,2,'2025-10-29 16:00:00'),(74,'FINPOL009.pdf','Sales Discount','FIN','POL',9,1,'2025-10-29 16:00:00'),(75,'FINPOL011.pdf','Sell Out Incentives for Stores without Promodiser','FIN','POL',9,2,'2025-10-29 16:00:00'),(76,'SCMPOL001.pdf','Sales Order Utilization','SCM','POL',9,1,'2025-10-29 16:00:00'),(77,'ADMGDL002.pdf','Office Supplies Request','ADM','GDL',10,1,'2025-10-29 16:00:00'),(78,'PIPPOL002.pdf','Domestic Procedure','PIP','POL',10,1,'2025-10-29 16:00:00'),(79,'PIPPOL001.pdf','Vendor Selection and Accreditation','PIP','POL',10,1,'2025-10-29 16:00:00'),(80,'PIPPOL003.pdf','Import Procedure','PIP','POL',10,1,'2025-10-29 16:00:00'),(81,'PIPPOL004.pdf','Project Code Registration','PIP','POL',10,1,'2025-10-29 16:00:00'),(82,'SCMPOL002.pdf','Procedure on Inbound Shipment','SCM','POL',10,1,'2025-10-29 16:00:00'),(83,'SCMPOL003.pdf','Procedure on Outbound Shipment','SCM','POL',10,1,'2025-10-29 16:00:00'),(84,'ADMPOL023.pdf','SCP Official Policy Format','ADM','POL',11,1,'2025-10-29 16:00:00'),(85,'ADMPOL026.pdf','Risk Assessment','ADM','POL',11,2,'2025-10-29 16:00:00'),(86,'ADMPOL027.pdf','Risk Compliance','ADM','POL',11,2,'2025-10-29 16:00:00'),(87,'HRPOL014.pdf','Training Framework','HR','POL',11,1,'2025-10-29 16:00:00'),(88,'ADMGDL001.pdf','Legal Document Processing','ADM','GDL',12,1,'2025-10-29 16:00:00'),(89,'ADMPOL024.pdf','Confidentiality','ADM','POL',14,1,'2025-10-29 16:00:00'),(90,'HRPOL015.pdf','Company Events','HR','POL',3,1,'2025-10-29 16:00:00'),(91,'HRGDL007.pdf','Compensation Confidentiality and Communication','HR','GDL',3,1,'2025-11-06 02:28:46'),(92,'FINGDL001.pdf','Financial Reporting Manual','FIN','GDL',7,2,'2025-11-07 01:26:27');
+/*!40000 ALTER TABLE `documents` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `events`
+--
+
+DROP TABLE IF EXISTS `events`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `events` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `start` datetime NOT NULL,
+  `end` datetime DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `agenda` text COLLATE utf8mb4_unicode_ci,
+  `meeting_room` text COLLATE utf8mb4_unicode_ci,
+  `pic` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=92 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `events`
+--
+
+LOCK TABLES `events` WRITE;
+/*!40000 ALTER TABLE `events` DISABLE KEYS */;
+INSERT INTO `events` VALUES (20,'SPECIAL NON- WORKING HOLIDAY : ALL SAINT\'S DAY EVE','Malacañang has officially declared October 31, 2025, as an additional special non-working day across the Philippines through Proclamation No. 727.\r\n\r\nThe government made the declaration to allow Filipinos sufficient time to prepare for and observe All Saints’ Day and All Souls’ Day, collectively known as Undas or Kalag-Kalag.\r\n\r\nPresident Ferdinand R. Marcos Jr. signed the proclamation, ensuring that citizens can spend quality time with their families while honoring departed loved ones.','2025-10-31 00:00:00','2025-10-31 12:00:00','2025-10-30 07:29:53','2025-10-30 07:29:53','Holiday',NULL,'gerryca.joves.gj@sanden-rs.com'),(21,'Overview & Process of JSOX Audit (Sales) Physical Audit','Orientation & Overview of JSOX Physical Audit','2025-11-03 13:00:00','2025-11-03 14:30:00','2025-10-30 07:34:26','2025-10-30 07:34:26','Room','conference_room_1f','fernan.dichoso.cj@sanden-rs.com'),(22,'OPM (Management Division)','OPM (Management Division Team)','2025-11-14 13:00:00','2025-11-14 16:00:00','2025-10-30 07:36:37','2025-10-30 07:36:37','Room','conference_room_1f','fernan.dichoso.cj@sanden-rs.com'),(23,'Flash Report October Results','Flash Report with Ikeda san & Larry san','2025-11-06 10:00:00','2025-11-06 11:37:00','2025-10-30 07:39:06','2025-10-30 07:39:06','Room','meeting_room_1_2f_right','fernan.dichoso.cj@sanden-rs.com'),(24,'SDRS-SCP (Monthly Meeting)','SDRS/SCP (Monthly Meeting) with Ikeda san & Larry san','2025-11-19 09:00:00','2025-11-19 10:00:00','2025-10-30 07:43:59','2025-10-30 07:43:59','Room','meeting_room_1_2f_right','fernan.dichoso.cj@sanden-rs.com'),(26,'SCP INTRANET LAUNCH!','Announcement and Account/Access Provision','2025-10-30 15:00:00','2025-10-30 16:00:00','2025-10-30 07:48:41','2025-10-30 07:48:41','Events',NULL,'neil.olivera.no@sanden-rs.com'),(27,'Cash Flow Projection','Cash Flow Projection','2025-11-06 11:40:00','2025-11-06 12:00:00','2025-10-30 08:03:26','2025-10-30 08:03:26','Room','meeting_room_1_2f_right','fernan.dichoso.cj@sanden-rs.com'),(28,'Policy Review - Finance / Admin','Policy Review','2025-11-04 09:30:00','2025-11-04 11:00:00','2025-11-04 01:26:56','2025-11-04 01:26:56','Room','meeting_room_1_2f_right','neil.olivera.no@sanden-rs.com'),(30,'Meeting','Aftersales Spare Parts Delivery - Logistic Partners','2025-11-04 13:00:00','2025-11-04 15:00:00','2025-11-04 01:58:54','2025-11-04 01:58:54','Room','conference_room_1f','christian.alcantara.ut@sanden-rs.com'),(31,'Aftersales Meeting','Aftersales Meeting','2025-11-10 08:30:00','2025-11-10 10:30:00','2025-11-04 02:01:05','2025-11-04 02:01:05','Room','conference_room_1f','christian.alcantara.ut@sanden-rs.com'),(32,'Aftersales Meeting','Aftersales OPM','2025-11-12 08:30:00','2025-11-12 12:00:00','2025-11-04 02:06:27','2025-11-04 02:06:27','Room','meeting_room_1_2f_right','christian.alcantara.ut@sanden-rs.com'),(33,'SCM Team Reports - October 2025',NULL,'2025-11-06 09:00:00','2025-11-06 11:00:00','2025-11-04 03:46:56','2025-11-04 03:46:56','Room','conference_room_1f','alvin.joven.fi@sanden-rs.com'),(34,'Happy Birthday','Happy Birthday Sir Larry!','2025-11-03 08:00:00','2025-11-03 16:00:00','2025-11-06 01:44:10','2025-11-06 01:44:10','Events',NULL,'neil.olivera.no@sanden-rs.com'),(38,'PETTY CASH, CA, LIQUIDATION POLICY',NULL,'2025-11-10 15:00:00','2025-11-10 16:00:00','2025-11-07 01:13:27','2025-11-07 01:13:27','Room','meeting_room_1_2f_right','richie.rabandaban.rr@sanden-rs.com'),(39,'Embraco Visit','Meeting with Cold Chain Department','2025-11-07 10:00:00','2025-11-07 12:00:00','2025-11-07 01:19:32','2025-11-07 01:19:32','Visitors',NULL,'neil.olivera.no@sanden-rs.com'),(40,'Finance monthly meeting with review of BIR and SEC Rulings & IFRS','Finance monthly meeting with review of BIR and SEC Rulings & IFRS','2025-11-25 09:00:00','2025-11-25 12:00:00','2025-11-07 01:24:38','2025-11-07 01:24:38','Room','meeting_room_1_2f_right','maryjoy.cinco.il@sanden-rs.com'),(41,'Preparation for discussion of Audit Plan & Procedures',NULL,'2025-11-21 10:00:00','2025-11-21 12:00:00','2025-11-07 01:34:28','2025-11-07 01:34:28','Room','meeting_room_1_2f_right','richie.rabandaban.rr@sanden-rs.com'),(42,'Finance monthly meeting with review of BIR and SEC Rulings & IFRS','Finance monthly meeting with review of BIR and SEC Rulings & IFRS','2025-12-22 09:00:00','2025-12-22 12:00:00','2025-11-07 01:41:42','2025-11-07 01:41:42','Room','meeting_room_1_2f_right','maryjoy.cinco.il@sanden-rs.com'),(43,'Finance monthly meeting with review of BIR and SEC Rulings & IFRS with exam','Finance monthly meeting with review of BIR and SEC Rulings & IFRS','2026-01-23 09:00:00','2026-01-23 15:00:00','2025-11-07 01:42:46','2025-11-07 01:42:46','Room','meeting_room_1_2f_right','maryjoy.cinco.il@sanden-rs.com'),(44,'Finance monthly meeting with review of BIR and SEC Rulings & IFRS','Finance monthly meeting with review of BIR and SEC Rulings & IFRS','2026-02-25 09:00:00','2026-02-25 12:00:00','2025-11-07 01:43:45','2025-11-07 01:43:45','Room','meeting_room_1_2f_right','maryjoy.cinco.il@sanden-rs.com'),(45,'Finance monthly meeting with review of BIR and SEC Rulings & IFRS with exam','Finance monthly meeting with review of BIR and SEC Rulings & IFRS with exam and kpi','2026-03-25 09:00:00','2026-03-25 15:00:00','2025-11-07 01:44:45','2025-11-07 01:44:45','Room','meeting_room_1_2f_right','maryjoy.cinco.il@sanden-rs.com'),(46,'PLC with Japan Session 1&2',NULL,'2025-11-13 09:00:00','2025-11-13 16:00:00','2025-11-07 03:13:56','2025-11-07 03:13:56','Room','meeting_room_1_2f_right','richie.rabandaban.rr@sanden-rs.com'),(47,'PLC with Japan Session 3',NULL,'2025-11-18 09:00:00','2025-11-18 12:00:00','2025-11-07 03:16:17','2025-11-07 03:16:17','Room','meeting_room_1_2f_right','richie.rabandaban.rr@sanden-rs.com'),(48,'Process Interview - Mazars',NULL,'2025-11-14 09:00:00','2025-11-14 14:00:00','2025-11-07 05:44:54','2025-11-07 05:44:54','Room','meeting_room_1_2f_right','richie.rabandaban.rr@sanden-rs.com'),(49,'Mancom Meeting',NULL,'2025-11-18 08:30:00','2025-11-18 11:00:00','2025-11-07 07:50:07','2025-11-07 07:50:07','Room','conference_room_1f','fernan.dichoso.cj@sanden-rs.com'),(50,'Tax updates - FB seminar',NULL,'2025-11-17 13:30:00','2025-11-17 17:00:00','2025-11-07 08:15:46','2025-11-07 08:15:46','Room','meeting_room_1_2f_right','richie.rabandaban.rr@sanden-rs.com'),(51,'AR 121 days overdue discussion',NULL,'2025-11-19 09:00:00','2025-11-19 10:00:00','2025-11-11 00:55:21','2025-11-11 00:55:21','Room','meeting_room_2_3f_right','monette.salazar.ms@sanden-rs.com'),(53,'Sales Process Flow',NULL,'2025-11-12 08:00:00','2025-11-12 10:00:00','2025-11-11 07:09:22','2025-11-11 07:09:22','Room','meeting_room_2_3f_right','richie.rabandaban.rr@sanden-rs.com'),(54,'Aftersales Meeting','Aftersales Meeting','2025-11-13 08:30:00','2025-11-13 14:00:00','2025-11-11 07:23:19','2025-11-11 07:23:19','Room','conference_room_1f','christian.alcantara.ut@sanden-rs.com'),(55,'Admin - MIS','Intranet','2025-11-17 10:00:00','2025-11-17 11:00:00','2025-11-13 05:25:28','2025-11-13 05:25:28','Room','meeting_room_1_2f_right','neil.olivera.no@sanden-rs.com'),(56,'Spare Parts Planning (Proposal) Meeting',NULL,'2025-11-14 10:00:00','2025-11-14 11:00:00','2025-11-13 05:51:37','2025-11-13 05:51:37','Events',NULL,'vazzim.soriano.vs@sanden-rs.com'),(57,'121 Days overdue discussion',NULL,'2025-11-18 13:00:00','2025-11-18 14:00:00','2025-11-14 00:12:43','2025-11-14 00:12:43','Room','meeting_room_1_2f_right','monette.salazar.ms@sanden-rs.com'),(58,'WEEKLY COORDINATION MEETING',NULL,'2025-11-14 09:45:00','2025-11-14 11:01:00','2025-11-14 01:45:32','2025-11-14 01:45:32','Room','conference_room_1f','Emirlyn.Palomillo.gi@sanden-rs.com'),(59,'Interview with auditor',NULL,'2025-11-14 14:00:00','2025-11-14 16:00:00','2025-11-14 05:04:04','2025-11-14 05:04:04','Room','meeting_room_1_2f_right','richie.rabandaban.rr@sanden-rs.com'),(60,'Aftersales Meeting','Aftersales Meeting','2025-11-17 08:30:00','2025-11-17 12:00:00','2025-11-17 00:40:06','2025-11-17 00:40:06','Room','conference_room_1f','christian.alcantara.ut@sanden-rs.com'),(61,'Invoice countering',NULL,'2025-11-20 11:00:00','2025-11-20 12:00:00','2025-11-17 05:08:54','2025-11-17 05:08:54','Room','meeting_room_1_2f_right','richie.rabandaban.rr@sanden-rs.com'),(62,'AR Discussion',NULL,'2025-11-18 14:00:00','2025-11-18 16:00:00','2025-11-18 03:56:20','2025-11-18 03:56:20','Room','meeting_room_1_2f_right','richie.rabandaban.rr@sanden-rs.com'),(63,'UPDATE ADVANCES TO OE AND SUPPLIERS/GRIR/AP AGING','UPDATE ADVANCES TO OE AND SUPPLIERS/GRIR/AP AGING','2025-11-26 10:30:00','2025-11-26 12:00:00','2025-11-18 07:56:33','2025-11-18 07:56:33','Room','conference_room_1f','maryjoy.cinco.il@sanden-rs.com'),(64,'Preparation for audit',NULL,'2025-11-20 09:00:00','2025-11-20 11:00:00','2025-11-19 00:21:47','2025-11-19 00:21:47','Room','meeting_room_1_2f_right','richie.rabandaban.rr@sanden-rs.com'),(65,'Aftersales Meeting','Aftersales Meeting','2025-11-19 13:00:00','2025-11-19 15:00:00','2025-11-19 02:44:03','2025-11-19 02:44:03','Room','conference_room_1f','christian.alcantara.ut@sanden-rs.com'),(66,'HRAD','HRAD OFFICE','2025-11-19 13:00:00','2025-11-19 16:00:00','2025-11-19 05:06:27','2025-11-19 05:06:27','Room','meeting_room_1_2f_right','neil.olivera.no@sanden-rs.com'),(67,'Annualization',NULL,'2025-11-21 09:00:00','2025-11-21 10:00:00','2025-11-20 03:35:26','2025-11-20 03:35:26','Room','meeting_room_1_2f_right','richie.rabandaban.rr@sanden-rs.com'),(69,'HR MEETING','HR AND COLD CHAIN MEETING','2025-11-24 14:00:00','2025-11-24 16:00:00','2025-11-24 05:37:33','2025-11-24 05:37:33','Room','meeting_room_1_2f_right','neil.olivera.no@sanden-rs.com'),(70,'Meeting with Local Suppliers 2025','To discuss the material readiness for the upcoming Cold chain projects.','2025-11-24 13:00:00','2025-11-24 15:00:00','2025-11-24 05:54:19','2025-11-24 05:54:19','Room','conference_room_1f','angelie.postrero.ap@sanden-rs.com'),(71,'SCP Employee Workshop & Year-End Event 2025','SCP Employee Workshop & Year-End Event 2025','2025-12-10 00:00:00','2025-12-12 12:00:00','2025-11-25 07:48:10','2025-11-25 07:48:10','Events',NULL,'neil.olivera.no@sanden-rs.com'),(72,'Finance meeting',NULL,'2025-11-26 10:00:00','2025-11-26 12:09:00','2025-11-26 02:10:38','2025-11-26 02:10:38','Room','meeting_room_1_2f_right','richie.rabandaban.rr@sanden-rs.com'),(73,'HR Activity 2025','HR Activities 2025','2025-11-28 08:30:00','2025-11-28 16:00:00','2025-11-28 00:31:40','2025-11-28 00:31:40','Room','meeting_room_1_2f_right','gerryca.joves.gj@sanden-rs.com'),(74,'Finance and Admin - Audit',NULL,'2025-11-28 14:00:00','2025-11-28 15:00:00','2025-11-28 05:47:23','2025-11-28 05:47:23','Room','meeting_room_2_3f_right','neil.olivera.no@sanden-rs.com'),(75,'SUBCONTRACTOR SAFETY ORIENTATION','Safety Orientation for Cold Chain Project Subcontractors','2025-12-02 08:00:00','2025-12-02 12:00:00','2025-11-28 13:17:35','2025-11-28 13:17:35','Room','conference_room_1f','russel.leyson.rl@sanden-rs.com'),(76,'SUBCONTRACTOR SAFETY ORIENTATION','Safety Orientation for Cold Chain Project Subcontractor','2025-12-02 12:00:00','2025-12-02 16:00:00','2025-11-28 13:59:33','2025-11-28 13:59:33','Room','conference_room_1f','russel.leyson.rl@sanden-rs.com'),(77,'5JS DESIGN REVIEW','5JS DESIGN REVIEW','2025-12-01 13:00:00','2025-12-01 16:00:00','2025-12-01 05:04:30','2025-12-01 05:04:30','Room','meeting_room_2_3f_right','russel.leyson.rl@sanden-rs.com'),(78,'Safety Orientation','Safety Project Orientation for Subcon of Cold Chain Project','2025-12-02 09:00:00','2025-12-02 12:00:00','2025-12-02 00:11:14','2025-12-02 00:11:14','Training & Seminars',NULL,'nelson.cubio.nc@sanden-rs.com'),(79,'SCM Report','SCM Report','2025-12-09 10:00:00','2025-12-09 12:00:00','2025-12-02 00:30:50','2025-12-02 00:30:50','Room','conference_room_1f','alvin.joven.fi@sanden-rs.com'),(80,'EDMS Orientation - RO Visayas','EDMS Orientation -  RO Visayas - Critical Policies and Procedures','2025-12-02 08:45:00','2025-12-02 10:00:00','2025-12-02 00:45:14','2025-12-02 00:45:14','Training & Seminars',NULL,'neil.olivera.no@sanden-rs.com'),(81,'HR Office','Temporary HR office this afternoon','2025-12-03 13:05:00','2025-12-03 16:00:00','2025-12-03 05:06:48','2025-12-03 05:06:48','Room','meeting_room_1_2f_right','gerryca.joves.gj@sanden-rs.com'),(82,'AP Team',NULL,'2025-12-04 08:00:00','2025-12-04 09:00:00','2025-12-03 06:27:03','2025-12-03 06:27:03','Room','meeting_room_1_2f_right','richie.rabandaban.rr@sanden-rs.com'),(83,'AP Team',NULL,'2025-12-04 14:00:00','2025-12-04 15:00:00','2025-12-04 00:55:57','2025-12-04 00:55:57','Room','meeting_room_1_2f_right','richie.rabandaban.rr@sanden-rs.com'),(84,'AP Team meeting',NULL,'2025-12-04 15:00:00','2025-12-04 16:00:00','2025-12-04 06:16:49','2025-12-04 06:16:49','Room','meeting_room_1_2f_right','richie.rabandaban.rr@sanden-rs.com'),(85,'Local Supplier\'s Meeting with Coldchain','Local Supplier\'s Personal Discussion with Coldhchain in relevant with the Material Preparedness','2025-12-05 13:00:00','2025-12-05 15:00:00','2025-12-04 06:19:16','2025-12-04 06:19:16','Room','conference_room_1f','angelie.postrero.ap@sanden-rs.com'),(86,'DISBURSEMENT POLICY REVIEW','DISBURSEMENT POLICY REVIEW','2025-12-15 08:30:00','2025-12-15 10:00:00','2025-12-05 03:06:05','2025-12-05 03:06:05','Room','meeting_room_1_2f_right','maryjoy.cinco.il@sanden-rs.com'),(87,'FIXED ASSET POLICY REVIEW','FIXED ASSET POLICY REVIEW','2025-12-16 08:30:00','2025-12-16 10:00:00','2025-12-05 03:06:56','2025-12-05 03:06:56','Room','meeting_room_1_2f_right','maryjoy.cinco.il@sanden-rs.com'),(88,'AR POLICY REVIEW','AR POLICY REVIEW','2025-12-19 08:30:00','2025-12-19 10:00:00','2025-12-05 03:07:43','2025-12-05 03:07:43','Room','meeting_room_1_2f_right','maryjoy.cinco.il@sanden-rs.com'),(89,'INVENTORY POLICY REVIEW','INVENTORY POLICY REVIEW','2025-12-19 10:00:00','2025-12-19 12:00:00','2025-12-05 03:08:45','2025-12-05 03:08:45','Room','meeting_room_1_2f_right','maryjoy.cinco.il@sanden-rs.com'),(90,'JSOX',NULL,'2025-12-05 13:00:00','2025-12-05 16:00:00','2025-12-05 03:28:38','2025-12-05 03:28:38','Room','meeting_room_1_2f_right','richie.rabandaban.rr@sanden-rs.com'),(91,'Aftersales Holiday Support Meeting',NULL,'2025-12-05 14:00:00','2025-12-05 15:30:00','2025-12-05 05:40:08','2025-12-05 05:40:08','Room','meeting_room_2_3f_right','joana.pabillo.fa@sanden-rs.com');
+/*!40000 ALTER TABLE `events` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `failed_jobs`
+--
+
+DROP TABLE IF EXISTS `failed_jobs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `failed_jobs` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `connection` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `exception` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `failed_jobs`
+--
+
+LOCK TABLES `failed_jobs` WRITE;
+/*!40000 ALTER TABLE `failed_jobs` DISABLE KEYS */;
+/*!40000 ALTER TABLE `failed_jobs` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `features`
+--
+
+DROP TABLE IF EXISTS `features`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `features` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `features_name_unique` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `features`
+--
+
+LOCK TABLES `features` WRITE;
+/*!40000 ALTER TABLE `features` DISABLE KEYS */;
+INSERT INTO `features` VALUES (13,'features.delete','Delete Features','2025-07-27 21:04:48','2025-07-27 21:04:48'),(18,'features.assign','Feature Assign','2025-07-27 21:41:31','2025-07-27 21:41:31'),(19,'features.update_sftp_sql','Update Policy File','2025-07-27 21:48:55','2025-07-27 21:48:55'),(20,'features.upload_sftp_sql','Upload New Policy','2025-07-27 23:18:28','2025-07-27 23:18:28'),(21,'features.policy.delete','Policy Delete','2025-07-28 17:00:33','2025-07-28 17:00:33'),(22,'form.deposit','Deposit Form','2025-07-28 19:55:46','2025-07-28 19:55:46'),(23,'agenda.create','Create Agenda Calendar','2025-08-07 03:57:51','2025-08-07 03:57:51'),(24,'agenda.delete','Delete Agenda Calendar','2025-08-07 04:01:35','2025-08-07 04:01:35'),(25,'activities.create_view','Activity Create','2025-09-09 06:06:34','2025-09-09 06:06:34'),(26,'activities.listview','Activity List','2025-09-19 07:17:01','2025-09-19 07:17:01'),(27,'form.view.it','Form IT Request','2025-10-29 03:19:47','2025-10-29 03:19:47'),(28,'registration.wellness','Registration Wellness Form','2025-10-29 06:13:55','2025-10-29 06:13:55');
+/*!40000 ALTER TABLE `features` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `intranet_version`
+--
+
+DROP TABLE IF EXISTS `intranet_version`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `intranet_version` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `version` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `updates` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `date_release` date NOT NULL,
+  `author` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `intranet_version`
+--
+
+LOCK TABLES `intranet_version` WRITE;
+/*!40000 ALTER TABLE `intranet_version` DISABLE KEYS */;
+INSERT INTO `intranet_version` VALUES (1,'1.0.0.0','Initial release of Sanden Intranet','2025-10-30','Jeffrey Salagubang',NULL,NULL),(2,'2.0.0.0','Initial release of IT Request','2025-11-07','Jeffrey Salagubang',NULL,NULL);
+/*!40000 ALTER TABLE `intranet_version` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `inventory_tbl`
+--
+
+DROP TABLE IF EXISTS `inventory_tbl`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `inventory_tbl` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `computer_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cost` varchar(12) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `purchase_date` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `year` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `position` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dept_region` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `brand_model` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `serial_number` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `tagged` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `tag_date` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `tagged_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `os` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `domain_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `antivirus` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ms_office` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `processor` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `hdd` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ssd` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `memory` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `warranty` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `monitor` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `mouse` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `bios_admin_password` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `bios_user_password` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `donated_disposed` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `remarks` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=184 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `inventory_tbl`
+--
+
+LOCK TABLES `inventory_tbl` WRITE;
+/*!40000 ALTER TABLE `inventory_tbl` DISABLE KEYS */;
+INSERT INTO `inventory_tbl` VALUES (1,'LT-SCP01-2019','56000','19-May','2019','SERVICE UNIT','','MIS','LENOVO THINKPAD','S5CDGTF','YES','July-27-2023','LT-SCP01-2019','WIN 10','Sanden.NET','ESET','2019','INTEL I7','1 TB','N/A','16 GB','NONE','LENOVO THINKVISION 21\"','LOGITEC WIRELESS ','','','','PREVIOUSLY OWNED BY CHARLES GELOTIN'),(2,'LT-SCP02-2019','N/A','N/A','2019','DISPOSAL','','MIS','LENOVO IDEAPAD 130','MP1HA5EH','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I3-7020U','1 TB','N/A','8 GB','1 YEAR','NONE','LOGITEC WIRELESS ','','','','DEFECTIVE (IT SERVICE PULLED OUT)'),(3,'LT-SCP03-2019','36700','19-Oct','2019','SERVICE UNIT','','MIS','HP 14S-CF1057TX','5CG93355MP','YES','July-27-2023','LT-SCP03-2019','WIN 10','Sanden.NET','ESET','2013','INTEL I5','1 TB','N/A','4 GB','NONE','NONE','LOGITEC WIRELESS ','','','','PREVIOUSLY OWNED BY RHIZA CAPATI'),(4,'LT-SCP04-2019','45920','19-Apr','2019','SERVICE UNIT','','FIN','LENOVO THINKPAD','PF1HSL0B','YES','July-27-2023','LT-SCP04-2019','WIN 10','Sanden.NET','ESET','2019','INTEL I5','1 TB','N/A','12 GB','NONE','NONE','LOGITEC WIRELESS ','Success2019','fhd06022021','','PREVIOUSLY OWNED BY FERNAN DICHOSO and MARK DE LEON'),(5,'LT-SCP05-2019','24000','19-Aug','2019','DISPOSAL','','MS','LENOVO IDEAPAD','FADED','NO','N/A','N/A','WIN 10','Sanden.NET','NONE','2013','INTEL I3','1 TB','N/A','4 GB','NONE','NONE','A4TECH','success2019','lenovo','FOR DISPOSAL','PREVIOUSLY OWNED BY ANGELITO DELA PAZ (Defective Keys)'),(6,'LT-SCP06-2019','N/A','N/A','2018','TRANFER OF OWNERSHIP','','MIS','LENOVO IDEAPAD 320','PF0XY0NJ','YES','','LT-SCP04-2019','WIN 10','Sanden.NET','ESET','2013','INTEL I5','500 GB','N/A','6 GB','NONE','NONE','A4TECH','success2019','lenovo','','PREVIOUSLY OWNED BYALVIN CAPUNO'),(7,'LT-SCP07-2019','N/A','N/A','2018','DAVAO TECHNICIAN','','DAV','LENOVO IDEAPAD 320','PF12NVLZ','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I5','500 GB','N/A','4 GB','NONE','NONE','NONE','','','','PREVIOUSLY OWNED BY ELLA VILLA'),(8,'LT-SCP08-2019','N/A','N/A','2018','DARYL DELFIN','','DAV','LENOVO THINKPAD','PF-OTH9QY','YES','September-11-2023','LT-SCP08-2019','WIN 10','Sanden.NET','ESET','2019','INTEL I5','1 TB','N/A','4 GB','NONE','NONE','A4TECH','','','','PREVIOUSLY OWNED BY BEN ONE AND MA\'AM EMIRLYN'),(9,'LT-SCP09-2019','N/A','N/A','2017','DISPOSAL','','CC','LENOVO IDEAPAD 300','PF0FGEJ5','YES','September-11-2023','LT-SCP13-2019','WIN 8.1','Sanden.NET','NONE','2013','INTEL I7-6500','1 TB','N/A','4 GB','NONE','NONE','A4TECH','','','FOR DISPOSAL','PREVIOUSLY OWNED BY NEMICIO BALANI AND ADEL BARLAN'),(10,'LT-SCP10-2019','','N/A','2018','DISPOSAL','','SL','TOSHIBA TECRA','3E133598S','','','','WIN 7','Sanden.NET','ESET','2007','INTEL I5-3230','500 GB','N/A','4 GB','NONE','NONE','','','','DISPOSED (SEPTEMBER 2022)','PREVIOUSLY OWNED BY KENVYLOU PALLADO'),(11,'LT-SCP11-2019','N/A','N/A','2018','UNDECIDED','','MS','LENOVO IDEAPAD 320','PF0W3WW7','YES','August-30-2023','LT-SCP11-2019','WIN 10','Sanden.NET','ESET','2013','INTEL I3','500 GB','N/A','4 GB','NONE','NONE','CLIPTECH','success2019','lenovo','','PREVIOUSLY OWNED BY  MA\'AM BABYLYN'),(12,'LT-SCP12-2019','N/A','N/A','2018','DISPOSAL','','CC','DELL VOSTRO','G8FL7H2','','','','WIN 10','Sanden.NET','NONE','2013','INTEL I7','500 GB','N/A','8 GB','NONE','NONE','A4TECH','','','FOR DISPOSAL','PREVIOUSLY OWN BY CLARENCE PANAMBO'),(13,'LT-SCP13-2019','N/A','N/A','2019','DISPOSAL','','MIS','LENOVO IDEAPAD 330','PF17FVBS','YES','September-11-2023','LT-SCP13-2019','WIN 10','Sanden.NET','ESET','2013','INTEL I3','1 TB','N/A','4 GB','NONE','NONE','NONE','','','DISPOSED (SEPTEMBER 2022)','PREVIOUSLY OWNED BY NEMICIO BALANI'),(14,'LT-SCP14-2019','24500','19-Jan','2017','UNDECIDED','','WRTY','LENOVO IDEAPAD 330','PF17FN1C','YES','July-27-2023','LT-SCP14-2019','WIN 10','Sanden.NET','ESET','2013','INTEL I3 -7020U','1 TB','N/A','4 GB','NONE','NONE','A1TECH','success2019','lenovo','','PREVIOUSLY OWNED BY MARK GARCIA'),(15,'LT-SCP15-2019','N/A','N/A','2018','SERVICE UNIT','','MIS','LENOVO IDEAPAD 320','PF0RPLBT','YES','August-30-2023','LT-SCP15-2019','WIN 10','Sanden.NET','ESET','2013','INTEL I3','500 GB','N/A','4 GB','NONE','NONE','LENOVO','sanden123','lenovo','','PREVIOUSLY OWNED BY IAN LLANETA'),(16,'LT-SCP16-2019','N/A','N/A','2018','SERVICE UNIT','','NL','LENOVO IDEAPAD','PF0X7X5Q','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I5','1 TB','N/A','6 GB','NONE','NONE','LOGITECH','success@2019','lenovo','','PREVIOUSLY OWNED BY JORDAN GALDONES'),(17,'LT-SCP17-2019','N/A','N/A','2018','DISPOSAL','','SL','HP DYNABOOK','5CD5510CWX','','','','WIN 10','Sanden.NET','NONE','2013','INTEL I5','1 TB','N/A','6 GB','NONE','NONE','LOGITECH','success@2019','lenovo','FOR DISPOSAL','PREVIOUSLY OWNED BY JULIETA ALCOS AND RHEA VILLA'),(18,'LT-SCP18-2019','N/A','N/A','2018','UNDECIDED','','NL','LENOVO IDEAPAD','PF0X7X5Q','','','','WIN 10','Sanden.NET','NONE','2013','INTEL I5','1 TB','N/A','6 GB','NONE','NONE','LOGITECH','success@2019','lenovo','','DEFECTIVE MOUSE PAD & SUBJECT FOR REPLACEMENT NEXT YEAR'),(19,'LT-SCP01-2020','N/A','N/A','2017','SERVICE UNIT','','HQ','LENOVO THINKPAD E480','PF0MC724','','','','WIN 10','Sanden.NET','NONE','2013','INTEL I5','1 TB','N/A','4 GB','NONE','NONE','HP','','','','PREVIOUSLY OWNED BY LARRY CRUZ and HAROLD DELA CRUZ'),(20,'LT-SCP02-2020','N/A','N/A','2016','DONATION','','MIS','TOSHIBA TECRA','2J070512H','','','','WIN 10','Sanden.NET','NONE','2013','INTEL I7','1 TB','N/A','4 GB','NONE','NONE','LOGITEC WIRELESS ','N/A','N/A','','PREVIOUSLY USED BY RAMIL BASCON'),(21,'LT-SCP03-2020','48000','18-Sep','2018','SERVICE UNIT','','MIS','LENOVO THINKPAD E480','SL10Q37361/ PF17XMUL','YES','August-30-2023','LT-SCP03-2020','WIN 10','Sanden.NET','ESET','2013','INTEL CORE I5','1 TB','N/A','8 GB','NONE','NONE','LOGITECH','','','','PREVIOUSLY USED BY JONATHAN LUCES & CASSANDRAE JOICE VILLAVERDE'),(22,'LT-SCP04-2020','N/A','N/A','2017','DONATION','','MIS','LENOVO IDEAPAD 330','FADED','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I3-7020U','1 TB','N/A','4 GB','NONE','NONE','NONE','N/A','N/A','( DONATED TO NFSTI)','PREVIOUSLY USED BY CHRISTOPHER CARREON DEFECTIVE SELECTED KEYS (UNABLE TO PUT BIOS LOGIN) AND DANVEL'),(23,'LT-SCP05-2020','24000','19-Aug','2019','SERVICE UNIT','','CL','LENOVO IDEAPAD','MP1HA6S6','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I3-7020U','1 TB','N/A','4 GB','NONE','NONE','NONE','success2019','lenovo','','PREVIOUSLY USED BY JOHN MARK SANTIAGO and TONY GONZALES(2ND)'),(24,'LT-SCP06-2020','24000','19-Aug','2019','TRANFER OF OWNERSHIP','','NL','LENOVO IDEAPAD 130','MP1HA9JF','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I3-7020U','1 TB','N/A','8 GB','NONE','NONE','A4TECH','N/A','N/A','','PREVIOUSLY USED BY RODNEY CASTRO'),(25,'LT-SCP07-2020','39984','N/A','2018','KAREN MATARLO','','DAV','LENOVO IDEAPAD 320','PF12NMA8','','','','WIN 10','Sanden.NET','NONE','2013','INTEL i5-8250U','2 TB','N/A','4 GB','NONE','NONE','NONE','','','','RESIGNED'),(26,'LT-SCP08-2020','N/A','N/A','2018','SERVICE UNIT','','MIS','LENOVO G40-70','YB01144268','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I5-4210U','512 GB','N/A','4 GB','NONE','NONE','NONE','success','lenovo','','PREVIOUSLY USED BY IRICK SALINAS'),(27,'LT-SCP09-2020','N/A','N/A','2018','DISPOSAL','','DAV','DELL P75G','4SJQ5H2','','','','WIN 10','Sanden.NET','NONE','2013','INTEL I7-7500U','500 GB','N/A','8GB','NONE','NONE','BANANA DIGITAL','','','','PREVIOUSLY OWNED BY BENJE OCA'),(28,'LT-SCP10-2020','N/A','N/A','2018','MARIA ADRENEE BATAG','','DAV','LENOVO IDEAPAD 330','PF1J0NER','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I3-7020U','1 TB','N/A','4 GB','NONE','NONE','HYTAC','','','','PREVIOUSLY OWNED BY JOAN HEGRIMOSA (DEFECTIVE KEYS)'),(29,'LT-SCP11-2020','N/A','N/A','2018','TRANFER OF OWNERSHIP','','DAV','LENOVO IDEAPAD 320','PF0Z0TRD','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I5','500 GB','N/A','4 GB','NONE','NONE','N. LOGIC','','','','PREVIOUSLY OWNED BY ESTHER REQUINTA'),(30,'LT-SCP12-2020','N/A','N/A','2015','TRANFER OF OWNERSHIP','','DAV','HP PROBOOK 430 G2','CND5191H3B','','','','WIN 7','Sanden.NET','ESET','2013','INTEL I5-5200U','500 GB','N/A','4GB','NONE','NONE','NONE','','','','PREVIOUSLY USED BY GERALD GERSALINA'),(31,'LT-SCP13-2020','N/A','N/A','2018','DONATION','','MIS','DELL INSPIRON 15-7559','4Y04KD2','','','','WIN 8.1','Sanden.NET','ESET','2013','INTEL I7','1 TB','N/A','8 GB','NONE','NONE','HP TRAVEL','','','','PREVIOUSLY USED BY EDMAR FERNANDEZ'),(32,'LT-SCP14-2020','24500','19-Jul','2019','DISPOSAL','','CB','LENOVO IDEAPAD','MP1HA94J.','YES','June-22-2023','LT-SCP14-2020','WIN 10','Sanden.NET','NONE','2013','INTEL I3-7020U','1 TB','N/A','8 GB','NONE','NONE','NONE','','','','PREVIOUSLY USED BY ROMERIE LACO NO HDD and RAM'),(33,'LT-SCP15-2020','N/A','N/A','2018','DISPOSAL','','CB','LENOVO IDEAPAD 320','FADED','YES','June-22-2023','LT-SCP15-2020','WIN 10','Sanden.NET','ESET','2013','INTEL I3','500 GB','N/A','4 GB','NONE','NONE','HYTAC','','','','PREVIOUSLY USED BY CHERRY ESTARES NO HDD and RAM'),(34,'LT-SCP16-2020','N/A','N/A','2018','JORDAN GALDONES (Safe Keep)','','CB','LENOVO IDEAPAD','FADED','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I5-7200U','1 TB','N/A','6 GB','NONE','NONE','A4TECH','','','','DEFECTIVE KEYBOARD \"P\" PREVIOUSLY USED BY RITCHIE DIA UNA'),(35,'LT-SCP17-2020','N/A','N/A','2018','DISPOSAL','','CB','LENOVO IDEAPAD 310','FPF0M8N9B','','','','WIN 10','Sanden.NET','NONE','2013','INTEL I5-7200U','1 TB','N/A','6 GB','NONE','NONE','NONE','','','','PREVIOUSLY OWNED BYJOYCE REUYAN (BROKEN HINGE) NO HDD and RAM'),(36,'LT-SCP18-2020','N/A','N/A','2018','DISPOSAL','','CB','LENOVO IDEAPAD 320','PF0XJEH3','','','','WIN 10','Sanden.NET','NONE','2013','INTEL I5','1 TB','N/A','4 GB','NONE','NONE','A4TECH','','','DISPOSED','PREVIOUSLY OWNED BY LEVIE LERASAN (DAMAGED BY CEBU TYPHOON)'),(37,'LT-SCP19-2020','N/A','N/A','2018','DISPOSAL','','DAV','LENOVO IDEAPAD 320','PFOTAMPJ','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I5','1 TB','N/A','6 GB','NONE','NONE','PROMATE','','','','PREVIOUSLY OWNED BY ABE QUILINGUING NO HDD and RAM'),(38,'LT-SCP20-2020','N/A','N/A','2018','JORDAN GALDONES (Safe Keep)','','CB','LENOVO IDEAPAD 310','PF0MCZ24','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I5-7200U','1 TB','N/A','6 GB','NONE','NONE','A4TECH','','','','PREVIOUSLY OWNED BY GLADYS BULAMBOT'),(39,'LT-SCP21-2020','N/A','N/A','2017','JOLLEN BALDECANAS(OLD UNIT) FOR CHECKING','','CB','LENOVO IDEAPAD 320 80XL','PF97528D42','','','','WIN 8.1','Sanden.NET','ESET','2013','INTEL I5-6200U','500 GB','N/A','4 GB','NONE','NONE','A4TECH','','','','OK'),(40,'LT-SCP22-2020','','N/A','2018','SERVICE UNIT','','MS','LENOVO IDEA PAD','','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I3 -7020U','1 TB','N/A','4 GB','NONE','NONE','','','','','PREVIOUSLY OWNED BAY CELESTIAL BERAN'),(41,'LT-SCP23-2020','N/A','N/A','2017','SERVICE UNIT','','NL','LENOVO IDEAPAD','PF17FJWN','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I3-7020U','1TB','N/A','4 GB','NONE','NONE','NONE','','','','PREVIOUSLY USED BY 1.KANE CYRIL GONZALES  2. NERILYN QUIMSON'),(42,'LT-SCP24-2020','N/A','N/A','2012','FOR CHECKING','','NL','LENOVO THINKPAD EDGE S4330','MPILY3M','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I5','1 TB','N/A','4 GB','NONE','NONE','NONE','','','','PREVIOUSLY OWNED BY RHEA VILLAR AND EDGARDO HORTILANO JR'),(43,'LT-SCP25-2020','','N/A','2018','DISPOSAL','','CC','DELL VOSTRO','','','','','','','','','','','','','','','','','','DISPOSED (SEPTEMBER 2022)','PREVIOUSLY OWNED BY NOEL MENDOZA (DISPOSED)'),(44,'LT-SCP26-2020','N/A','N/A','2016','DISPOSAL','','DAV','LENOVO G40-80','PF098BV7','','','','WIN 8.1','Sanden.NET','ESET','2007','INTEL I5-5200U','500 GB','N/A','4 GB','NONE','NONE','NONE','','','FOR DISPOSAL','PREVIOUSLY OWNED BY NUL JAI'),(45,'LT-SCP27-2020','24000','19-Aug','2019','DONATION','','CL','LENOVO IDEAPAD','MP1HAAK8','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I3 -7020U','1 TB','N/A','4 GB','NONE','NONE','A4TECH','success2019','lenovo','','PREVIOUSLY OWNED BY MICKO PANADO'),(46,'LT-SCP28-2020','N/A','N/A','2015','DONATION','','NL','HP DYNABOOK','FADED','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I5-5200U','1 TB','N/A','4 GB','NONE','NONE','NONE','success@2019','N/A','DONATED TO NFSTI','PREVIOUSLY OWNED BY RYAN GABUYO '),(47,'LT-SCP29-2020','N/A','N/A','2014','DONATION','','MIS','LENOVO IDEAPAD','YB04482037','YES','August-11-2023','LT-SCP29-2020','WIN 7','Sanden.NET','ESET','2013','INTEL I5-4210U','500GB','N/A','4 GB','NONE','NONE','A4TECH','','','FOR DONATION','PREVIOUSLY USED BY LOIDA BANTIGUE'),(48,'LT-SCP30-2020','24000','19-Aug','2019','TRANFER OF OWNERSHIP','','HQ','LENOVO IDEAPAD 130','MP1HA7LA','YES','August-11-2023','LT-SCP30-2020','WIN 10','Sanden.NET','ESET','2013','INTEL I3 -7020U','1 TB','N/A','8 GB ','NONE','NONE','A4TECH','','','','PREVIOUSLY USED BY RICKY SALAMANTE'),(49,'LT-SCP31-2020','N/A','N/A','2018','SERVICE UNIT','','MIS','DELL VOSTRO','G8FT7H2','YES','August-11-2023','LT-SCP31-2020','WIN 10','Sanden.NET','NONE','2013','INTEL I7','1 TB','N/A','8 GB','NONE','NONE','A4TECH','sanden123','dell','','PREVIOUSLY USED BY CHRISTIAN ALCANTARA'),(50,'LT-SCP32-2020','N/A','N/A','-','OSAMU IKEDA','','EXEC','TOHSIBA','6G084152H','YES','June-9-2023','LT-SCP32-2020','WIN 10','Sanden.NET','ESET','2019','INTEL I5','125 GB','N/A','4 GB','NONE','NONE','NONE','','','','OK'),(51,'LT-SCP33-2020','45920','19-Apr','2019','SERVICE UNIT','','SCM','LENOVO THINKPAD E480','PF1HSEU6','YES','July-27-2023','LT-SCP33-2020','WIN 10','Sanden.NET','ESET','2019','INTEL I5','1 TB','N/A','8 GB','NONE','NONE','NONE','','','','PREVIOUSLY USED BY JAY AR REMARIM'),(52,'LT-SCP34-2020','N/A','N/A','2015','DISPOSAL','','WRTY','LENOVO Z40-70','YB06936860','WIN 7','Sanden.NET','NONE','2007','INTEL I5-4210U','500 GB','N/A','4 GB','NONE','NONE','NONE','N/A','N/A','JOANA PABILLO OLD UNIT','','','FOR DISPOSAL','PREVIOUSLY USED BY JOANA PABILLO'),(53,'LT-SCP35-2020','37500','20-Aug','2020','SERVICE UNIT','','MIS','LENOVO IDEAPAD 3','PF29BZYE','YES','June-9-2023','LT-SCP35-2020','WIN 10','Sanden.NET','ESET','2013','INTEL I5','1TB','256GB','4GB','NONE','NONE','TRAVEL WHEEL MOUSE','','','','PREVIOUSLY USED BY Alvin Joven'),(54,'LT-SCP36-2020','37500','20-Aug','2020','DISPOSAL','','CC','LENOVO IDEAPAD 3','PF29C8JZ','YES','June-9-2023','LT-SCP36-2020','WIN 10','Sanden.NET','ESET','2013','INTEL I5','1TB','256GB','8GB','NONE','NONE','A4TECH','sanden123','lenovo','','PREVIOUSLY USED BY JOLINA GERMINA AND MIKHU MAGBITANG AND RENNIEL CAPUSO'),(55,'LT-SCP37-2020','55000','20-Jun','2020','BENEFIT','','EXEC','DELL INSPIRON 15 5000','9NN8KT2','','','','WIN 10','Sanden.NET','ESET','2019','INTEL I7','1 TB','128 GB','8 GB','NONE','NONE','LOGITECH WIRELESS','','','DUE TO RETRENCH','PREVIOUSLY USED BY RAMIL BASCON'),(56,'LT-SCP38-2020','55000','20-Jun','2020','TRANFER OF OWNERSHIP','','WTY','DELL INSPIRON 15 5000','9SN8KT2','YES','June-9-2023','LT-SCP38-2020','WIN 10','Sanden.NET','ESET','2019','INTEL I7','1 TB','128 GB','8 GB','NONE','NONE','FROM OLD LAPTOP','success2019','dell','','PREVIOUSLY USED BY JULIUS APIGO'),(57,'LT-SCP39-2020','55000','20-Jun','2020','EUVY ANGELO MARABLE','','MIS','DELL INSPIRON 15 5000','CPN8KT2','YES','June-9-2023','LT-SCP39-2020','WIN 10','Sanden.NET','ESET','2019','INTEL I7-8565U','1 TB','128 GB','12 GB','NONE','LENOVO THINKVISION 21\"','LENOVO','sanden123','dell','','SWAP LAPTOP TO DESKTOP AND REPLACE YCA DESKTOP WITH EUVY DESKTOP'),(58,'LT-SCP40-2020','N/A','N/A','2018','SERVICE UNIT','','MIS','LENOVO IDEAPAD 320 80XL','PF97528D42','YES','June-13-2023','LT-SCP40-2020','WIN 10','Sanden.NET','ESET','2013','INTEL I7','2 TB','N/A','8 GB','NONE','NONE','NONE','N/A','N/A','','PREVIOUSLY USED BY JULIUS APIGO'),(59,'LT-SCP41-2020','','','2015','DISPOSAL','','MS','LENOVO  Z40-70','YB06851224','WIN','Sanden.NET','ESET','WIN 10','INTEL I5','500 GB','N/A','4  GB','NONE','NONE','NONE','FOR REPLACEMENT BATTERY','','','','','FOR DISPOSAL','PREVIOUSLY USED BY ROWEL JUMAQUIO'),(60,'LT-SCP42-2020','55000','20-Jun','2020','UNDECIDED','','CC','DELL INSPIRON 15 5000','SNN8KT2','YES','June-13-2023','LT-SCP42-2020','WIN 10','Sanden.NET','NONE','2019','INTEL I7','1 TB','128 GB','8 GB','NONE','NONE',' NONE','sanden123','dell','','PREVIOUSLY USED BY ALMAR MARUGGAY'),(61,'LT-SCP43-2020','N/A','N/A','2020','DISPOSAL','','WRTY','LENOVO THINKPAD','PF1LRMJU','','','','WIN 10','Sanden.NET','NONE','2013','INTEL I7-7500U','1 TB','N/A','8 GB','NONE','NONE','A4TECH','success2019','lenovo','FOR DISPOSAL','PREVIOUSLY USED BY NOEL BUSTAMANTE'),(62,'LT-SCP44-2020','N/A','N/A','2010','DONATION','','CL','HP PROBOOK 430','1588-3003','','','','WIN 7','Sanden.NET','NONE','2013','INTEL I5','500 GB','N/A','4 GB','NONE','NONE','NONE','','','DONATED TO NFSTI','PREVIOUSLY USED BY MARK DELOS REYES'),(63,'LT-SCP45-2020','N/A','N/A','2018','SERVICE UNIT','','MIS','LENOVO IDEAPAD 80XL','PF0ULKQG','','June-13-2023','LT-SCP45-2020','WIN 10','Sanden.NET','NONE','2013','INTEL I7-7500','1 TB','N/A','4 GB','NONE','NONE','A1TECH','N/A','N/A','','PREVIOUSLY USED BY CELESTIAL BERAN'),(64,'LT-SCP46-2020','N/A','N/A','2018','SERVICE UNIT','','CC','DELL VOSTRO','GL2W7H2','YES','June-13-2023','LT-SCP46-2020','WIN 10','Sanden.NET','ESET','2013','INTEL I7','500 GB','N/A','8 GB','NONE','LENOVO THINKVISION 18\"','NONE','','','','PREVIOUSLY USED BY ROBERT ALPAJARO and ADEL BARLAN(2nd)'),(65,'LT-SCP47-2020','N/A','N/A','2017','DONATION','','MS','LENOVO IDEAPAD 330','PF17NAUS','YES','August-30-2023','LT-SCP47-2020','WIN 10','Sanden.NET','ESET','2013','INTEL I3','1 TB','N/A','4 GB','NONE','NONE','TRAVEL WHEEL MOUSE','success2019','lenovo','','PREVIOUSLY OWNED BY KENVYLOU'),(66,'LT-SCP48-2020','37913','20-Sep','2020','TRANFER OF OWNERSHIP','','WTY','LENOVO IDEAPAD 3','PF2DA0CQ','YES','June-8-2023','LT-SCP48-2020','WIN 10','Sanden.NET','ESET','2013','INTEL I5','1 TB','125 GB','8 GB','NONE','NONE','LENOVO','sanden123','lenovo','','PREVIOUSLY OWNED BY JOANA PABILLO'),(67,'LT-SCP49-2020','37913','20-Sep','2020','TRANFER OF OWNERSHIP','','FIN','LENOVO IDEAPAD 3','','YES','June-8-2023','LT-SCP49-2020','WIN 10','Sanden.NET','ESET','2013','INTEL I5','1 TB','125 GB','12 GB','NONE','NONE','TRAVEL WHEEL MOUSE','sanden123','lenovo','','PREVIOUSLY USED BY MAICA HERNANDEZ & JOLINA GERMINA'),(68,'LT-SCP50-2020','37913','20-Sep','2020','MONETTE SALAZAR','','FIN','LENOVO IDEAPAD 3','PF2D7VAS','YES','June-13-2023','LT-SCP50-2020','WIN 10','Sanden.NET','ESET','2013','INTEL I5','1 TB','125 GB','8 GB','NONE','NONE','TRAVEL WHEEL MOUSE','sanden123','lenovo','','OK'),(69,'LT-SCP51-2020','37913','20-Sep','2020','TRANFER OF OWNERSHIP','','MS','LENOVO IDEAPAD 3','PF2D91S2','YES','June-13-2023','LT-SCP51-2020','WIN 10','Sanden.NET','ESET','2013','INTEL I5','1 TB','125 GB','8 GB','NONE','NONE','NONE','','','','PREVIOUSLY USED BY  JULIETA ALCOS'),(70,'LT-SCP52-2020','24000','20-Sep','2020','DISPOSAL','','MIS','LENOVO IDEAPAD 3','PF2D9QMD','YES','June-9-2023','LT-SCP52-2020','WIN 10','Sanden.NET','ESET','2013','INTEL I5','1 TB','125 GB','8 GB','NONE','NONE','TRAVEL WHEEL MOUSE','','','','PREVIOUSLY USED BY  KEAM VELOSO'),(71,'LT-SCP53-2020','44166','20-Dec','2020','JUN PEROCHO','','DAV','LENOVO IDEAPAD 3','PF2913BS','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I5-1035G4','1 TB','125 GB','4 GB','NONE','NONE','A4TECH','','','','OK'),(72,'LT-SCP54-2020','44166','20-Dec','2020','NICOLAI ASISTIDO','','DAV','LENOVO IDEAPAD 3','PF293RHE','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I5-1035G4','1 TB','125 GB','4GB ','NONE','NONE','A4TECH','','','','PREVIOUSLY USED BY JUMAR JAMINDANG'),(73,'LT-SCP55-2020','44166','20-Dec','2020','PEARL PACILAN','','DAV','LENOVO IDEAPAD 3','PF2934MB','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I5-1035G4','1 TB','125 GB','4GB ','NONE','NONE','A4TECH','','','','PREVIOUSLY USED BY NUL JAI'),(74,'LT-SCP01-2021','36211','FEBUARY 2021','2021','NEMESIS GODOY','','FIN','LENOVO IDEAPAD 3 (81WE)','PF1WWC7W','YES','June-8-2023','LT-SCP01-2021','WIN 10','Sanden.NET','ESET','2013','INTEL I5-1035G1','1 TB','256 GB','4GB ','1 YEAR','NONE','THINKPAD','sanden123','lenovo','','PREVIOUSLY USED BY KLARRISSE LANTICAN'),(75,'LT-SCP02-2021','36211','FEBUARY 2021','2021','SERVICE UNIT','','MIS','LENOVO IDEAPAD 3 (81WE)','PF1WY11H','YES','June-8-2023','LT-SCP02-2021','WIN 10','Sanden.NET','ESET','2013','INTEL I5-1035G1','1 TB','256 GB','4GB ','1 YEAR','NONE','NONE','success2019','lenovo','','PREVIOUSLY USED BY JOSEF MAMARADLO AND GERRYCA JOVES'),(76,'LT-SCP03-2021','36211','FEBUARY 2021','2021','JOSUAH REPOMANTA','','CC','LENOVO IDEAPAD 3 (81WE)','PF1WX1HL','YES','June-8-2023','LT-SCP03-2021','WIN 10','Sanden.NET','ESET','2013','INTEL I5-1035G1','1 TB','256 GB','4GB ','1 YEAR','NONE','NONE','sanden123','lenovo','','PREVIOUSLY USED BY ARVIN SAUNAR'),(77,'LT-SCP04-2021','36211','21-Mar','2021','RJ KENNETH BATAYON','','FIN','LENOVO IDEAPAD 3 (81WE)','PF1WXAKV','YES','June-8-2023','LT-SCP04-2021','WIN 10','Sanden.NET','ESET','2013','INTEL I5-1035G1','1 TB','256 GB','8GB ','1 YEAR','NONE','NONE','','','','PREVIOUSLY USER BY JOHN LOUIE GAVINO'),(78,'LT-SCP05-2021','37913','21-Mar','2021','JOYCE ANNE DELA CRUZ','','CL','LENOVO IDEAPAD 3 (81WE)','PF1WY393','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I5-1035G1','1 TB','256 GB','8GB','1 YEAR','NONE','NONE','success2019','lenovo','','OK'),(79,'LT-SCP06-2021','37913','21-Mar','2021','JOHN CHAVEZ','','CB','LENOVO IDEAPAD 3 (81WE)','PF1WEEDV','YES','June-8-2023','LT-SCP06-2021','WIN 10','Sanden.NET','ESET','2013','INTEL I5-1035G1','1 TB','256 GB','8GB','1 YEAR','NONE','NONE','','','','PREVIOUSLY USED BY NICK FLORES'),(80,'LT-SCP07-2021','36211','21-Mar','2021','SABRINA MOSQUERA','','SCM','LENOVO IDEAPAD 3 (81WE)','PF1WWG1D','YES','June-8-2023','LT-SCP07-2021','WIN 10','Sanden.NET','ESET','2013','INTEL I5-1035G1','1 TB','256 GB','8GB','1 YEAR','NONE','NONE','sanden123','lenovo','','OK'),(81,'LT-SCP08-2021','45570','21-Mar','2021','LARRY CRUZ','','EXEC','DELL INSPIRON 3501','D12TGB3','YES','June-8-2023','LT-SCP08-2021','WIN 10','Sanden.NET','ESET','2013','INTEL I7-116567','1 TB','512 GB','8GB','1 YEAR','NONE','NONE','','','','OK'),(82,'LT-SCP09-2021','37913','21-Mar','2021','NEIL OLIVERA','','HRAD','LENOVO IDEAPAD 3 (81WE)','PF1WWNT6','YES','June-9-2023','LT-SCP09-2021','WIN 10','Sanden.NET','ESET','2013','INTEL I5-1035G1','1 TB','256 GB','8GB','1 YEAR','NONE','NONE','sanden123','lenovo','','PREVOUSLY USED BY CYRELLE MERCADO'),(83,'LT-SCP10-2021','37913','21-Mar','2021','RHEA VILLAR','','MS','LENOVO IDEAPAD 3 (81WE)','PF1WXNVM','YES','June-8-2023','LT-SCP10-2021','WIN 10','Sanden.NET','ESET','2013','INTEL I5-1035G1','1 TB','256 GB','8GB','1 YEAR','NONE','NONE','sanden123','lenovo','','OK'),(84,'LT-SCP11-2021','37913','21-Mar','2021','KANE CYRIL GONZALES','','HQ','LENOVO IDEAPAD 3 (81WE)','PF1WYFNM','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I5-1035G1','1 TB','256 GB','8GB','1 YEAR','NONE','NONE','','','','PREVOUSLY USED BY KANE CYRIL GONZALES'),(85,'LT-SCP12-2021','45570','21-Mar','2021','BENEFIT','','PULLEDOUT','DELL INSPIRON 3501','52RSGB3','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I7-116567','1 TB','256 GB','8GB','1 YEAR','NONE','NONE','success2019','dell','DUE TO RETRENCH','PREVOUSLY USED BY TANYA TICZON'),(86,'LT-SCP13-2021','37913','21-Mar','2021','MARY JOY M. CINCO','','FIN','LENOVO IDEAPAD 3 (81WE)','PF1WWLMX','YES','June-8-2023','LT-SCP13-2021','WIN 10','Sanden.NET','ESET','2013','INTEL I5-1035G1','1 TB','512GB','8GB','1 YEAR','NONE','NONE','','','','OK'),(87,'LT-SCP14-2021','45570','21-Mar','2021','EDD BRANDON MALABANAN','','CC','DELL INSPIRON 3501','7GZSGB3','YES','June-8-2023','LT-SCP14-2021','WIN 10','Sanden.NET','ESET','2013','INTEL I7-116567','1TB','512 GB','8GB','1 YEAR','NONE','NONE','sanden123','dell','','PREVIOUSLY USED BY ROBERT ALPAJARO'),(88,'LT-SCP15-2021','45570','21-Mar','2021','DANICA ANIDO','','LOG','LENOVO IDEAPAD 3 (81WE)','PF1WWT04','YES','June-8-2023','LT-SCP15-2021','WIN 10','Sanden.NET','ESET','2013','INTEL I5-1035G1','1 TB','256GB','8GB','1 YEAR','NONE','NONE','','','','OK'),(89,'LT-SCP16-2021','37913','30-Apr-21','2021','RONALYN PULUTAN','','LOG','LENOVO IDEAPAD 3 (81WE)','PFWW96H','YES','June-8-2023','LT-SCP16-2021','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1035G1','1 TB','256GB','8GB','1 YEAR','NONE','NONE','','','','OK'),(90,'LT-SCP17-2021','37913','30-Apr-21','2021','MARK DELOS REYES','','HQ','LENOVO IDEAPAD 3 (81WE)','PF1WXLX2','YES','August-11-2023','LT-SCP17-2021','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1035G1','1 TB','256GB','8GB','1 YEAR','NONE','NONE','','','','OK'),(91,'LT-SCP18-2021','37913','30-Apr-21','2021','BILLY JOEL MANALO','','CC','LENOVO IDEAPAD 3 (81WE)','PF1WWVN8','YES','June-8-2023','LT-SCP18-2021','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1035G1','1 TB','256GB','8GB','1 YEAR','NONE','NONE','','','','OK'),(92,'LT-SCP19-2021','37913','30-Apr-21','2021','DISPOSAL','','CL','LENOVO IDEAPAD 3 (81WE)','PF1WX11P','','','','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1035G1','1 TB','256GB','8GB','1 YEAR','NONE','NONE','','','','PREVIOUSLY USED BY JON EDWARD ALHAMBRA'),(93,'LT-SCP20-2021','37913','30-Apr-21','2021','LUEL MONDEJAR','','CB','HP NOTEBOOK','5CG1034061','YES','June-22-2023','LT-SCP20-2021','WIN 10','Sanden.NET','ESET','2019','INTEL I3-10110U','1 TB','128GB','4GB','1 YEAR','NONE','NONE','','','','PREVIOUSLY USED BY JAN EARL FRANCISCO'),(94,'LT-SCP21-2021','37913','30-Apr-21','2021','ANGELIE POSTRERO','','PUR','LENOVO IDEAPAD 3 (81WE)','PF1WY88Z','YES','June-8-2023','LT-SCP21-2021','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1035G1','1 TB','256GB','8GB','1 YEAR','NONE','NONE','','','','PREVIOUSLY USED BY (1ST) ROWEL JUMAQUIO AND (2ND) MARIEL JAVIER'),(95,'LT-SCP22-2021','37913','30-Apr-21','2021','LEVIE LERASAN','','CB','HP 14S-CF2xxx','5CG1033K07','','','','WIN 10','','','2019','','','','','','','','','','','PREVIOUSLY USED BY MARK ANTHONY SUSON'),(96,'LT-SCP23-2021','26400','10-Jun-21','2021','JAY MEDELLIN','','CB','HP NOTEBOOK','5CG1032WKN','YES','Sept-3-2024','LT-SCP23-2021','WIN 10','Sanden.NET','ESET','2019','INTEL I3-10110U','1 TB','128GB','4GB','1 YEAR','NONE','NONE','','','','PREVIOUSLY USED BY JOYCE REUYAN'),(97,'LT-SCP24-2021','61000','22-Oct-19','2021','ALMAR MARUGGAY','','CC','DELL INSPIRON 15 5500','4KSDGG3','','','','WIN 10','Sanden.NET','ESET','2019','INTEL I7-11370H','NONE','512GB','8GB','1 YEAR','NONE','NONE','Success2019','dell','','OK'),(98,'LT-SCP25-2021','61000','22-Oct-19','2021','CHRISTIAN ALCANTARA','','CC','DELL INSPIRON 15 5500','1KSDGG3','YES','September-11-2023','LT-SCP25-2021','WIN 10','Sanden.NET','ESET','2019','INTEL I7-11370H','NONE','512GB','8GB','1 YEAR','NONE','NONE','Success2019','dell','','OK'),(99,'LT-SCP26-2021','','22-Oct-19','2021','CLARENCE PANAMBO','','CC','DELL INSPIRON 15 5500','8B2BPH3','YES','September-11-2023','LT-SCP26-2021','WIN 10','Sanden.NET','ESET','2019','INTEL I7-11370H','NONE','512GB','8GB','1 YEAR','NONE','NONE','Success2019','dell','','OK'),(100,'LT-SCP01-2022','39281','22-Jan','2022','EMIRLYN PALOMILLO','','CC','LENOVO IDEAPAD 3 (81WE)','PF32YP20','YES','August-11-2023','LT-SCP01-2022','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','8GB','1 YEAR','NONE','NONE','','','','NEW'),(101,'LT-SCP02-2022','39281','22-Jan','2022','MART JOSHUA LANTICAN','','CC','LENOVO IDEAPAD 3 (81WE)','PF32VRMT','YES','August-11-2023','LT-SCP02-2022','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','8GB','1 YEAR','NONE','NONE','Success2019','dell','','NEW'),(102,'LT-SCP03-2022','39281','22-Jan','2022','SERVICE UNIT','','CC','LENOVO IDEAPAD 3 (81WE)','PF32VG0T','YES','August-11-2023','LT-SCP03-2022','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','8GB','1 YEAR','NONE','NONE','','','','PREVIOUSLY USED BY JADEENREV MONTANO'),(103,'LT-SCP04-2022','39281','22-Mar','2022','JAMAICA BUCU','','CL','LENOVO IDEAPAD 3 (81WE)','PF3F9BSB','','','','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','8GB','1 YEAR','NONE','NONE','success2019','lenovo','','PREVIOUSLY USED BY BONIFACIO HERAMIS'),(104,'LT-SCP05-2022','39281','22-Mar','2022','WILLIAM LLOSALA','','MS','LENOVO IDEAPAD 3 (81WE)','PF3FMAFN','','','','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','8GB','1 YEAR','NONE','NONE','success2019','lenovo','','NEW'),(105,'LT-SCP06-2022','69000','22-Mar','2022','FERNAN DICHOSO','','FIN','DELL INSPIRON 5 SERIES',' ','','','','WIN 10','Sanden.NET','NONE','2019','INTEL I5-1135G7','NONE','512GB','8GB','1 YEAR','NONE','NONE','','','','NEW'),(106,'LT-SCP07-2022','','22-Mar','2022','ROBERT ALPAJARO','','CC','DELL INSPIRON','YX03ENYY','YES','August-11-2023','LT-SCP07-2022','WIN 10','Sanden.NET','ESET','2013','INTEL CELERON?','NONE','512GB','8GB','1 YEAR','NONE','NONE','success2019','lenovo','','NEW'),(107,'LT-SCP08-2022','','22-Mar','2022','VAZZIM  SORIANO','','WTY','LENOVO IDEAPAD 3 (81WE)','PF3F6ENM','YES','July-27-2023','LT-SCP08-2022','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','8GB','1 YEAR','NONE','NONE','success2019','lenovo','','PREVIOUSLY USED BY JEFFERSON CASTULO'),(108,'LT-SCP09-2022','','22-Mar','2022','NELSON CUBIO','','HRAD','LENOVO IDEAPAD 3 (81WE)','PF3FLZSP','YES','July-27-2023','LT-SCP09-2022','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','8GB','1 YEAR','NONE','NONE','success2019','lenovo','','NEW'),(109,'LT-SCP10-2022','','22-Mar','2022','DEN MARK AMURAO','','PUR','LENOVO IDEAPAD 3 (81WE)','PF3FL99T','YES','July-27-2023','LT-SCP10-2022','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','8GB','1 YEAR','NONE','NONE','success2019','lenovo','','NEW'),(110,'LT-SCP11-2022','','22-Mar','2022','ELLA VILLA(new)','','DAV','','','','','','WIN 10','Sanden.NET','ESET','2019','','NONE','','8GB','1 YEAR','NONE','NONE','','','','NEW'),(111,'LT-SCP12-2022','','22-Mar','2022','HERSHEY NIKKI JOLLEN SAFE KEEP FOR CHEKCING','','CB','LENOVO IDEAPAD 3 (81WE)','PF39P7WL','','','','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','8GB','1 YEAR','NONE','NONE','','','','NEW'),(112,'LT-SCP13-2022','','APRIL','2022','JORDAN GALDONES','','CB','LENOVO IDEAPAD 3 (81WE)','PF3G8DLK','YES','June-22-2023','LT-SCP13-2022','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1135G7','1TB','512GB','8GB','1 YEAR','NONE','NONE','success2019','lenovo','','NEW'),(113,'LT-SCP14-2022','','APRIL','2022','RYAN GABUYO','','NL','LENOVO IDEAPAD 3 (81WE)','PF3HLXF1','','','','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1135G7','1TB','512GB','8GB','1 YEAR','NONE','NONE','success2019','lenovo','','NEW'),(114,'LT-SCP15-2022','','APRIL','2022','LOIDA BANTIGUE','','HQ','LENOVO IDEAPAD 3 (81WE)','','YES','September-11-2023','LT-SCP15-2022','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1135G7','1TB','512GB','8GB','1 YEAR','NONE','NONE','success2019','lenovo','','NEW'),(115,'LT-SCP16-2022','','APRIL','2022','ARDIE SOLIS','','CB','LENOVO IDEAPAD 3 (81WE)','','YES','June-22-2023','LT-SCP16-2022','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','8GB','1 YEAR','NONE','NONE','','','','PREVIOUSLY USED BY ROMERIE LACO'),(116,'LT-SCP17-2022','','MAY','2022','NEMICIO A.BALANI','','CC','LENOVO IDEAPAD 3 (81WE)','PF3EFYRL','','','','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','8GB','1 YEAR','NONE','NONE','success2019','lenovo','','NEW'),(117,'LT-SCP18-2022','','MAY','2022','MERRIE ANN PUNDANO','','HRAD','LENOVO IDEAPAD 3 (81WE)','PF3EG5KB','YES','July-27-2023','LT-SCP18-2022','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','8GB','1 YEAR','NONE','NONE','success2019','lenovo','','PREVIOUSLY USED BY BABYLYN MUNLAWIN'),(118,'LT-SCP19-2022','','MAY','2022','CELESTIAL BERAN','','MS','LENOVO IDEAPAD 3 (81WE)','PF3HL2H2','YES','August-30-2023','LT-SCP21-2022','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','8GB','1 YEAR','NONE','NONE','','','','NEW'),(119,'LT-SCP20-2022','','MAY','2022','RUSSEL BLAKE LEYSON','','MIS','LENOVO IDEAPAD 3 (81WE)','PF3EG5LH','YES','July-27-2023','LT-SCP20-2022','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','8GB','1 YEAR','NONE','NONE','success2019','lenovo','','PREVIOUSLY USED BY KENVYLOU AND NOEL BUSTAMANTE AND EDISON MIRANDA (3rd:JOHN BIENJO MAILOM)'),(120,'LT-SCP21-2022','','MAY','2022','IAN LLANETA','','MS','LENOVO IDEAPAD 3 (81WE)','PF3EG7VB','YES','August-30-2023','LT-SCP21-2022','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','8GB','1 YEAR','NONE','NONE','success2019','lenovo','','NEW'),(121,'LT-SCP22-2022','','JULY','2022','MELCON SANTANDER','','CB','HP LAPTOP 15S','','','','','WIN 10','Sanden.NET','','2019','INTEL I5-1135G7','NONE','512GB','8GB','1 YEAR','NONE','NONE','','','','PREVIOUSLY USED BY JOLLEN BALDECANAS'),(122,'LT-SCP23-2022','','JULY','2022','SERVICE UNIT','','CB','HP LAPTOP 15S','','','','','WIN 10','Sanden.NET','','2019','INTEL I5-1135G7','NONE','512GB','8GB','1 YEAR','NONE','NONE','','','','PREVIOUSLY USED BY GLADYS BULAMBOT'),(123,'LT-SCP24-2022','49900','22-Dec','2022','MARK GARCIA','','WTY','DELL INSPIRON 15 5510','52SJMG3','YES','August-30-2023','LT-SCP24-2022','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','8GB','1 YEAR','NONE','NONE','Success2019','dell','','NEW'),(124,'LT-SCP25-2022','49900','22-Dec','2022','ROMMEL UMANDAP','','FIN','DELL INSPIRON 15 5510','30SJMG3','YES','August-30-2023','LT-SCP25-2022','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','8GB','1 YEAR','NONE','NONE','Success2019','dell','','PREVIOUSLY USED BY MARK DE LEON'),(125,'LT-SCP26-2022','49900','22-Dec','2022','VINSIE LAVENA','','FIN','DELL INSPIRON 15 5510','11SJMG3','YES','August-30-2023','LT-SCP26-2022','WIN 10','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','8GB','1 YEAR','NONE','NONE','Success2019','dell','','PREVIOUSLY USED BY MIKHU MAGBITANG'),(126,'LT-SCP01-2023','49900','23-Jan','2023','ALVIN JOVEN','','LOG','DELL INSPIRON 15 5510','2CRJMG3','YES','August-30-2023','LT-SCP01-2023','WIN 11','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','8GB','1 YEAR','NONE','NONE','Success2019','dell','','NEW'),(127,'LT-SCP02-2023','49900','23-Jan','2023','ADEL BARLAN','','CC','DELL INSPIRON 15 5620','38XDFS3','','','','WIN 11','Sanden.NET','NONE','2019','INTEL I5-1240P','NONE','512GB','8GB','1 YEAR','NONE','NONE','Success@2019','dell','','NEW'),(128,'LT-SCP01-2024','35640','24-Mar','2024','ALVIN CAPUNO','','NL','DELL INSPIRON 15 3511','DLFMRK3','','','','WIN 11','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','16Gb','1 YEAR','NONE','NONE','Success@2019','dell','',''),(129,'LT-SCP02-2024','35640','24-Mar','2024','RENNIEL CAPUSO','','CC','DELL INSPIRON 15 3511','DYSKRK3','YES','March-15-2024','LT-SCP02-2024','WIN 11','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','16Gb','1 YEAR','NONE','NONE','Success@2019','dell','',''),(130,'LT-SCP03-2024','62395','24-Apr','2024','KEAM VELOSO','','MIS','HP VICTUS 15-FA0180TX','5CD3220ZJH','YES','April-29-2024','LT-SCP03-2024','WIN 11','Sanden.NET','ESET','2013','INTEL i5-12450H','NONE','512GB','32GB','1 YEAR','NONE','NONE','','','',''),(131,'LT-SCP04-2024','59995','24-May','2024','FINANCE MANAGER','','FIN','DELL INSPIRON 5430','4DL6NX3','YES','','','WIN 11','Sanden.NET','ESET','2019','INTEL i7-1360P','NONE','512GB','','1 YEAR','NONE','NONE','Success@2019','dell','',''),(132,'LT-SCP05-2024','35640','24-May','2024','MARIEL JUSTINE REYES','','FIN','DELL INSPIRON 15 3511','3N6WRK3','YES','May-17-2024','LT-SCP05-2024','WIN 11','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','16Gb','1 YEAR','NONE','NONE','Success@2019','dell','',''),(133,'LT-SCP06-2024','33990','24-May','2024','MARIA ESTHER REQUINTA','','DAV','DELL INSPIRON 15 3511','64K84L3','','','','WIN 11','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','8GB','1 YEAR','NONE','NONE','','','',''),(134,'LT-SCP07-2024','33990','24-May','2024','GERALD GERSALINA','','DAV','DELL INSPIRON 15 3511','F5K84L3','','','','WIN 11','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','8GB','1 YEAR','NONE','NONE','','','',''),(135,'LT-SCP08-2024','35640','24-May','2024','MARK JOSEPH ALGIRE','','HRAD','DELL INSPIRON 15 3511','7TGH4L3','YES','May-27-2024','LT-SCP08-2024','WIN 11','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','16Gb','1 YEAR','NONE','NONE','Success@2019','dell','','PREVIOUSLY USED BY PATRICK REYES'),(136,'LT-SCP09-2024','35640','24-May','2024','BEA PATRICIA BRIONES','','CC','DELL INSPIRON 15 3511','HNRWRK3','YES','May-28-2024','LT-SCP09-2024','WIN 11','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','16Gb','1 YEAR','NONE','NONE','Success@2019','dell','',''),(137,'LT-SCP10-2024','35640','24-May','2024','RODNEY CASTRO','','CL','DELL INSPIRON 15 3511','C43YRK3','YES','July-08-2024','LT-SCP08-2024','WIN 11','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','16Gb','1 YEAR','NONE','NONE','Success@2019','dell','',''),(138,'LT-SCP11-2024','35640','24-May','2024','MARY ROSE ILAGAN','','CL','DELL INSPIRON 15 3511','7ZHYRK3','YES','July-09-2024','LT-SCP09-2024','WIN 11','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','16Gb','1 YEAR','NONE','NONE','Success@2019','dell','',''),(139,'LT-SCP12-2024','35640','24-May','2024','TONY GONZALES','','CL','DELL INSPIRON 15 3511','HTMZRK3','YES','July-10-2024','LT-SCP10-2024','WIN 11','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','16Gb','1 YEAR','NONE','NONE','Success@2019','dell','',''),(140,'LT-SCP13-2024','','','2024','BENJE OCA','','','','','','','','','','','','','','','','','','','','','',''),(141,'LT-SCP14-2024','','','2024','CHERRY ESTARES','','CB','DELL INSPIRON 15 3511','','','','','WIN 11','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','16Gb','1 YEAR','NONE','NONE','','','',''),(142,'LT-SCP15-2024','','','2024','NEIL FORTES','','HQ','DELL INSPIRON 15 3511','C4RYYJ3','YES','August-14-2024','LT-SCP15-2024','WIN 11','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','16Gb','1 YEAR','NONE','NONE','Success@2019','dell','',''),(143,'LT-SCP16-2024','','','2024','BiILLY NATIVIDAD','','FIN','DELL INSPIRON 15 3511','42N84L3','YES','November-11-2024','LT-SCP16-2024','WIN 11','Sanden.NET','ESET','2019','INTEL I5-1135G7','NONE','512GB','16Gb','1 YEAR','NONE','NONE','Success@2019','dell','',''),(144,'LT-SCP17-2024','','','2024','JULIUS APIGO','','WTY','HP VICTUS 16-R0xxx','CND3222CST','YES','December-26-2024','LT-SCP17-2024','WIN 11','Sanden.NET','ESET','2019','INTEL I5-13500HX','1TB','512GB','16Gb','1 YEAR','NONE','NONE','Success@2019','hpvictus','',''),(145,'LT-SCP01-2025','','FEBUARY','2025','RICKY SALAMANTE','','SL','DELL INSPIRON 15 3520','HBNH134','YES','JANUARY-20-2025','LT-SCP01-2025','WIN 11','Sanden.NET','ESET','2019','INTEL I5-1235U','NONE','512GB','16Gb','1 YEAR','NONE','NONE','Success@2019','dell','',''),(146,'LT-SCP02-2025','','FEBUARY','2025','KANE CYRIL GONZALES','','SL','DELL INSPIRON 14 5440','FP6BP54','YES','February-25-2025','LT-SCP02-2025','WIN 11','Sanden.NET','ESET','2019','INTEL I5-1235U','NONE','1TB','16Gb','1 YEAR','NONE','NONE','Success@2019','dell','',''),(147,'LT-SCP03-2025','','MARCH','2025','IKEDA OSAMU','','','TOSHIBA PROT?G? X30-L','','YES','MARCH-07-2025','LT-SCP03-2025','WIN 11','Sanden.NET','ESET','2019','INTEL I5-1235U','NONE','1TB','32Gb','1 YEAR','NONE','NONE','','','',''),(148,'LT-SCP04-2025','','MARCH','2025','GERRYCA JOVES','','HRAD','DELL INSPIRON 5640','60DHR34','YES','MARCH-11-2025','LT-SCP04-2025','WIN 11','Sanden.NET','ESET','2019','Intel Core 5 proc 120U','NONE','1TB','32Gb','1 YEAR','NONE','NONE','Success@2019','dell','',''),(149,'LT-SCP05-2025','','MARCH','2025','EUVY ANGELO MARABLE','','MIS','HP VICTUS 16-R0xxx','CDN4513G1C','YES','MARCH-11-2025','LT-SCP05-2025','WIN 11','Sanden.NET','ESET','2019','Core i7-13700HX','NONE','1TB','16GB','1 YEAR','NONE','NONE','Success@2019','','',''),(150,'LT-SCP06-2025','','MARCH','2025','JOANA PABILLO','','WTY','DELL INSPIRON 5640','DJ1LR34','YES','MARCH-11-2025','LT-SCP06-2025','WIN 11','Sanden.NET','ESET','2019','Intel Core 5 proc 120U','NONE','1TB','32Gb','1 YEAR','NONE','NONE','Success@2019','dell','',''),(151,'LT-SCP07-2025','','MARCH','2025','ALMAR MARUGGAY','','WTY','DELL INSPIRON 5640','JD1LR34','YES','','LT-SCP07-2025','WIN 11','Sanden.NET','ESET','2019','Intel Core 5 proc 120U','NONE','1TB','32Gb','1 YEAR','NONE','NONE','Success@2019','dell','',''),(152,'LT-SCP08-2025','','MARCH','2025','JULIETA ALCOS','','SL','DELL INSPIRON 5640','FBC5V34','YES','April-29-2025','LT-SCP08-2025','WIN 11','Sanden.NET','ESET','2019','INTEL CORE I7-150U','NONE','1TB','16GB','1 YEAR','NONE','NONE','Success@2019','dell','',''),(153,'LT-SCP09-2025','','','','MIS STAFF','','MIS','HP VICTUS 16-R0xxx','5CD427466T','','','','','','','','','','','','','','','','','',''),(154,'LT-SCP10-2025','','','','MONETTE SALAZAR','','FIN','DELL INSPIRON 16 5640','25QKR34','YES','MAY-23-2025','LT-SCP10-2025','WIN 11','Sanden.NET','ESET','2019','INTEL CORE 5 120U','NONE','1TB','16GB','1 YEAR','NONE','NONE','Success@2019','dell','',''),(155,'LT-SCP11-2025','','','','NEMISIS GODOY','','FIN','DELL INSPIRON 16 5640','6GTKR34','YES','MAY-23-2025','LT-SCP11-2025','WIN 11','Sanden.NET','ESET','2019','INTEL CORE 5 120U','NONE','1TB','16GB','1 YEAR','NONE','NONE','Success@2019','dell','',''),(156,'LT-SCP12-2025','','MAY','','JEFFREY A. DEALINO','','','DELL INSPIRON 15 3520','B80K554','','','','WIN 11','Sanden.NET','ESET','2019','INTEL CORE 7 1255U','NONE','1TB','16GB','1 YEAR','NONE','NONE','Success@2019','dell','',''),(157,'LT-SCP13-2025','','MAY','','','','','DELL INSPIRON 15 3520','PWBK554','','','','WIN 11','Sanden.NET','ESET','2019','INTEL CORE 7 1255U','NONE','1TB','16GB','1 YEAR','NONE','NONE','Success@2019','dell','',''),(158,'PC-SCP01-2019','','20-Feb','2020','SERVICE UNIT','','HRAD','LENOVO','YL00KRR7','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I3','1 TB','4 GB','LENOVO THINKVISION 21\"','HP','LENOVO','NONE','1 YEAR','','','PREVIOUSLY USED BY CYRELLE MERCADO AND JOHN MICHAEL ABLIR'),(159,'PC-SCP02-2019','','19-Sep','2019','CONFERENCE ROOM','','MIS','LENOVO V530 - I3','PC12EXJT','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I3-8100','1 TB','4 GB','LENOVO THINKVISION 21\"','LENOVO','LENOVO','NONE','1 YEAR','','','PREVIOUSLY USED BY DANICA ANIDO'),(160,'PC-SCP03-2019','','19-Nov','2019','SERVICE UNIT','','SCM','LENOVO V530 - I3','PC12EXHX','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I3-8100','1 TB','4 GB','AOC','LENOVO','LENOVO','APC','1 YEAR','','','PREVIOSLY USED BY RONALYN PULUTAN AND CATHERINE BAGA'),(161,'PC-SCP04-2019','','19-Nov','2019','JEFFREY DEALINO','','SCM','LENOVO V530 - I3','PC12EXJM','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I3-8100','1 TB','4 GB','AOC','HP','A4TECH','NONE','1 YEAR','','','PREVIOSLY USED BY CLARENCE BUAN'),(162,'PC-SCP05-2019','','19-Nov','2019','SERVICE UNIT','','SCM','LENOVO V530 - I3','PC12EXJW','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I3-8100','1 TB','4 GB','AOC','LENOVO','LOGITECH','NONE','1 YEAR','','','PREVIOSLY USED BY RUSSEL AWITAN'),(163,'PC-SCP07-2019','','19-Nov','2019','CHARLES GELOTIN','','MIS','LENOVO V530 - I5','YL00FR1A','','','','WIN 10','Sanden.NET','ESET','2019','INTEL I5-8400','1 TB','8 GB','LENOVO THINKVISION 21\"','LENOVO','LENOVO','NONE','1 YEAR','','','FOR DTR USE AND TROUBLESHOOTING'),(164,'PC-SCP08-2019','N/A','N/A','2014','WTY WARRANTY TECHNICIAN','','WRTY','HP COMPAQ 4000','SGH207SWQ3','','','','WIN 7','Sanden.NET','ESET','2007','INTER CORE 2 DUO','300 GB','2 GB','AOC','LENOVO','','NONE','NONE','','','PREVIOUSLY USED BY RONALYN PULUTAN AND COMMON PC - TECH'),(165,'PC-SCP09-2019','','19-Jul','2019','VEEJAY MANALO','','CC','LENOVO V530 - I3','PC0WNES6','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I3-8100','1 TB','16 GB','AOC','HP','A4TECH','NONE','1 YEAR','','','INSTALLED - HP OFFICEJET 7610'),(166,'PC-SCP10-2019','N/A','N/A','2017','JOHN LOUIE GAVINO','','CC','LENOVO SFF','PC0QTGGZ','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I5','500 GB','4 GB','AOC','LENOVO','CLIPTECH','NONE','NONE','','','PREVIOUSLY USED BY CATHLEEN MENDOZA'),(167,'PC-SCP11-2019','','','2019','PANTRY ISI','','HRAD','LENOVO V530 - I5','YL00G44X','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I5-8400','1 TB','8 GB','AOC','LENOVO','A4TECH','NONE','NONE','','','PREVIOUSLY USED BY MONETTE SALAZAR'),(168,'PC-SCP12-2019','','19-Jul','2019','SERVICE UNIT','','HRAD','LENOVO V530 - I3','PC100NTK','','','','WIN 10','Sanden.NET','ESET','2019','INTEL I3-8100','1 TB','8 GB','LENOVO THINKVISION 21\", AOC','LENOVO','LENOVO','APC','1 YEAR','','','PREVIOUSLY USED BY GERRYCA JOVES'),(169,'PC-SCP13-2019','N/A','N/A','2017','SCM WAREHOUSE','','SCM','LENOVO V520S','PC0QTGHL','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I5-7400','500 GB','4 GB','AOC','A4TECH','A4TECH','NONE','1 YEAR','','','PREVIOUSLY USED BY SABRINA MOSQUERA'),(170,'PC-SCP14-2019','N/A','N/A','2016','MIS PULLED OUT','','MIS','LENOVO THINKCENTRE','S5CD5TN','YES','JUNE-15-2023','PC-SCP14-2019','WIN 10','Sanden.NET','ESET','2013','INTEL CORE 2 DUO','500 GB','4 GB','AOC','A4TECH','SILVERTECH','NONE','NONE','','','PREVIOUSLY USED BY ERWIN MALABUYOC AND ALREADY IN MIS STOCK ROOM'),(171,'PC-SCP15-2019','N/A','N/A','2013','NL WARRANTY TECHNICIAN','','NL','LENOVO THINKCENTRE','S5CDGYY','','','','WIN 7','Sanden.NET','ESET','2007','INTEL CORE 2 DUO','500 GB','2 GB','LENOVO','LENOVO','A4TECH','NONE','NONE','','','PREVIOUSLY USED BY ERICA PACIOLCO / WTY TECHNICIAN'),(172,'PC-SCP16-2019','','19-Nov','2019','ALFREDO  LUNA JR.','','WRTY','LENOVO V530 - I5','YL00FR2B','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I5-8400','1 TB','8 GB','LENOVO','LENOVO','LENOVO','NONE','1 YEAR','','','PREVIOUSLY DEPLOYED TO MAKATI FOR ADMIN USE'),(173,'PC-SCP01-2020','','19-Aug','2019','WTY WARRANTY TECHNICIAN 1','','WRTY','LENOVO V530','PC10QNRK','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I3-8100','1 TB','4GB','AOC','LENOVO','LENOVO','NONE','1 YEAR','','','INSTALLED PRINTER COLORED WTY (NEAR NOEL BUSTAMANTE)'),(174,'PC-SCP02-2020','N/A','N/A','2015','OLD PC JAMAICA','','CL','LENOVO THINKCENTRE E73','PC056MW4','','','','WIN 7','Sanden.NET','ESET','2013','INTEL I5-4590S','512 GB','4 GB','AOC','LENOVO','LENOVO','APC','NONE','','','OK'),(175,'PC-SCP04-2020','','19-Aug','2019','RUBY AUTIDA','','DV','LENOVO V530','PC10QNTN','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I3-8100','1 TB','4 GB','LENOVO','LENOVO','LENOVO','NONE','1 YEAR','','',''),(176,'PC-SCP05-2020','N/A','N/A','-','CEBU WAREHOUSE','','CB','TRENDSONIC','FADED','','','','WIN 7','Sanden.NET','ESET','2013','INTEL I5','500 GB','4 GB','AOC','A4TECH','A4TECH','BOOST','NONE','','','OK'),(177,'PC-SCP06-2020','N/A','N/A','2013','SECURITY (OB & CCTV\')','','MIS','LENOVO THINKCENTRE','S5CDGTF','','','','WIN 10','Sanden.NET','ESET','2013','INTEL CORE 2 DUO','500 GB','4 GB','NONE','NONE','NONE','NONE','','','','OLD UNIT OF GERRYCA JOVES'),(178,'PC-SCP07-2020','','20-Feb','2020','SERVICE UNIT','','NL','LENOVO','YL00KRR0','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I3','1 TB','4 GB','LENOVO THINKVISION 21\"','LENOVO','LENOVO','NONE','1 YEAR','','','PREVIOUSLY FOR FINANCE ANALYST'),(179,'PC-SCP08-2020','?33,000.00','20-Feb','2020','ISI MANAGER','','HRAD','LENOVO','YL00KRSH','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I3','1 TB','4 GB','LENOVO THINKVISION 21\"','LENOVO','LENOVO','NONE','1 YEAR','','','PREVIOUSLY USED BY KLARISSE LANTICAN'),(180,'PC-SCP01-2022','','22-Jan','2022','MIS PULLED OUT','','HQ','LENOVO','YL00KRSH','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I3','1 TB','4 GB','LENOVO THINKVISION 21\"','LENOVO','LENOVO','NONE','1 YEAR','','','PREVIOUSLY USED BY CASSANDRA AND JERWHYNE'),(181,'PC-SCP02-2022','','22-Mar','2022','KARLSON CRISOSTOMO','','CC','HP Z2 G8 TOWER WORKSTATION','4CE150BFC8','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I3','1 TB','4 GB','LENOVO THINKVISION 21\"','LENOVO','LENOVO','NONE','1 YEAR','','autocadhp','PREVIOUSLY USED BY JEFFREY DELGADO'),(182,'PC-SCP03-2022','','','2022','RUBY AUTIDA','','DAV','','','','','','WIN 10','Sanden.NET','ESET','2013','INTEL I3','1 TB','4 GB','LENOVO THINKVISION 21\"','LENOVO','LENOVO','NONE','1 YEAR','','',''),(183,'PC-SCP01-2025','','25-Jun','2025','','','','HP Z2 Tower','4CE517BY8Z','','','','WIN 11','Sanden.NET','ESET','2019','Intel(R) Core(TM) i7-14700K','500GB HDD\n1TB SSD','32 GB','','','','','2 YEAR','','','');
+/*!40000 ALTER TABLE `inventory_tbl` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `it_request_approval`
+--
+
+DROP TABLE IF EXISTS `it_request_approval`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `it_request_approval` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `reference_no` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `approved_by` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `role` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `approver_email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `current_approver_role` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` enum('Disapproved','Pending','Approved','Rejected','Completed') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Pending',
+  `remarks` text COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `it_request_approval_reference_no_index` (`reference_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `it_request_approval`
+--
+
+LOCK TABLES `it_request_approval` WRITE;
+/*!40000 ALTER TABLE `it_request_approval` DISABLE KEYS */;
+/*!40000 ALTER TABLE `it_request_approval` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `it_request_tbl`
+--
+
+DROP TABLE IF EXISTS `it_request_tbl`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `it_request_tbl` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `reference_no` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `requestor_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `requestor_email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `department` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `issue` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `item_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `date_needed` date DEFAULT NULL,
+  `plan_return_date` date DEFAULT NULL,
+  `purchase_item_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `project_details` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `intranet_request_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `manager_email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `change_request_intranet` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `type_request` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description_of_request` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Level_Request` enum('Low','Medium','High','Very High') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Medium',
+  `attachment_name` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` enum('Pending','In Progress','Completed','Rejected','Approved','Disapproved') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Pending',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `it_request_tbl_reference_no_unique` (`reference_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `it_request_tbl`
+--
+
+LOCK TABLES `it_request_tbl` WRITE;
+/*!40000 ALTER TABLE `it_request_tbl` DISABLE KEYS */;
+/*!40000 ALTER TABLE `it_request_tbl` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `maintenance_modes`
+--
+
+DROP TABLE IF EXISTS `maintenance_modes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `maintenance_modes` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `route_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `enabled` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=84 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `maintenance_modes`
+--
+
+LOCK TABLES `maintenance_modes` WRITE;
+/*!40000 ALTER TABLE `maintenance_modes` DISABLE KEYS */;
+INSERT INTO `maintenance_modes` VALUES (10,'login',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(11,'login.process',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(12,'dashboard',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(13,'portal',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(14,'inventory.data',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(15,'send.button',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(16,'pdf.view',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(17,'logout',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(18,'password.update',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(20,'computer.inventory',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(21,'policy.render',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(22,'sftp.download',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(23,'calendar.events',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(24,'calendar.store',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(25,'calendar.show',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(26,'calendar.destroy',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(27,'api.holidays',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(28,'docs.version_control',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(29,'versions.view',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(30,'policies.page.upload',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(31,'filename.policies',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(32,'upload.policies',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(33,'policy.update',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(34,'pdf.delete',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(35,'policy.data',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(36,'special-access.index',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(37,'special.access.assign',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(38,'special.access.addFeature',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(39,'special.access.removeFeature',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(40,'special-access.features.delete',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(41,'it.request.insert',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(42,'fields',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(43,'IT.RequestForm',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(44,'Shuttle_Form',1,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(45,'Deposit_Form',1,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(46,'LunchPass_Form',1,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(47,'IT.Request.Data.view',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(48,'itrequest.approval',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(49,'IT.Request.Form.Data',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(50,'it_request.reference_data',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(51,'it_request.approval.store',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(52,'notifications.index',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(53,'activities.store',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(54,'activities.destroy',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(55,'activities.create_view',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(56,'activities.statistics_view',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(57,'activities.team_registration',1,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(58,'activities.list',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(59,'activities.view.list',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(60,'activities.getFields',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(61,'activities.listActivity',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(62,'activities.findPendingLevel',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(63,'submission.store',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(64,'activityLog.updateStatus',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(65,'activities.updateLevel',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(66,'teams.store',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(67,'teams.index',1,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(68,'approvalForm.activity',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(69,'activityLog.data',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(70,'teams.list',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(71,'teams.activity_logs',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(72,'teams.members',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(73,'teams.checkName',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(74,'teams.activitiesList',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(75,'team.ranking',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(76,'teams.delete',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(77,'teams.checkUserPendingStatus',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(78,'teams.checkSize',0,'2025-10-02 07:00:42','2025-10-02 07:00:42'),(79,'scanner',0,'2025-10-02 07:04:36','2025-10-02 07:04:36'),(80,'activities.log-form',1,'2025-10-02 07:05:04','2025-10-02 07:05:04'),(81,'categorytbl',0,NULL,NULL),(82,'it_request.approvalForm',0,NULL,NULL),(83,'vpn.page',0,NULL,NULL);
+/*!40000 ALTER TABLE `maintenance_modes` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `migrations`
+--
+
+DROP TABLE IF EXISTS `migrations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `migrations` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `batch` int NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `migrations`
+--
+
+LOCK TABLES `migrations` WRITE;
+/*!40000 ALTER TABLE `migrations` DISABLE KEYS */;
+INSERT INTO `migrations` VALUES (1,'2014_10_12_000000_create_users_table',1),(2,'2014_10_12_100000_create_password_reset_tokens_table',1),(3,'2019_08_19_000000_create_failed_jobs_table',1),(4,'2019_12_14_000001_create_personal_access_tokens_table',1),(5,'2025_07_18_050407_add_role_to_users_table',2),(8,'2025_07_18_060109_create_inventory_tbl_table',3),(9,'2025_07_18_063304_create_documents_table',4),(10,'2025_07_24_032636_add_file_type_to_documents_table',5),(11,'2025_07_25_024851_create_special_access_users_table',6),(12,'2025_07_25_062957_create_features_table',7),(13,'2025_07_25_065058_create_special_access_users_table',8),(14,'2025_07_31_020840_add_department_to_users_table',9),(15,'2025_07_31_021108_add_status_position_to_users_table',10),(18,'2025_07_31_050724_create_item_request_tbl',11),(19,'2025_08_01_072303_add_doc_type_upload_date_control_type_to_documents_table',12),(20,'2025_08_06_134319_create_events_table',13),(21,'2025_08_07_113631_add_agenda_and_pic_to_events_table',14),(22,'2025_08_15_094921_create_intranet_version_table',15),(23,'2025_08_26_152352_create_sessions_table',16),(25,'2025_09_01_110405_create_it_request_tbl',17),(26,'2025_09_04_144247_create_it_request_approval_table',18),(27,'2025_09_09_132629_create_activity_team_tables',19),(28,'2025_09_12_095416_change_progress_value_to_decimal_in_team_user_table',20),(29,'2025_09_16_111743_add_progress_value_exceed_to_submissions_table',21),(30,'2025_09_19_112605_add_status_to_activities_table',22),(31,'2025_09_22_081918_add_level_active_to_activities_table',23),(32,'2025_10_02_145241_create_maintenance_modes_table',24),(33,'2025_10_27_130634_add_password_changed_to_users_table',25),(34,'2025_10_28_083421_create_category_tbl',26),(35,'2025_11_03_104258_create_request_types_table',27),(36,'2025_11_14_085417_create_vpn_accounts_table',28);
+/*!40000 ALTER TABLE `migrations` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `password_reset_tokens`
+--
+
+DROP TABLE IF EXISTS `password_reset_tokens`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `password_reset_tokens` (
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `password_reset_tokens`
+--
+
+LOCK TABLES `password_reset_tokens` WRITE;
+/*!40000 ALTER TABLE `password_reset_tokens` DISABLE KEYS */;
+/*!40000 ALTER TABLE `password_reset_tokens` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `personal_access_tokens`
+--
+
+DROP TABLE IF EXISTS `personal_access_tokens`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `personal_access_tokens` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `tokenable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tokenable_id` bigint unsigned NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `abilities` text COLLATE utf8mb4_unicode_ci,
+  `last_used_at` timestamp NULL DEFAULT NULL,
+  `expires_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
+  KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `personal_access_tokens`
+--
+
+LOCK TABLES `personal_access_tokens` WRITE;
+/*!40000 ALTER TABLE `personal_access_tokens` DISABLE KEYS */;
+/*!40000 ALTER TABLE `personal_access_tokens` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `request_types`
+--
+
+DROP TABLE IF EXISTS `request_types`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `request_types` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `can_bypass` tinyint(1) NOT NULL DEFAULT '0',
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `request_types`
+--
+
+LOCK TABLES `request_types` WRITE;
+/*!40000 ALTER TABLE `request_types` DISABLE KEYS */;
+/*!40000 ALTER TABLE `request_types` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sessions`
+--
+
+DROP TABLE IF EXISTS `sessions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `sessions` (
+  `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_id` bigint unsigned DEFAULT NULL,
+  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` text COLLATE utf8mb4_unicode_ci,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `last_activity` int NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `sessions_user_id_index` (`user_id`),
+  KEY `sessions_last_activity_index` (`last_activity`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sessions`
+--
+
+LOCK TABLES `sessions` WRITE;
+/*!40000 ALTER TABLE `sessions` DISABLE KEYS */;
+INSERT INTO `sessions` VALUES ('0Jt68AHbaemvRmvMrguvFs3YXL9qvpDn5tfV7o1z',NULL,'192.168.5.186','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiTUpWdXJRcUpwQk9nY1h2S3BMb2o1TUtobnNyM0R6MTlxM0xxMmNDQiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1764920228),('1bJh8WEKomforXe3It0CVncvidfGzSkC68ysWGiV',38,'192.168.8.127','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTo0OntzOjY6Il90b2tlbiI7czo0MDoiNElHSGRpSDI5cU9tN3NjSzhsd0l0Tms2QUJSTmdQRlo4S0FnaDhySSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDA6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldC90ZWFtLXJhbmtpbmciO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aTozODt9',1764975511),('1fcByqZuGOuCzIRAqulybnfys8hrZpwXUFQpD7uq',NULL,'10.212.134.150','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiUmJ5V2luUFhIdDJlamk5d0ZDQ25jMzFKSXJjRkRsQ3BpYnJzMkp6cSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1764918685),('2RlTfXxwNBWKLXrw1VK8FRz4l8BAQRwsckNwFtXz',NULL,'10.212.134.151','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoibEZsaFFCaDd5WmJOSWw3bkVqcWxvZ3RCRzNONXVMYUlveklmb08xdiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1764937571),('6rm6ZaGRBcsWpN9kZBDEBtwRKrsRWLmWBLpbpExf',NULL,'192.168.5.186','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiWG5NSFk2Y2Uzb1BkYnh6YURiVEpCZXNKMGROdzZOWnRkYWlyOHhDTyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1764918952),('8e2AjrJaDGwc9ld0x7KXnbK5eBfVvkAHtWDkvfma',NULL,'192.168.5.186','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoia2hEdmdqUVdUTjlORFloU28xY3FqTTBFbUo2UUtDTE4zcWcyVzZtZyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1764919671),('8UbYCw3ZbTL64DSetkPAYH6eSSgMWlBLgCtf7bAX',NULL,'10.212.134.150','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiUzVHY1ozSldqSnF1SkZRS1NYUEJxOFNPMnJaOUZwOXJNZVpScGdJVyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1764977594),('96DLnWuaNuiEqZSsh8zR4cmKf5z9lt7Oc6eJcu4I',NULL,'192.168.5.117','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTo0OntzOjY6Il90b2tlbiI7czo0MDoiNlMwR0hpRXRDU2tBWWxFNEVpcHlDMVBFdEt3dXZ0YTJpNjZ4aE85ciI7czozOiJ1cmwiO2E6MTp7czo4OiJpbnRlbmRlZCI7czozNzoiaHR0cHM6Ly9pbnRyYW5ldC5zYW5kZW4ubmV0L2Rhc2hib2FyZCI7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjI3OiJodHRwczovL2ludHJhbmV0LnNhbmRlbi5uZXQiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX19',1764921592),('9zwzTvKIOiGiRSPLGHnWuZOpbZSnny2W8mu3cXEA',NULL,'10.212.134.150','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiZ2tlczg1SDI0YTBxbnBVZEVUSTB1V1c3d0tHZ3cwNmJoa2ZFV1piUiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1764923897),('A4jJ3zvOWJyMskun4qLCwccDQrxXvE8VYg3v8CyJ',NULL,'192.168.5.186','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoicVlxRVRpUkx2TFM5ek82Wm9VdjJnd3lkMVlCekZYbnM1eWxUcWZNUiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1764920060),('b1RoQaXn3yDHpZU3YKn7GcmiOunczyoO1tOqDySK',NULL,'192.168.5.136','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoibG5aMlZaY1l5dlhZN29PUmZlMG9sSUg2V2QzbkQ4WEJRVUJTOTMwbCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1764922775),('Bnyu6pY4yP3E8OGOiQDZnRGK1ox7QGjRoXQHNONA',NULL,'10.212.134.151','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoieGJaTTQ5TVd3ZXlTQktaQ1FJbDR5OEpqS0QyamJVbzE1NW1DVE1QWiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1764947800),('gT5sFr2NtO8895vmpdL5as8PkqUnaRm8kgdr9DtZ',NULL,'192.168.5.169','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiM080bHB6ZXdtWHp1OTlXaVcwRXdsTUk0NHJMZ1ZmYUdMalRKM0NNeiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1764980446),('guNUlXBPQR99AQ7Rl65dV5M6BFPAJ2434UrXi0LK',NULL,'10.212.134.154','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiQ0pJbm16ZlJRZ08yT3JIZFduUVNIOTd0Z05YQmNOM084Mmt4bkJIZyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1764950028),('hfOgZmrmOGCQU1oDCYrAAW1NUXRGms9EJxBuZ1yo',NULL,'10.212.134.150','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoidDF1MTYzcE9McWZOaTNXOEFVYXZIZjdWb3ZkU1pMUW9sb2wxQmxkVyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1764989820),('ILaznrIfEXKj6oTR6LUvduePJQAXowz4cgoic8fB',NULL,'192.168.8.127','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiUnNUbXdyTG85TTFpa3JHbndoc00xMGpVeEpzZ2RKOFU5UjFielVKZiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1765010869),('Im0ricPAUsUJtpBaYyJWnddulsehhd787BbsSdC6',NULL,'192.168.4.169','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiVEc5a0c5QkRiTDE4V1RhSWg4V3hsVThqb2JCQzY3cWF0ZlNmZTB6biI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1765021402),('jGKTvZqFoMXEyZRX02fVXAYzrDm1azRelfiOkyQJ',NULL,'10.212.134.152','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiYktrc25RRkZTWElVSTZqZGdBeDBkUTBWZVlMeXlWWXh6V1VvUk1SUSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1764929043),('kDtgQqqvRD6TClWIxwP7otzpvrEiIiHbXzm7ihhh',NULL,'192.168.8.127','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiZnBTQ2hnazNqRGt1cXNwRjJENEJSTmd0c2h3eEZUWlNibDVueXY0TyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1765010337),('lCvjw0HonP5qL3rgTj5nsekx5u5cqayU6LVDcJCa',NULL,'192.168.5.36','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiZVRaMFA2a1dqQWl6YllRcjNMdWxseTZJVHNxc0hGMklXMGZraEsxcCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1764979666),('M89N3Tf1X9J1VJWCxpBDQNSv6juDuk8K8NJpIbRA',NULL,'192.168.5.194','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiZ2ZZRnBCNzZsSmZWSkpZbmVYZTZWWlN2ZUZqZFpXRUt0UWIxcXFIayI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1764919821),('njbeJGl30rKn54nGTcHk4Cueypzi5RJzLipO0E0e',NULL,'192.168.5.115','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiSVdUd3BEMUZMVEtLV2hBa2hselpjdlVsc1ljVE9XeFNyUXVnamVieSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1764921861),('nJezLyPGxKUkOOForsIcZ9hecWL9Uyn0sQ3JQaeO',NULL,'192.168.4.169','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiRmZOQlJpQkJFRWNHMGU2Z3o0SGRaeDBHVVNaSDVBN1hpS3NyTjBVRCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1765020711),('nk7QFMzYxX7bHlUiRcblCuHoRw6znTc7m3nq8c1D',NULL,'192.168.5.128','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiVWVpOGFLOG0ycjV0RWU2UW5aRE1zUmp2SEQ1WTlKYkVXeFdyQUF1cyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1764921821),('QL2oyNq2m1T2zehwqlhwvgKsNp17CDda2pJvdkrV',NULL,'192.168.5.186','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoibTY3NEtCT0dGM0lIakxBYVRoZDR3UWRqOVJEOHBpSDNhRGtWY3A3MCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1764920349),('tE0ilOZWaHHIdbSljr1dE1VBetOY29cryarm6FFO',NULL,'10.212.134.150','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiR1hmVTY0OGExSzRGNHNCcDBzNnlBNW5FZXBKdXBKbk5yWktzUkcyUiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1764919186),('TXa8lqTT8CxDBcvMkQEbG9pwAalCsE6IrvT6P4bz',NULL,'192.168.5.186','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiMXNTMVdyUEF3VWtOTnhWbjFDQ0RyelVkSXRKWkFzZHZqTUI4cG9JRiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1764921397),('U3y2aaP0c0970MNddqU04gcvXK3Xk4JqGBjFCAS2',NULL,'192.168.5.186','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiTHIyZ2JTRXJjNTNoZk8zZEgxMmoySW5PY1hxTkloWk5oVTJPM2pKYSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1764921850),('W900q4ZJObWQWuF69dn9PL00ilD41UQrPyumlSU0',NULL,'127.0.0.1','curl/7.81.0','YTozOntzOjY6Il90b2tlbiI7czo0MDoiTXR1ZVdIbXdBaFJkV2FpQTNnYnJrNWd1N1JGbTVEem9obEY5YkozSyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDQ6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldC92cG4tZXhwaXJlZC1saXN0Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1764979202),('WQR4tIvybdJdWgoO0jcVqGUzkdF0vxOsrrs61pWF',NULL,'10.212.134.151','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiZDJOUzZYaWdWMWNyNUdPbW5NRFFJQUhtNjVocDN1TnIxdGJGdDFERSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1764929347),('yAJqxpgs9Vbt04QVeDuWHc6AeysGuR1rUM7O5RNI',NULL,'10.212.134.150','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoibUZwN1FpdGdtdmFSWTB2WFl2RlZIUTlLV1ZOZnpneUM4V2NyQTV3dyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHBzOi8vaW50cmFuZXQuc2FuZGVuLm5ldCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1764920143);
+/*!40000 ALTER TABLE `sessions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `special_access_users`
+--
+
+DROP TABLE IF EXISTS `special_access_users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `special_access_users` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned NOT NULL,
+  `feature_id` bigint unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `special_access_users_user_id_foreign` (`user_id`),
+  KEY `special_access_users_feature_id_foreign` (`feature_id`),
+  CONSTRAINT `special_access_users_feature_id_foreign` FOREIGN KEY (`feature_id`) REFERENCES `features` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `special_access_users_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `special_access_users`
+--
+
+LOCK TABLES `special_access_users` WRITE;
+/*!40000 ALTER TABLE `special_access_users` DISABLE KEYS */;
+INSERT INTO `special_access_users` VALUES (1,100,18,NULL,NULL),(2,100,20,NULL,NULL),(3,63,20,NULL,NULL),(4,100,19,NULL,NULL),(5,34,18,NULL,NULL),(6,34,13,NULL,NULL),(7,34,21,NULL,NULL),(8,63,21,NULL,NULL),(9,63,19,NULL,NULL),(10,100,24,NULL,NULL),(11,100,25,NULL,NULL),(12,34,25,NULL,NULL),(13,63,24,NULL,NULL),(14,100,26,NULL,NULL),(15,63,25,NULL,NULL),(16,63,26,NULL,NULL);
+/*!40000 ALTER TABLE `special_access_users` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `submissions`
+--
+
+DROP TABLE IF EXISTS `submissions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `submissions` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `log_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `team_id` bigint unsigned NOT NULL,
+  `user_id` bigint unsigned NOT NULL,
+  `activity_id` bigint unsigned NOT NULL,
+  `level_id` varchar(11) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `activity_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `other_informations` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `file_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `progress_value` double(8,2) NOT NULL,
+  `progress_value_exceed` decimal(8,2) NOT NULL DEFAULT '0.00' COMMENT 'Stores the portion of progress that exceeded the required value',
+  `status` enum('pending','approved','disapproved') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `submissions_team_id_foreign` (`team_id`),
+  KEY `submissions_user_id_foreign` (`user_id`),
+  KEY `submissions_activity_id_foreign` (`activity_id`),
+  CONSTRAINT `submissions_activity_id_foreign` FOREIGN KEY (`activity_id`) REFERENCES `activities` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `submissions_team_id_foreign` FOREIGN KEY (`team_id`) REFERENCES `teams` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `submissions_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `submissions`
+--
+
+LOCK TABLES `submissions` WRITE;
+/*!40000 ALTER TABLE `submissions` DISABLE KEYS */;
+/*!40000 ALTER TABLE `submissions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `team_user`
+--
+
+DROP TABLE IF EXISTS `team_user`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `team_user` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `team_id` bigint unsigned NOT NULL,
+  `user_id` bigint unsigned NOT NULL,
+  `role` enum('captain','member') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `progress_value` decimal(8,2) NOT NULL DEFAULT '0.00',
+  `joined_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `team_user_team_id_foreign` (`team_id`),
+  KEY `team_user_user_id_foreign` (`user_id`),
+  CONSTRAINT `team_user_team_id_foreign` FOREIGN KEY (`team_id`) REFERENCES `teams` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `team_user_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `team_user`
+--
+
+LOCK TABLES `team_user` WRITE;
+/*!40000 ALTER TABLE `team_user` DISABLE KEYS */;
+/*!40000 ALTER TABLE `team_user` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `teams`
+--
+
+DROP TABLE IF EXISTS `teams`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `teams` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `activity_id` bigint unsigned NOT NULL,
+  `activity_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `level_id` bigint unsigned NOT NULL,
+  `captain_id` bigint unsigned NOT NULL,
+  `invite_code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` enum('pending','active','completed','cancelled') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `teams_invite_code_unique` (`invite_code`),
+  KEY `teams_activity_id_foreign` (`activity_id`),
+  KEY `teams_level_id_foreign` (`level_id`),
+  KEY `teams_captain_id_foreign` (`captain_id`),
+  CONSTRAINT `teams_activity_id_foreign` FOREIGN KEY (`activity_id`) REFERENCES `activities` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `teams_captain_id_foreign` FOREIGN KEY (`captain_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `teams_level_id_foreign` FOREIGN KEY (`level_id`) REFERENCES `challenge_levels` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `teams`
+--
+
+LOCK TABLES `teams` WRITE;
+/*!40000 ALTER TABLE `teams` DISABLE KEYS */;
+/*!40000 ALTER TABLE `teams` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `users` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `department` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `department_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `head_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` enum('Active','Inactive') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'Active',
+  `position` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email_verified_at` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password_changed` tinyint(1) NOT NULL DEFAULT '0',
+  `role` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `users_email_unique` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=107 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `users`
+--
+
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (1,'Ikeda, Osamu','osamu.ikeda.iv@sanden-rs.com','MANAGEMENT','1','','Active','President',NULL,'$2y$12$EgwEWurotZBazM3Krm7pPOChk.IxSyPtxMJO9BdDf5uc6XVStuSTO',1,'4',NULL,NULL,'2025-10-30 07:17:37'),(2,'Agauna, Eric Concepcion','eric.agauna','SCM','2','23','Active','Company Driver',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(3,'Mosquera, Sabrina Marfil','sabrina.m.mosquera.sb@sanden-rs.com','PROCUREMENT & IMPORTATION','3','6','Active','Supervisor',NULL,'$2y$12$WsB0bBHO2zrX.eYINlhswOB1vpnSin1x9PSLHQa5axQ4k5wATT71i',1,'2',NULL,NULL,'2025-10-30 07:17:40'),(4,'Garcia, Mark Marlo Mingi','mark.garcia.mg@sanden-rs.com','AFTER SALES','4','1','Active','Aftersales Supervisor',NULL,'$2y$12$IsACe8bD2HQvI.rBPZEwzuITG0YKdz51VrC/sUthMhw/YXP9IaKhW',1,'2',NULL,NULL,'2025-11-04 03:06:57'),(5,'Lerasan, Levie Olivar','levie.lerasan.ew@sanden-rs.com','RO-VISAYAS','7','','Active','Leadman',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(6,'Alcos, Julieta Manumbas','julieta.alcos.qp@sanden-rs.com','South Luzon','6','','Active','Manager',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'3',NULL,NULL,NULL),(7,'Alpajaro, Roberto Tolenada','robert.alpajaro.vf@sanden-rs.com','COLD CHAIN','7','','Active','Vice President',NULL,'$2y$12$vbP/HtCEl70vLqWzlYh/l.K/OhCzirbhtox7LhEM2p5kEQlhHARRS',1,'4',NULL,NULL,'2025-11-05 06:05:58'),(8,'Apigo, Julius Ubera','julius.apigo.dw@sanden-rs.com','AFTER SALES','4','','Active','Senior Manager',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'3',NULL,NULL,NULL),(9,'Cruz, Larry Cruz','larry.cruz.jz@sanden-rs.com','MANAGEMENT','13','','Active','Chief Operating Officer',NULL,'$2y$12$0ArJ4t8Dsden2j48nNUOde71sG.IlgbxJQgub7.7zEhqfLkCQfuMu',1,'4',NULL,NULL,'2025-10-30 07:32:33'),(10,'Olpindo, Moises Soriano','moises.olpindo','ADMIN','8','8','Active','Company Driver',NULL,'$2y$12$3IumBmcszAUT8uZgnGWGSeYRTvXoGTgU//pJ./lZ/fkSe0eEMVJSi',1,'1',NULL,NULL,'2025-10-30 07:55:20'),(11,'Maruggay, Almar Pudoc','almar.maruggay.dd@sanden-rs.com','COLD CHAIN','7','','Active','Project Engineering Manager',NULL,'$2y$12$XCtJ0yFEQTzTcK2k4CBGYuTRqmd.xBEASMgTKdOzdmI21SlDE.L8u',1,'3',NULL,NULL,'2025-11-24 03:34:07'),(12,'Gonzales Jr., Tony Del Rosario','centralluzon.technician.ph@sanden-rs.com','RO-NL','9','4','Active','Ref & Aircon Technician ',NULL,'$2y$12$yRmEpzSV5VDg.MEUr1zt8O.IhkWSz.dRNm/7kZPS6NPPhrYRSH4rm',1,'1',NULL,NULL,'2025-11-20 04:36:09'),(13,'Estares, Cherry Donque','cherry.estares.ym@sanden-rs.com','RO-VISAYAS','7','','Active','Sales Coordinator',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(14,'Llosala, William JR Asiado','william.llosala.wl@sanden-rs.com','South Luzon','6','2','Active','Sales Executive',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',1,'1',NULL,NULL,NULL),(15,'Galdones, Jordan Alafriz','jordan.galdones.wd@sanden-rs.com','RO-VISAYAS','7','','Active','Manager',NULL,'$2y$12$cYY.y.ElybR2Cq2uPhQXVuM08/mekkqKo5ohLPukO5yuaMvq5c5Ki',1,'3',NULL,NULL,'2025-12-02 04:04:33'),(16,'Villa, Ella-d Dizor','ella.villa.vo@sanden-rs.com','RO-MINDANAO','10','','Active','Manager',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'3',NULL,NULL,NULL),(17,'Llaneta, Ian Teves','ian.llaneta.ih@sanden-rs.com','South Luzon','6','2','Active','Sales Executive',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(18,'Dichoso, Fernan Hernandez','fernan.dichoso.cj@sanden-rs.com','MANAGEMENT','6','','Active','Senior Manager',NULL,'$2y$12$rfm47SHXG4Rvr0SyKFN98.vhPSC6.wa./IhahMsXNlDinK6MpPBme',1,'4',NULL,NULL,'2025-10-30 07:28:14'),(19,'Requinta, Maria Esther Marasigan','esther.requinta.rk@sanden-rs.com','RO-MINDANAO','10','12','Active','Sales Executive',NULL,'$2y$12$xg.EAE.sI6lY3LgeR/I23.tX3/dwhJuAvHDcGEERpQQnt8CvwXOee',1,'1',NULL,NULL,'2025-12-02 01:49:44'),(20,'Alcantara, Christian Katigbak','christian.alcantara.ut@sanden-rs.com','AFTER SALES','4','','Active','Manager',NULL,'$2y$12$nT2nN4WgwxRVhQqBmdpTouKDgqnbBZ8AbDhYbQOydaI.pYPzNlOG6',1,'3',NULL,NULL,'2025-10-30 08:04:42'),(21,'Dealino, Jeffrey Aliazas','jeffrey.dealino.cd@sanden-rs.com','SCM','2','23','Active','Leadman',NULL,'$2y$12$/Euv5U3y7F2SaOkbR0ALzutHeH6VAlqYCLJya/tBDXZ9BuKAV2umC',1,'1',NULL,NULL,'2025-11-03 23:31:44'),(22,'Manansala, Eric Raymond Mercado','eric.mercado','AFTER SALES','4','1','Active','Ref & Aircon Technician',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(23,'Delos Reyes, Mark Laguit','mark.delosreyes.ir@sanden-rs.com','OFFICE OF THE PRESIDENT','','','Active','Manager',NULL,'$2y$12$ytbN1iNxvcNoC93m8UGhq.S7verBur8yjSXFBc10sM92ODiXCzdkq',0,'3',NULL,NULL,NULL),(24,'Dela Cruz, Joyce Anne Ledda','joyce.delacruz.jb@sanden-rs.com','RO-NL','9','','Active','Manager',NULL,'$2y$12$fzgYN3RebudzsbFiwVjMzO1KR/nMzeA5nZltv4Y1LwZZh9dNC7eha',1,'3',NULL,NULL,'2025-11-07 03:04:00'),(25,'Beran, Celestial Maestre','celestial.m.beran.qr@sanden-rs.com','South Luzon','6','2','Active','Sales Executive',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(26,'Pabillo, Joana Rosales','joana.pabillo.fa@sanden-rs.com','AFTER SALES','4','1','Active','Aftersales and Waranty Analyst',NULL,'$2y$12$TK4AQkMFZDkgPKjWjhecvOIDfx.3jrQ3o0cJCwpiMsjhx1omsPPiO',1,'1',NULL,NULL,'2025-11-03 02:37:58'),(27,'Pulutan, Ronalyn Bondad','ronalyn.pulutan.df@sanden-rs.com','SCM','2','23','Active','Logistics Analyst',NULL,'$2y$12$db/u/z2LQp99iK1JMz16hu877s/d3DNmghjh0hzAbNdxtooF1BjUW',1,'1',NULL,NULL,'2025-11-04 02:00:50'),(28,'Gonzales, Kane Cyril Rostata','kane.gonzales.kc@sanden-rs.com','Advertising & Marketing','12','13','Active','Supervisor',NULL,'$2y$12$rFPMcN8lwQOgGA6orlKJ1eVrBn9tVrlkZCyuVPa0dcn7pFftCxtSK',1,'2',NULL,NULL,'2025-11-24 07:51:08'),(29,'Buenaventura, Gomer Gestiada','gomer.gestida','AFTER SALES','4','1','Active','Ref & Aircon Technician',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(30,'Bucu, Jamaica Lacuna','jamaica.bucu.jc@sanden-rs.com','RO-NL','9','4','Active','Sales Executive',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(31,'Salazar, Monette Naparan','monette.salazar.ms@sanden-rs.com','FINANCE','13','11','Active','Finance Supervisor - Accounts Receivable',NULL,'$2y$12$3kBGP.9UoPyiwQizMa5rXew/WmQW1/X5WawiRNxv2z0FlHxebPila',1,'2',NULL,NULL,'2025-11-06 23:50:44'),(32,'Castro, Rodney Mamaril','rodney.castro.xz@sanden-rs.com','RO-NL','9','4','Active','Sales Executive',NULL,'$2y$12$eSuqc37RjntOOcd9o6EfLugd5N6jjzKMtUrKPtsBHsvhHOaXgCBeq',1,'1',NULL,NULL,'2025-11-04 07:06:41'),(33,'Lorete, Pearl Dia Dem Pacilan','pearl.pacilan.df@sanden-rs.com','RO-MINDANAO','10','12','Active','Sales Coordinator',NULL,'$2y$12$bSYe3jOkFNn4sh4VlUJ3feJloaCsXJfpOVPTbNZubxo6i8wxfnxbW',1,'1',NULL,NULL,'2025-10-30 07:16:38'),(34,'Marable, Euvy Angelo Gerero','euvy.marable.df@sanden-rs.com','MIS','14','6','Active','Supervisor',NULL,'$2y$12$ATvgPPxual4eoVeSc7344.nLHDyRBlD5iGvnWGK7GTeF/mt1T2ICO',1,'5',NULL,NULL,'2025-10-30 07:24:39'),(35,'Salamante, Ricky Amparo','ricky.salamante.rs@sanden-rs.com','South Luzon','6','2','Active','Sales Executive',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(36,'Palomillo, Emirlyn Quilatan','Emirlyn.Palomillo.gi@sanden-rs.com','COLD CHAIN','7','','Active','Sales Engineering Manager',NULL,'$2y$12$Uq2n3uFXWxGh27WN7V8bBOF.yFeh26ZC7Bb1f7yYY.HtXtu87Eucq',1,'3',NULL,NULL,'2025-11-11 23:18:34'),(37,'Coldas, Henry Jr. Balisa','henry.balisa','AFTER SALES','4','1','Active','Ref & Aircon Technician',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(38,'Gersalina, Gerald De La Cruz','gerald.gersalina.dc@sanden-rs.com','RO-MINDANAO','10','12','Active','Leadman',NULL,'$2y$12$AmTOmP1Rsp/6xsTaqqL5WeX1Gapg7.88ySn11W707tp5BORJyoK0G',1,'1',NULL,NULL,'2025-10-30 07:14:25'),(39,'Anido, Danica Manaig','danica.anido.da@sanden-rs.com','SCM','2','23','Active','Logistic Warehouse Associate',NULL,'$2y$12$Rshx70R7LX6PRIR.Sm6bR.VWXUVDeskXqf6VlowIFC19ia00Giffi',1,'1',NULL,NULL,'2025-11-04 02:00:09'),(40,'Capuno, Alvin Cabigao','alvin.capuno.ac@sanden-rs.com','RO-NL','9','4','Active','Sales Executive',NULL,'$2y$12$O8aSQszmGoRRc3FqYi7LvOE8RoZju4bB5Sq5G7CVGBdqXFF7FzldG',1,'1',NULL,NULL,'2025-11-04 03:52:46'),(41,'De Castro, Jeravy','jeravy.decastro.jd@sanden-rs.com','SCM','2','23','Active','WAREHOUSE & INVENTORY STAFF',NULL,'$2y$12$vUtQlGAOOyGBDJ6U1u0KCu7AHnA86//jNIxocL79zURXUwskvl2km',1,'1',NULL,NULL,'2025-11-06 00:12:47'),(42,'Oca, Benje Morales','benje.oca.bo@sanden-rs.com','COLD CHAIN','7','9','Active','Supervisor (Visayas & Davao Operation)',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'2',NULL,NULL,NULL),(43,'Barlan, Adel Paolo Delloson','adel.barlan.ab@sanden-rs.com','COLD CHAIN','7','9','Active','Supervisor (Electrical & Kitchen)',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'2',NULL,NULL,NULL),(44,'Villar, Rhea Mae Rivera','rhea.villar.rv@sanden-rs.com','South Luzon','6','2','Active','Sales Executive',NULL,'$2y$12$uOISv1/ocM0W1kWF7Qni3uQAY/p27k0Y1QCVX9wGIqjRlrrDF2cZK',1,'1',NULL,NULL,'2025-10-30 07:15:41'),(45,'Lat, Gerryca Syra Joves','gerryca.joves.gj@sanden-rs.com','HUMAN RESOURCE','6','','Active','HR Supervisor',NULL,'$2y$12$7boII5f4jzGu77XTTcrE7.erhvj8JLB8QG94wnSKZyfZSJ3cCBSj.',1,'2',NULL,NULL,'2025-10-29 05:58:44'),(46,'Panambo, Clarence Davin','clarence.panambo.bc@sanden-rs.com','COLD CHAIN','7','8','Active','Design Engineer Supervisor',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'2',NULL,NULL,NULL),(47,'Orcine, Jayson Dado','jayson.orcine.cd@sanden-rs.com','COLD CHAIN','7','9','Active','Lead Technician',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(48,'Alimon, Archie Balota','archie.alimon','ADMIN','8','8','Active','Company Driver',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(49,'Escuadro, Stephen Guanzon','stephen.escuadro.se@sanden-rs.com','RO-MINDANAO','10','12','Active','Ref & Aircon Technician',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(50,'Veloso, Keam Luwys Dinulos','keam.luwys.kl@sanden-rs.com','MIS','14','18','Active','MIS Analyst',NULL,'$2y$12$Wn2Uf1srm7fArf0FrRJHLeBm8TXv/sQVQyopSgrIzgrShtJ6gYFhi',1,'5',NULL,NULL,'2025-10-30 07:12:33'),(51,'Joven, Alvin Sara','alvin.joven.fi@sanden-rs.com','SCM','2','6','Active','Supervisor',NULL,'$2y$12$Ya41wortDRifuGQVDu8hHevst586lf8Y5VpBsjxB/rmuH5n/RwGf.',1,'2',NULL,NULL,'2025-11-04 03:42:27'),(52,'Mondejar, Luel Edano','luel.mondejar','COLD CHAIN','7','9','Active','Ref & Aircon Technician',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(53,'Cinco, Mary Joy Magbanua','maryjoy.cinco.il@sanden-rs.com','FINANCE','13','11','Active','Disbursement Specialist',NULL,'$2y$12$ADFxfEOfea5wFqVv5Oysi.xMM4knN/h1qB9DXdn8KueyAR.CjZTIa',1,'1',NULL,NULL,'2025-10-30 07:11:36'),(54,'Manalo, Billy Joel Canape','billy.manalo.nq@sanden-rs.com','COLD CHAIN','7','','Active','Sales Engineering Manager',NULL,'$2y$12$pRXlD4N9u4d7ZXeFW2GOo.m/dDlUlAcEP/VicTSSyD.C3YbVZik6y',1,'3',NULL,NULL,'2025-11-07 01:10:33'),(55,'Delfin, Daryl Glenn Geodisico','daryl.delfin.sv@sanden-rs.com','RO-MINDANAO','10','12','Active','Warehouseman',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(56,'Balani, Nemicio Aquino','nemicio.balani.wz@sanden-rs.com','COLD CHAIN','7','9','Active','Aftersales Supervisor',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'2',NULL,NULL,NULL),(57,'Ilagan, Mary Rose Castro','maryrose.ilagan.mi@sanden-rs.com','RO-NL','9','4','Active','Sales and Admin Staff',NULL,'$2y$12$RrMBzI2yDFNBcz1M7VSlVOo/luCbxG9jooJ/m.YRM67AxIlJa9wEC',1,'1',NULL,NULL,'2025-11-17 06:36:45'),(58,'Lantican, Mart Joshua Palma','mart.lantican.ml@sanden-rs.com','COLD CHAIN','7','10','Active','Sales Engineer',NULL,'$2y$12$1/I.DQtYN8hLiNhT43yBEuEx3.kGoO.4dARdBbHLP7kiXTBKXEm2q',1,'1',NULL,NULL,'2025-11-06 00:27:03'),(59,'Cubio, Nelson Maliksi','nelson.cubio.nc@sanden-rs.com','ADMIN','8','8','Active','EHS Officer',NULL,'$2y$12$7ksu3LpIY4UbrpNEck47FecbkYluBxu5/OaFcDVQxTXt69zob6QwG',1,'1',NULL,NULL,'2025-12-02 00:09:04'),(60,'Brazal, Bryan Habal','bryan.brazal','COLD CHAIN','7','9','Active','Ref & Aircon Technician ',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(61,'Crisostomo, Karlson Sityar','karlson.crisostomo.kc@sanden-rs.com','COLD CHAIN','7','8','Active','Draftsman',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(62,'Acuna, Christian Jay Sardea','christian.sardea','AFTER SALES','4','1','Active','Ref & Aircon Technician ',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(63,'Olivera, Neil Erzon Esquilon','neil.olivera.no@sanden-rs.com','ADMIN','8','6','Active','Admin Supervisor',NULL,'$2y$12$NA6z2mzcYXsKaKSlK9qOV.RePyOXcfJLqnYXk1pDUYMFiNWatigiS',1,'2',NULL,NULL,'2025-10-29 08:20:31'),(64,'Amurao, Den Mark Manaog','den.amurao.da@sanden-rs.com','PROCUREMENT & IMPORTATION','3','14','Active','Importation Specialist',NULL,'$2y$12$kh/9qd.hwwcqCNcBtYgZa.gII.jymLYFb5NSv3EdrjzO6UgKVPUPa',1,'1',NULL,NULL,'2025-10-30 07:13:28'),(65,'Malabanan, Edd Brandon Gomez','edd.malabanan.em@sanden-rs.com','COLD CHAIN','7','8','Active','Project Engineer',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(66,'Mortera, Eduard Gutierrez','eduard.mortera','RO-NL','9','4','Active','Warehouseman',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(67,'Lalaguna, Edward Bitongan','edward.lalaguna.el@sanden-rs.com','RO-NL','9','4','Active','Warehouseman',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(68,'Quiballo, Ian Howard Manzanero','ian.quiballo','SCM','2','23','Active','Warehouseman',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(69,'Palacio, Reynold Bagon','reynold.palacio','COLD CHAIN','7','9','Active','Ref & Aircon Technician',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(70,'Repomanta, Josuah Atun','josuah.repomanta.jr@sanden-rs.com','COLD CHAIN','7','9','Active','Project Engineer',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(71,'Capuso, Renniel Aguilar','renniel.capuso.rc@sanden-rs.com','COLD CHAIN','7','10','Active','Sales Engineer',NULL,'$2y$12$ENFbt4kBGaEQs6vWIr1XR.y1HWTxkO1M3h3O.7tCo6/Mp7AhO1A5q',1,'1',NULL,NULL,'2025-11-24 05:39:26'),(72,'Medellin, Jay Espinosa','jay.medellin.jm@sanden-rs.com','RO-VISAYAS','7','','Active','Sales and Admin Staff',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(73,'Pundano, Merrie Ann Fajardo','merrie.pundano.mp@sanden-rs.com','HUMAN RESOURCE','6','','Active','HR Payroll Specialist',NULL,'$2y$12$OIOqJehBpzGMjLx2KKZ8COHnHDNTJjksOHHElt.XWnMwvx70EZ2P2',1,'1',NULL,NULL,'2025-10-30 01:34:33'),(74,'Soriano, Vazzim Jamolin','vazzim.soriano.vs@sanden-rs.com','AFTER SALES','4','3','Active','Product Engineer',NULL,'$2y$12$uL5T4RQIo/6.g0HbeRrKuORzzOEZgJoPZQ.m8IrDViexs5GxR9SW2',1,'1',NULL,NULL,'2025-10-30 07:17:23'),(75,'Mayamaya, Leonard Caday','leonard.mayamaya','COLD CHAIN','7','9','Active','Ref & Aircon Technician',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(76,'Autida, Ruby Mae ','ruby.autida.ra@sanden-rs.com','RO-MINDANAO','10','12','Active','Sales and Admin Staff',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(77,'Mahinay, Julie Nantes','julie.mahinay','COLD CHAIN','7','9','Active','Ref & Aircon Technician',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(78,'Gavino, John Louie Tamashiro','john.gavino.jg@sanden-rs.com','COLD CHAIN','7','10','Active','Sales and Admin Staff',NULL,'$2y$12$jV5RDDLaFszYrclPF5.NOeVKKlxzCWktwucGkUqaRi/9o8yNH6IrC',1,'1',NULL,NULL,'2025-11-19 05:07:29'),(79,'Perez, Hanzel Coligado','hanzel.perez','ADMIN','8','8','Active','Company Driver',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(80,'Lavena, Vinsie Legarda','vinsie.lavena.vl@sanden-rs.com','SCM','2','23','Active','Project Material Planner Specialist',NULL,'$2y$12$d52wqTi0t0KPNDeQ.1nouOF33AIYVpvQpqbwqA5drS/zQ9kGz36Ya',1,'1',NULL,NULL,'2025-11-04 01:39:54'),(81,'Tuazon, Elmer James','elmer.tuazon','RO-MINDANAO','10','12','Active','Warehouseman',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(82,'Chavez,John Amion','john.chavez.jc@sanden-rs.com','COLD CHAIN','7','9','Active','Sales Engineer',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(83,'Briones, Bea Patricia Costales','bea.briones.bb@sanden-rs.com','COLD CHAIN','7','8','Active','Sales Engineer',NULL,'$2y$12$Y01CQNhL/1c4UM.ttiyVAuw.nSQlNj/oBeTF6h8oLrpL33PKV5Bk2',1,'1',NULL,NULL,'2025-11-04 02:02:27'),(84,'Reyes,Mariel Justine','mariel.reyes.mr@sanden-rs.com','FINANCE','13','11','Active','Accounts Payable Staff',NULL,'$2y$12$rsz3OorAVG7Y484N2ukBfelT/5kpWO5EhCoGjwi75tY0DHDbvSMKG',1,'1',NULL,NULL,'2025-10-30 08:05:59'),(85,'Lumactud, John Rhay','john.lumactud','AFTER SALES','4','1','Active','Ref & Aircon Technician',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(86,'Umandap, Rommel Lumines','rommel.umandap.ru@sanden-rs.com','FINANCE','13','11','Active','Financial Analyst Accounts Receivable',NULL,'$2y$12$CFX9XQQdEloz5egf/OvZi.fthgyMR.UpD9nZUuqAUaG1xvsINHBqK',1,'1',NULL,NULL,'2025-10-30 07:32:18'),(87,'Godoy, Nemesis Reyes','nemesis.godoy.ng@sanden-rs.com','FINANCE','13','11','Active','Cost and Tax Analyst',NULL,'$2y$12$LED.aUXKlKo0J3Rc1dzkC.bLU70HaSFSokqvqGUJhw7T4blhHNwte',1,'1',NULL,NULL,'2025-10-31 00:58:16'),(88,'Batag, Maria Adrenee Bautista','adrenee.batag.ab@sanden-rs.com','RO-MINDANAO','10','12','Active','Sales Associate',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(89,'Solis, Ardie Cantal','ardie.solis.as@sanden-rs.com','RO-VISAYAS','7','','Active','Sales Executive',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(90,'Fortes, Neil Galang','neil.fortes.nf@sanden-rs.com','Advertising & Marketing','12','13','Active','Customer Service Coordinator',NULL,'$2y$12$TYdKpgDEM3t/6B9Vwyc6UezyjPzPjeifIuhW6FRG84oxQEO4eGuk6',1,'1',NULL,NULL,'2025-10-30 07:12:34'),(91,'Batayon, RJ Kenneth Pena','rj.batayon.rb@sanden-rs.com','SCM','2','23','Active','Inventory Planning Staff',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(92,'Placiente, Paulo Tosi','coldchain.operator.ph@sanden-rs.com','COLD CHAIN','7','8','Active','CAD Operator',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(93,'Natividad, Billy Gil Canonigo','billy.natividad.bn@sanden-rs.com','FINANCE','13','11','Active','Disbursement Analyst',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(94,'Leyson, Russel Blake Soquiat','russel.leyson.rl@sanden-rs.com','COLD CHAIN','7','8','Active','Project Engineer',NULL,'$2y$12$V81hgLvNkIviMjVY.57J5uQgF0g07N28pKC/8jhDi62RhMza5EEV6',1,'1',NULL,NULL,'2025-11-24 02:51:49'),(95,'Candolada, Raffy Jun Marterio','raffy.candolada.rc@sanden-rs.com','COLD CHAIN','7','10','Active','Sales Engineer',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(96,'Postrero, Angelie Elarco','angelie.postrero.ap@sanden-rs.com','PROCUREMENT & IMPORTATION','3','14','Active','Purchasing Analyst',NULL,'$2y$12$tSy6Rht2B8FkeEmN9nVpcuaVBqGQ6XzHTCob5fY14Z7BP3Y7J4Yza',1,'1',NULL,NULL,'2025-11-05 05:23:09'),(97,'Rabandaban, Richie Calanog','richie.rabandaban.rr@sanden-rs.com','FINANCE','13','','Active','Finance Manager',NULL,'$2y$12$WaJ.oJa00cguFBKp/lP7t.J1zwiIVe8a2/jogMQ5bRoitwYA8y7Mm',1,'3',NULL,NULL,'2025-11-05 00:37:33'),(98,'Frial, Dessa Quite','dessa.frial.df@sanden-rs.com','ADMIN','8','8','Active','Admin Staff',NULL,'$2y$12$AYmN95kOK4/R70dmaFvEP.1T/bTsnMvlkxJK94uNzq99zDFZXe2g.',1,'1',NULL,NULL,'2025-12-01 04:41:50'),(99,'Alcuizar,Noel Arcilla','noel.alcuizar','RO-VISAYAS','7','','Active','Delivery Driver',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(100,'Salagubang, Jeffrey Contreras','jeffrey.salagubang.js@sanden-rs.com','MIS','14','18','Active','MIS Analyst',NULL,'$2y$12$C.8Lb8wA5SLxoVMu2GOTQeLraKJrx4BbA8MDFWYpvXMwTUjGNcysK',1,'6',NULL,NULL,'2025-10-29 05:11:32'),(101,'Algire, Mark Joseph Garcia','mark.algire.ma@sanden-rs.com','COLD CHAIN','7','8','Active','Sales Engineer',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(102,'Perin, Edmar Fernandez','edmar.perin','AFTER SALES','4','1','Active','Ref & Aircon Technician',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(103,'Villasin, Dean Gadgode','cebu.technician.ph@sanden-rs.com','RO-VISAYAS','7','','Active','Ref & Aircon Technician',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(104,'Castillo, Kristina Andrea Terrones','kristina.castillo.kc@sanden-rs.com','COLD CHAIN','7','8','Active','Project Engineer',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(105,'Leycano, Francis Arellano','francis.leycano.fl@sanden-rs.com','COLD CHAIN','7','8','Active','Cadet Engineer',NULL,'$2y$12$SUSmksis0jiW2/t0GgH/COQoJ2pCcl1.qgv6e66MQt2LOP7EyJB42',0,'1',NULL,NULL,NULL),(106,'Dennis Videna','dennis.videna.dv@sanden-rs.com','South Luzon','6','2','Active','Sales Executive',NULL,'$2y$12$QWumB9jv/mXWNVCaDlQtfePX8r6mcji39LOnmfd6tkniXsy9nSGJ.',1,'1',NULL,NULL,'2025-11-05 00:22:35');
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `vpn_accounts`
+--
+
+DROP TABLE IF EXISTS `vpn_accounts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `vpn_accounts` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `send_status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'inactive',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=82 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `vpn_accounts`
+--
+
+LOCK TABLES `vpn_accounts` WRITE;
+/*!40000 ALTER TABLE `vpn_accounts` DISABLE KEYS */;
+INSERT INTO `vpn_accounts` VALUES (1,'CC_Adel','adel.barlan.ab@sanden-rs.com','CgacY8NI','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(2,'CC_Almar','almar.maruggay.dd@sanden-rs.com','WJa9XxOZ','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(3,'CC_Bea','bea.briones.bb@sanden-rs.com','AchV1ANh','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(4,'CC_Christian','christian.alcantara.ut@sanden-rs.com','duuDO824','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(5,'CC_Clarence','clarence.panambo.bc@sanden-rs.com','dHLii0EY','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(6,'CC_Edd','edd.malabanan.em@sanden-rs.com','SYI7J0vi','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(7,'CC_Emirlyn','emirlyn.palomillo.gi@sanden-rs.com','dJZa3R7u','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(8,'CC_Francis','francis.leycano.fl@sanden-rs.com','rgEMRXl2','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(9,'CC_John','john.chavez.jc@sanden-rs.com','8mGYr0GY','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(10,'CC_Josuah','josuah.repomanta.jr@sanden-rs.com','ECLN0V8v','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(11,'CC_Kristina','kristina.castillo.kc@sanden-rs.com','sO9H8GWc','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(12,'CC_Louie','john.gavino.jg@sanden-rs.com','V5N7p2DK','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(13,'CC_MarkJoseph','mark.algire.ma@sanden-rs.com','JN4rS78g','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(14,'CC_Nemicio','nemicio.balani.wz@sanden-rs.com','SOZzM91M','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(15,'CC_Paulo','coldchain.operator.ph@sanden-rs.com','q3KbQ2jt','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(16,'CC_Renniel','renniel.capuso.rc@sanden-rs.com','HJCn5B6j','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(17,'CC_Robert','robert.alpajaro.vf@sanden-rs.com','2vKMQnCD','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(18,'CEB_Ardie','ardie.solis.as@sanden-rs.com','b9STF5dz','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(19,'CEB_Cherry','cherry.estares.ym@sanden-rs.com','BZWT55Yl','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(20,'CEB_Jay','jay.medellin.jm@sanden-rs.com','38QMuGdh','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(21,'CEB_Levie','levie.lerasan.ew@sanden-rs.com','7QRMPNXw','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(22,'CEB_Luel','luel.mondejar.lm@sanden-rs.com','oE8GI1EB','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(23,'CEB_Technician','cebu.technician.ph@sanden-rs.com','TYO4YRy8','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(24,'CL_Alvin',' alvin.capuno.ac@sanden-rs.com','QxQ05ko8','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(25,'CL_Jamaica','jamaica.bucu.jc@sanden-rs.com','ij0U3g0b','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(26,'CL_Joyce','joyce.delacruz.jb@sanden-rs.com','MykQPT3L','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(27,'CL_Rose','maryrose.ilagan.mi@sanden-rs.com','6egR2HSO','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(28,'CL_Technician','centralluzon.technician.ph@sanden-rs.com','T7yF94Oo','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(29,'DAV_Daryl','daryl.delfin.sv@sanden-rs.com','gnk6W1Pe','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(30,'DAV_Ella','ella.villa.vo@sanden-rs.com','mOzqLl2R','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(31,'DAV_Gerald','gerald.gersalina.dc@sanden-rs.com','M9KlM1AG','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(32,'DAV_Maria','esther.requinta.rk@sanden-rs.com R','22M6HMWE','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(33,'DAV_MariaA','adrenee.batag.ab@sanden-rs.com','1r85vVTk','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(34,'DAV_Pearl','pearl.pacilan.df@sanden-rs.com','bt4xUrQ2','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(35,'DAV_Raffy','raffy.candolada.rc@sanden-rs.com','BLqdJ8E5','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(36,'DAV_Ruby','ruby.autida.ra@sanden-rs.com','CpHzYu05','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(37,'FHD','fernan.dichoso.cj@sanden-rs.com','2uObsP06','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(38,'FIN_Alvin','alvin.joven.fi@sanden-rs.com','P7V0WEkX','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(39,'FIN_Billy','billy.natividad.bn@sanden-rs.com','F4Oh0vyy','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(40,'FIN_Mariel','mariel.reyes.mr@sanden-rs.com','86YPtRIf','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(41,'FIN_Monette','monette.salazar.ms@sanden-rs.com ','9Gm0BHCS','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(42,'FIN_Nemesis','nemesis.godoy.ng@sanden-rs.com','GQO4HY64','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(43,'FIN_Richie','richie.rabandaban.rr@sanden-rs.com','2gTatLZV','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(44,'FIN_Rommel','rommel.umandap.ru@sanden-rs.com','dvhCIUH6','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(45,'FIN_Vinsie','vinsie.lavena.vl@sanden-rs.com','LjwM7W0r','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(46,'HQ_Celestial','celestial.m.beran.qr@sanden-rs.com','WLfnE7U6','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(47,'HQ_Kane','kane.gonzales.kc@sanden-rs.com','x0yFOAVY','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(48,'HQ_Neil','neil.fortes.nf@sanden-rs.com','fAnKaGR3','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(49,'HQ_Ricky','ricky.salamante.rs@sanden-rs.com','W96pUOYZ','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(50,'HRAD_Dessa','dessa.frial.df@sanden-rs.com','9P9IQLzH','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(51,'HRAD_Gerryca','gerryca.joves.gj@sanden-rs.com','88ht1ADB','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(52,'HRAD_Merrie','merrie.pundano.mp@sanden-rs.com','3LO5l7Ph','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(53,'HRAD_Neil','neil.olivera.no@sanden-rs.com','Czo9K9j6','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(54,'HRAD_Nelson','nelson.cubio.nc@sanden-rs.com','qmTozA27','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(55,'Ikeda','osamu.ikeda.iv@sanden-rs.com','6LEYYkZL','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(56,'JUA','julius.apigo.dw@sanden-rs.com','R7tGV1P1','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(57,'MIS_Euvy','euvy.marable.df@sanden-rs.com','R1ft^!64','1','Active','2025-11-13 16:00:00','2025-11-28 01:17:35'),(58,'MIS_Jeffrey','jeffrey.salagubang.js@sanden-rs.com','GoFSnzP4','0','Active','2025-10-13 16:00:00','2025-10-29 01:25:07'),(59,'MIS_Keam','keam.luwys.kl@sanden-rs.com','HGR6AJBU','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(60,'MS_Billy','billy.manalo.nq@sanden-rs.com','PcyCeAo0','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(61,'MS_Dennis','dennis.videna.dv@sanden-rs.com','G6AEcuLO','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(62,'MS_Ian','ian.llaneta.ih@sanden-rs.com','92oWO19r','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(63,'MS_Julieta','julieta.alcos.qp@sanden-rs.com','RsGi0fCJ','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(64,'MS_Rhea','rhea.villar.rv@sanden-rs.com','ANHDNn72','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(65,'MS_William','william.llosala.wl@sanden-rs.com','Qt0iPc73','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(66,'NL_Jordan','jordan.galdones.wd@sanden-rs.com','J95CROZ4','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(67,'NL_Technician','northluzon.technician.ph@sanden-rs.com','IkV4Q1JN','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(68,'SCM_Angelie','angelie.postrero.ap@sanden-rs.com','kp9JKaL4','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(69,'SCM_Den','den.amurao.da@sanden-rs.com','OGXaDGt8','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(70,'SCM_Jeffrey','jeffrey.dealino.cd@sanden-rs.com','S2RAC7AP','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(71,'SCM_Jeravy','jeravy.decastro.jd@sanden-rs.com','dA2ytc1z','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(72,'SCM_RJ','rj.batayon.rb@sanden-rs.com','0VTnvr8d','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(73,'SCM_Ronalyn','ronalyn.pulutan.df@sanden-rs.com','EYRhp0VD','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(74,'SCM_Sabrina','sabrina.m.mosquera.sb@sanden-rs.com','9Uinx8NP','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(75,'WTY_Joana','joana.pabillo.fa@sanden-rs.com','obqW2Mv9','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(76,'WTY_Mark','mark.garcia.mg@sanden-rs.com','7WkdCi4H','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07'),(77,'WTY_Vazzim','vazzim.soriano.vs@sanden-rs.com','Ai0OdHWV','0','Active','2025-11-13 16:00:00','2025-10-29 01:25:07');
+/*!40000 ALTER TABLE `vpn_accounts` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2025-12-07  0:00:01

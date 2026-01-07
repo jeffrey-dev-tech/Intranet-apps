@@ -41,6 +41,7 @@ class RequestFieldController extends Controller
                 <option value="Design">Design (Website, Brochure, Video & Photo shoot, etc)</option>
                 <option value="Installation of Application">Installation of Application</option>
                 <option value="Corporate Website">Corporate Website</option>
+                    <option value="Intranet Support">Intranet Support</option>
                 <option value="Other">Other</option>
                 </select>
 
@@ -133,7 +134,7 @@ class RequestFieldController extends Controller
                     <label class="control-label" for="intranet_request_type">Type</label>
                    <select name="intranet_request_type" id="intranet_request_type" required>
                     <option selected disabled>Choose Type</option>
-                    <option value="New Intranet">New Intranet</option>
+                    <option value="New Intranet">New Intranet System</option>
                     <option value="Change Request">Change Request</option>
                    </select>
                   </div>

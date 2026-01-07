@@ -3,10 +3,14 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ChristmasController;
  Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/logout', function () { return redirect()->route('login'); });
 Route::middleware(['guest', 'prevent-back-history'])->group(function () {
     Route::get('/', [PageController::class, 'login'])->name('login');
+    
+Route::get('/christmas-images', [ChristmasController::class, 'getImages']);
+
     Route::post('/login', [AuthController::class, 'processLogin'])->name('login.process');
 });
 Route::middleware(['auth', 'dashboard.maintenance'])->group(function () {

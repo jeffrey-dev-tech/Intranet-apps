@@ -227,12 +227,12 @@ input[type="file"]::file-selector-button:active {
         >
     </div>
 </div>
-<div class="message-disabled">
+<!-- <div class="message-disabled">
     <h6>Temporary Disabled</h6>
-</div>
+</div> -->
     <div class="col-sm-12">
       <div class="form-group">
-        <input type="button" name="btnSubmit" id="btnSubmit" class="btn btn-success" value="Submit" disabled>
+        <input type="button" name="btnSubmit" id="btnSubmit" class="btn btn-success" value="Submit">
           
       </div>
     </div>

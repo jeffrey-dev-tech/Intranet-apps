@@ -8,6 +8,7 @@ $routeFiles = [
     'forms.php',
     'activities.php',
     'teams.php',
+    'pettycash.php',
 ];
 
 foreach ($routeFiles as $file) {

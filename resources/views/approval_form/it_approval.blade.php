@@ -177,7 +177,7 @@
         {{ $approval->remarks ?? '-' }}
     </div>
 </td>
-                             <td>{{ $approval->created_at ? $approval->created_at->format('Y-m-d H:i:s') : '-' }}</td>
+                             <td>{{ $approval->updated_at ? $approval->updated_at->format('Y-m-d H:i:s') : '-' }}</td>
 
                                 </tr>
                             @endforeach

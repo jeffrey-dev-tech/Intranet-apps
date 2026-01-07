@@ -24,13 +24,14 @@
 <body style="background: linear-gradient(45deg, #007bff, #7ee5e5);">
     <style>
       
-    .sm-logo-sanden{
-        padding-top:100px;
-        margin-left: 50px;
-        justify-content: center;
-    }
+ .sm-logo-sanden{
+padding-top: 100px;
+margin-left: 50px;
+justify-content: center;
+text-align: center;
+}
     </style>
-<style>
+<!-- <style>
     .alert-message {
         color: red;
         animation: shake 1s;
@@ -50,7 +51,7 @@
         100% { transform: translateX(0); }
     }
 </style>
- <!-- 
+ 
 <script>
     window.addEventListener("load", function() {
       document.querySelector(".main").classList.add("loaded");
@@ -66,8 +67,25 @@
 <div class="snow" style="color: skyblue;">&#10052;</div>
 <div class="snow" style="color: skyblue;">&#10052;</div>
 <div class="snow" style="color: skyblue;">&#10052;</div>
-	</div>
+<div class="snow" style="color: skyblue;">&#10052;</div>
+
+</div>
 </div> -->
+
+<!-- @php
+    $images = [
+        'ornament.gif',
+        'gingerbread.gif.gif',
+        'tree.gif',
+        'candy cane.gif',
+        'bell.gif',
+        'stocking.gif',
+        'gift.gif',
+        'reindeer.gif',
+        'candle.gif'
+    ];
+    $randomImage = $images[array_rand($images)];
+@endphp -->
 	<div class="main-wrapper">
 		<div class="page-wrapper full-page">
 			<div class="page-content d-flex align-items-center justify-content-center">
@@ -75,11 +93,16 @@
 				<div class="row w-100 mx-0 auth-page">
 					<div class="col-md-8 col-xl-6 mx-auto">
 						<div class="card">
+   <!-- <div style="display: flex; position: absolute; right: 0;">
+  <img id="christmasImg" src="" alt="Christmas Image" style="width: 100px;">
+</div> -->
 							<div class="row">
                 <div class="col-md-4 pr-md-0">
                   <div class="auth-left-wrapper">
+                  
                     <div class="sm-logo-sanden">
-                 <img src="{{ asset('img/sm-logo.jpg') }}" alt="">
+              
+                    <img src="{{ asset('img/sm-logo.jpg') }}" alt="">
 
                     </div>
                        
@@ -126,7 +149,22 @@
 			</div>
 		</div>
 	</div>
+<!-- <script>
+    const imgEl = document.getElementById('christmasImg');
 
+    fetch('/christmas-images')
+        .then(res => res.json())
+        .then(images => {
+            if(images.length === 0) return;
+            imgEl.src = images[0]; // initial image
+
+            setInterval(() => {
+                const random = images[Math.floor(Math.random() * images.length)];
+                imgEl.src = random;
+            }, 5000);
+        })
+        .catch(err => console.error('Failed to load images:', err));
+</script> -->
     	<!-- core:js -->
 	<script src="{{asset('assets/vendors/core/core.js')}}"></script>
 	<!-- endinject -->

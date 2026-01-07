@@ -74,40 +74,59 @@ public function store(Request $request)
     DB::beginTransaction();
 
     try {
+        // --- Validate request ---
         $validated = $request->validate([
-            'activity_id' => 'required|exists:activities,id',
-            'progress_value' => 'required|numeric',
+            'activity_id'        => 'required|exists:activities,id',
+            'progress_value'     => 'required|numeric',
             'other_informations' => 'required|string',
-            'team_id' => 'required|exists:teams,id',
-            'level_id' => 'required|integer',
-            'department' => 'required|string',
-            'email' => 'required|email',
+            'team_id'            => 'required|exists:teams,id',
+            'department'         => 'required|string',
+            'email'              => 'required|email',
         ]);
 
-        // Generate log_id
+        // --- Load team and its level ---
+        $team = Team::with('users', 'level')->findOrFail($validated['team_id']);
+        $level = $team->level;
+
+        if (!$level) {
+            return response()->json([
+                'success' => false,
+                'message' => "Challenge level not found for this team."
+            ], 404);
+        }
+
+        // --- Check if team is complete ---
+        $currentMembersCount = $team->users()->count();
+        if ($currentMembersCount < $level->team_size) {
+            return response()->json([
+                'success' => false,
+                'message' => "Submission blocked: Team '{$team->name}' is not complete yet. Current members: {$currentMembersCount}/{$level->team_size}."
+            ], 422);
+        }
+
+        // --- Generate log_id ---
         $prefix = 'LOG';
         $date = date('Ymd');
         $randomSuffix = substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 4);
         $logId = $prefix . '-' . $date . '-' . $randomSuffix;
 
-        // Create the submission (still inside transaction)
+        // --- Create submission ---
         $submission = Submission::create([
-            'log_id' => $logId,
-            'user_id' => auth()->id(),
-            'team_id' => $validated['team_id'],
-            'activity_id' => $validated['activity_id'],
-            'activity_name' => Activity::find($validated['activity_id'])->name,
-            'level_id' => $validated['level_id'],
-            'progress_value' => $validated['progress_value'],
+            'log_id'             => $logId,
+            'user_id'            => auth()->id(),
+            'team_id'            => $team->id,
+            'activity_id'        => $validated['activity_id'],
+            'activity_name'      => Activity::find($validated['activity_id'])->name,
+            'level_id'           => $level->id,
+            'progress_value'     => $validated['progress_value'],
             'other_informations' => $validated['other_informations'],
-            'department' => $validated['department'],
-            'email' => $validated['email'],
+            'department'         => $validated['department'],
+            'email'              => $validated['email'],
         ]);
 
-        // --- Collect attachments ---
+        // --- Handle attachments ---
         $attachments = [];
         $tempFiles = [];
-
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
                 $path = $file->store('temp_attachments');
@@ -122,53 +141,47 @@ public function store(Request $request)
             }
         }
 
-        // --- Email details ---
+        // --- Prepare email ---
         $to = ['neil.olivera.no@sanden-rs.com'];
         $cc = [];
         $bcc = [];
         $subject = "New Activity Submission - {$submission->activity_name}";
 
-        // Optional logo embedding
         $logoPath = public_path('img/sanden-logo-white.png');
-        $logoDataUri = null;
-        if (file_exists($logoPath)) {
-            $logoDataUri = 'data:' . mime_content_type($logoPath) . ';base64,' . base64_encode(file_get_contents($logoPath));
-        }
+        $logoDataUri = file_exists($logoPath)
+            ? 'data:' . mime_content_type($logoPath) . ';base64,' . base64_encode(file_get_contents($logoPath))
+            : null;
 
-        // Render email body with Blade view
-      $body = view('emails.activity_mail', [
-        'team_name'      => $submission->team->name ?? 'N/A',
-        'activity_name'  => $submission->activity_name,
-        'activity_level' => $submission->level_id,
-        'uploader_name'  => auth()->user()->name,
-        'department'     => auth()->user()->department,
-        'progress_value' => $submission->progress_value,
-        'other_info'     => $submission->other_informations,
-        'log_id'         => $submission->log_id,
-        'logoDataUri'           => $logoDataUri, // ✅ logo included
-    ])->render();
+        $body = view('emails.activity_mail', [
+            'team_name'      => $team->name,
+            'activity_name'  => $submission->activity_name,
+            'activity_level' => $level->level_number,
+            'uploader_name'  => auth()->user()->name,
+            'department'     => auth()->user()->department,
+            'progress_value' => $submission->progress_value,
+            'other_info'     => $submission->other_informations,
+            'log_id'         => $submission->log_id,
+            'logoDataUri'    => $logoDataUri,
+        ])->render();
 
         // --- Send email ---
         $mailService = new ActivitiesMailService();
         $mailService->registration_mail($to, $cc, $bcc, $subject, $body, $attachments);
 
-        // --- If email succeeded, commit DB transaction ---
         DB::commit();
 
         // --- Cleanup temporary files ---
         foreach ($tempFiles as $file) {
-            if (file_exists($file)) {
-                unlink($file);
-            }
+            if (file_exists($file)) unlink($file);
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Submission created, email sent, and attachments cleaned up successfully',
+            'message' => 'Submission created successfully, email sent, and attachments cleaned up.',
         ], 201);
 
     } catch (\Throwable $e) {
-        DB::rollBack(); // rollback if DB error OR email error
+        DB::rollBack();
         Log::error('Submission error: ' . $e->getMessage());
 
         return response()->json([
@@ -177,9 +190,6 @@ public function store(Request $request)
         ], 500);
     }
 }
-
-
-
 
 
 }

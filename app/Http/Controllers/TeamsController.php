@@ -234,7 +234,7 @@ if ($request->role_type === 'member') {
 }
 public function members($teamId)
 {
-    Log::info("Fetching members for team ID: {$teamId}");
+    // Log::info("Fetching members for team ID: {$teamId}");
 
     try {
         // Find the team and its active level_id
@@ -242,7 +242,7 @@ public function members($teamId)
             ->findOrFail($teamId);
 
         $teamLevelId = $team->level?->id; // or $team->level_id
-        Log::info("Resolved team level ID", ['team_id' => $teamId, 'level_id' => $teamLevelId]);
+        // Log::info("Resolved team level ID", ['team_id' => $teamId, 'level_id' => $teamLevelId]);
 
         // Load users with submission sums & counts filtered by level_id
         $team->load(['users' => function ($query) use ($teamLevelId) {
@@ -285,15 +285,15 @@ public function members($teamId)
                 })
                 ->pluck('progress_value_exceed');
 
-            Log::info("Member progress debug", [
-                'team_id' => $teamId,
-                'user_id' => $user->id,
-                'approved_progress_sum' => $approved,
-                'progress_value_exceed_sum' => $approvedExceed,
-                'raw_progress_value_exceed' => $rawSubmissions, // 👈 all DB values
-                'per_member_required' => $perMemberRequired,
-                'approved_submissions_count' => $user->approved_submissions_count ?? 0,
-            ]);
+            // Log::info("Member progress debug", [
+            //     'team_id' => $teamId,
+            //     'user_id' => $user->id,
+            //     'approved_progress_sum' => $approved,
+            //     'progress_value_exceed_sum' => $approvedExceed,
+            //     'raw_progress_value_exceed' => $rawSubmissions, // 👈 all DB values
+            //     'per_member_required' => $perMemberRequired,
+            //     'approved_submissions_count' => $user->approved_submissions_count ?? 0,
+            // ]);
 
             return [
                 'id' => $user->id,
@@ -314,13 +314,13 @@ public function members($teamId)
             ? ($totalApprovedProgress / $teamRequiredValue) * 100
             : 0;
 
-        Log::info("Team summary", [
-            'team_id' => $teamId,
-            'total_approved_progress' => $totalApprovedProgress,
-            'team_required_value' => $teamRequiredValue,
-            'percentage_of_required' => $percentageOfRequired,
-            'members_count' => $members->count(),
-        ]);
+        // Log::info("Team summary", [
+        //     'team_id' => $teamId,
+        //     'total_approved_progress' => $totalApprovedProgress,
+        //     'team_required_value' => $teamRequiredValue,
+        //     'percentage_of_required' => $percentageOfRequired,
+        //     'members_count' => $members->count(),
+        // ]);
 
         // Check if no submissions yet
         $hasSubmissions = $members->sum('approved_submissions_count') > 0;
@@ -390,7 +390,7 @@ public function list()
 {
     $userId = auth()->id(); // logged-in user ID
 
-    if ($userId == 69 || $userId == 119) {
+    if ($userId == 63 || $userId == 100 || $userId == 34 || $userId == 18) {
         // Special users: fetch all teams (all statuses)
         $teams = Team::withCount('users')->get();
     } else {
@@ -414,7 +414,7 @@ public function activityLogsList()
     $userId = auth()->user()->id;
 
     // Determine which submissions to fetch
-    if (in_array($userId, [69, 119])) {
+    if (in_array($userId, [63, 100])) {
         // Admins: get all submissions
         $submissions = Submission::with(['activity', 'team', 'user', 'level'])->get();
     } else {
@@ -453,7 +453,7 @@ public function checkUserPendingStatus()
 
     // Step 1: Get all team_ids where status = 'pending' AND the activity is active AND team created this year
     $pendingTeamIds = Team::where('status', 'pending')
-        ->whereYear('created_at', $currentYear) // ✅ filter by current year
+        // ->whereYear('created_at', $currentYear) // ✅ filter by current year
         ->whereHas('activity', function ($query) {
             $query->where('status', 'active'); // only active activities
         })

@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Show approval row only for user 69/119 AND pending logs
 const userId = @json(auth()->user()->id);
 
-if (approvalRow && (userId === 69 || userId === 119) && log.status === 'pending') {
+if (approvalRow && (userId === 63 || userId === 100) && log.status === 'pending') {
     approvalRow.style.display = 'table-row';
     console.log('Approval row displayed');
 } else {

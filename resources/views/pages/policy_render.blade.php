@@ -270,157 +270,180 @@ docSelect.addEventListener('change', function () {
 /* **************************************** End of policy table************************************ */  
 
 /* **************************************** Start of load file ************************************ */
-let currentFilename = '';
-let currentDepartment = '';
+let currentSignedUrl = '';
 let currentPDF = null;
+let isLoading = false;
 
-let isLoading = false; // 🔒 Global flag
-async function loadFile(filename, department, pageFilter = null) {
-  if (isLoading) return;
-  isLoading = true;
+// -------------------------
+// Load and Render PDF
+// -------------------------
+async function loadFile(signedUrl, pageFilter = null) {
+    if (isLoading) return;
+    isLoading = true;
 
-  currentFilename = filename;
-  currentDepartment = department;
+    currentSignedUrl = signedUrl;
 
-  const viewer = document.getElementById('viewer');
-  viewer.innerHTML = '';
+    const viewer = document.getElementById('viewer');
+    viewer.innerHTML = '';
 
-  // 🔹 Show SweetAlert loading
-Swal.fire({
-  title: 'Loading...',
-  text: 'Please wait...',
-  toast: true,          // small toast style
-  position: 'center',   // center of screen
-  background: '#dbeafe', // 👈 light blue background (Tailwind's blue-100)
-  color: '#1e3a8a',     // optional: dark blue text
-  allowOutsideClick: false,
-  allowEscapeKey: false,
-  showConfirmButton: false,
-  didOpen: () => {
-    Swal.showLoading();
-  }
-});
-
-  const url = `/pdf/view?file=${encodeURIComponent(filename)}&department=${encodeURIComponent(department)}`;
-  const loadingTask = pdfjsLib.getDocument(url);
-
-  try {
-    const pdf = await loadingTask.promise;
-    currentPDF = pdf;
-    const numPages = pdf.numPages;
-
-    let pagesToRender = [];
-    if (pageFilter && pageFilter.length > 0) {
-      pagesToRender = pageFilter.filter(p => p >= 1 && p <= numPages);
-      if (pagesToRender.length === 0) {
-        viewer.innerHTML = `<p style="color:red;">No valid page numbers selected.</p>`;
-        Swal.close(); // 🔹 Close SweetAlert
-        isLoading = false;
-        return;
-      }
-    } else {
-      pagesToRender = Array.from({ length: numPages }, (_, i) => i + 1);
-    }
-
-    for (const pageNumber of pagesToRender) {
-      const page = await pdf.getPage(pageNumber);
-      const scale = 1.3;
-      const viewport = page.getViewport({ scale });
-
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-
-      await page.render({ canvasContext: context, viewport }).promise;
-      addWatermark(context, canvas.width, canvas.height, 'UNCONTROLLED');
-      addPageNumber(context, canvas.width, canvas.height, pageNumber, numPages);
-
-      viewer.appendChild(canvas);
-    }
-
-    Swal.close(); // 🔹 Hide loader
-    viewer.scrollTo({ top: 0, behavior: 'smooth' });
-
-  } catch (error) {
-    viewer.innerHTML = '❌ Failed to load PDF.';
-    console.error(error);
-    Swal.fire('Error', 'Failed to load PDF.', 'error'); // 🔹 Error alert
-  } finally {
-    isLoading = false;
-  }
-}
-
-
-
-
-// ✅ Parse multiple pages input (supports "1,3,5" and "2-4")
-function parsePageInput(input) {
-  const pages = [];
-  const parts = input.split(',');
-  for (let part of parts) {
-    part = part.trim();
-    if (part.includes('-')) {
-      const [start, end] = part.split('-').map(Number);
-      if (!isNaN(start) && !isNaN(end) && start <= end) {
-        for (let i = start; i <= end; i++) {
-          pages.push(i);
-        }
-      }
-    } else {
-      const page = parseInt(part);
-      if (!isNaN(page)) pages.push(page);
-    }
-  }
-  return [...new Set(pages)]; // Remove duplicates
-}
-
-function filterPages() {
-  const input = document.getElementById('pageInput').value;
-  const pageArray = parsePageInput(input);
-  if (currentPDF && pageArray.length > 0) {
-    loadFile(currentFilename, currentDepartment, pageArray);
-  } else {
+    // 🔹 Show loading indicator
     Swal.fire({
-  icon: 'warning',
-  title: 'Invalid Input',
-  text: 'Enter valid page numbers or ranges.',
-  confirmButtonText: 'OK',
-  confirmButtonColor: '#3085d6'
-});
-  }
+        title: 'Loading...',
+        text: 'Please wait...',
+        toast: true,
+        position: 'center',
+        background: '#dbeafe',
+        color: '#1e3a8a',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => Swal.showLoading()
+    });
+
+    try {
+        const loadingTask = pdfjsLib.getDocument({
+            url: signedUrl,
+            withCredentials: true // ✅ send Laravel session cookie
+        });
+
+        const pdf = await loadingTask.promise;
+        currentPDF = pdf;
+        const numPages = pdf.numPages;
+
+        let pagesToRender = [];
+        if (pageFilter && pageFilter.length > 0) {
+            pagesToRender = pageFilter.filter(p => p >= 1 && p <= numPages);
+            if (pagesToRender.length === 0) {
+                viewer.innerHTML = `<p style="color:red;">No valid page numbers selected.</p>`;
+                Swal.close();
+                isLoading = false;
+                return;
+            }
+        } else {
+            pagesToRender = Array.from({ length: numPages }, (_, i) => i + 1);
+        }
+
+        for (const pageNumber of pagesToRender) {
+            const page = await pdf.getPage(pageNumber);
+            const scale = 1.3;
+            const viewport = page.getViewport({ scale });
+
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+
+            await page.render({ canvasContext: context, viewport }).promise;
+
+            addWatermark(context, canvas.width, canvas.height, 'UNCONTROLLED');
+            addPageNumber(context, canvas.width, canvas.height, pageNumber, numPages);
+
+            viewer.appendChild(canvas);
+        }
+
+        Swal.close();
+        viewer.scrollTo({ top: 0, behavior: 'smooth' });
+
+    } catch (error) {
+        viewer.innerHTML = '❌ Failed to load PDF.';
+        console.error(error);
+        Swal.fire('Error', 'Failed to load PDF.', 'error');
+    } finally {
+        isLoading = false;
+    }
 }
 
+// -------------------------
+// Parse page input
+// -------------------------
+function parsePageInput(input) {
+    const pages = [];
+    const parts = input.split(',');
+    for (let part of parts) {
+        part = part.trim();
+        if (part.includes('-')) {
+            const [start, end] = part.split('-').map(Number);
+            if (!isNaN(start) && !isNaN(end) && start <= end) {
+                for (let i = start; i <= end; i++) pages.push(i);
+            }
+        } else {
+            const page = parseInt(part);
+            if (!isNaN(page)) pages.push(page);
+        }
+    }
+    return [...new Set(pages)]; // remove duplicates
+}
+
+// -------------------------
+// Filter pages
+// -------------------------
+function filterPages() {
+    const input = document.getElementById('pageInput').value;
+    const pageArray = parsePageInput(input);
+
+    if (currentPDF && pageArray.length > 0) {
+        loadFile(currentSignedUrl, pageArray);
+    } else {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Invalid Input',
+            text: 'Enter valid page numbers or ranges.',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#3085d6'
+        });
+    }
+}
+
+// -------------------------
+// Show all pages
+// -------------------------
 function showAllPages() {
-  if (currentPDF) {
-    loadFile(currentFilename, currentDepartment);
-  }
+    if (currentPDF) {
+        loadFile(currentSignedUrl);
+    }
 }
 
-// ✅ Watermark function
+// -------------------------
+// Watermark
+// -------------------------
 function addWatermark(ctx, width, height, text) {
-  ctx.save();
-  ctx.globalAlpha = 0.15;
-  ctx.translate(width / 2, height / 2);
-  ctx.rotate(-Math.PI / 4);
-  ctx.font = 'bold 78px Arial';
-  ctx.fillStyle = 'red';
-  ctx.textAlign = 'center';
-  ctx.fillText(text, 0, 0);
-  ctx.restore();
+    ctx.save();
+    ctx.globalAlpha = 0.15;
+    ctx.translate(width / 2, height / 2);
+    ctx.rotate(-Math.PI / 4);
+    ctx.font = 'bold 78px Arial';
+    ctx.fillStyle = 'red';
+    ctx.textAlign = 'center';
+    ctx.fillText(text, 0, 0);
+    ctx.restore();
 }
 
-// ✅ Page number function
+// -------------------------
+// Page number
+// -------------------------
 function addPageNumber(ctx, width, height, pageNumber, totalPages) {
-  ctx.save();
-  ctx.globalAlpha = 0.8;
-  ctx.font = 'bold 16px Arial';
-  ctx.fillStyle = 'black';
-  ctx.textAlign = 'center';
-  ctx.fillText(`Page ${pageNumber} of ${totalPages}`, width / 2, height - 20);
-  ctx.restore();
+    ctx.save();
+    ctx.globalAlpha = 0.8;
+    ctx.font = 'bold 16px Arial';
+    ctx.fillStyle = 'black';
+    ctx.textAlign = 'center';
+    ctx.fillText(`Page ${pageNumber} of ${totalPages}`, width / 2, height - 20);
+    ctx.restore();
 }
 
+// -------------------------
+// Example usage
+// -------------------------
+document.addEventListener('DOMContentLoaded', () => {
+    // Laravel passes signed URL
+    const signedUrl = "{{ $signedUrl }}";
+
+    loadFile(signedUrl);
+
+    // Optional: attach buttons
+    document.getElementById('filterBtn')?.addEventListener('click', filterPages);
+    document.getElementById('showAllBtn')?.addEventListener('click', showAllPages);
+});
 
 /* **************************************** end of load file ************************************ */
 

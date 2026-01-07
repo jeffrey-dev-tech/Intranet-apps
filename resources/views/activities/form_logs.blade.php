@@ -25,7 +25,6 @@ input[type="file"]::file-selector-button:hover { background-color: #f3f4f6; }
 input[type="file"]::file-selector-button:active { background-color: #e5e7eb; }
 </style>
 <style>
-
 .ranking-heading {
   display: flex;                 /* arrange items side by side */
   align-items: center;           /* vertically center image + text */
@@ -36,6 +35,9 @@ input[type="file"]::file-selector-button:active { background-color: #e5e7eb; }
   margin: 0;
   font-family: "Atlanta College", sans-serif;
 
+}
+.ranking-heading h3 {
+  text-align: center;                 /* keep aspect ratio */
 }
 
 
@@ -52,7 +54,7 @@ input[type="file"]::file-selector-button:active { background-color: #e5e7eb; }
   <div class="row">
     <div class="col-md-8 grid-margin stretch-card mx-auto">
       <div class="card">
-           <img class="ranking-heading" src="{{asset('img/wellness-2.png')}}" alt="">
+         <img class="ranking-heading" src="{{asset('img/Q1 - Lets Win Together1.jpg')}}" alt="">
         <div class="card-body">
 
                   
