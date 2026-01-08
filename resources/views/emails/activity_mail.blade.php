@@ -124,7 +124,7 @@ to 79 Manila Line: (02) 8-898- 5110
 
 <tr>
     <td colspan="2" align="center" style="padding: 20px;">
-        <a href="https://intranet.sanden.net//teams/activity/approval/{{ $log_id }}" 
+        <a href="https://intranet.sanden.net/teams/activity/approval/{{ $log_id }}" 
            style="
                background-color: #007bff;
                color: #ffffff;

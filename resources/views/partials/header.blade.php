@@ -256,7 +256,7 @@
 @endif
 @endauth
 @auth
-@if (in_array(auth()->user()->role, ['6']))
+@if(auth()->user()->pcv)
    <!-- <li class="nav-item nav-category">Docs</li> -->
 		      <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#pcvs" role="button" aria-expanded="false" aria-controls="pcvs">

@@ -91,6 +91,10 @@ public function head()
 {
 return $this->belongsTo(DepartmentHead::class, 'head_id');
 }
+public function pcv()
+{
+    return $this->hasOne(PCVUser::class, 'user_id', 'id');
+}
 
 
 }
