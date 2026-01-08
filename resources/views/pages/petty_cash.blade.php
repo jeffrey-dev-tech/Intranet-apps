@@ -29,7 +29,7 @@
         @csrf
         <div class="mb-3">
             <label for="department" class="form-label">Department</label>
-            <select class="form-select" id="department" name="department" required>
+            <select class="form-select " id="department" name="department" required>
                 <option selected disabled>Select Department</option>
                 @foreach($departments as $dept)
                     <option value="{{ $dept->id }}">{{ $dept->name }}</option>
@@ -134,11 +134,9 @@ document.getElementById('downloadBtn').addEventListener('click', function() {
         confirmButtonText: 'Yes, download it!'
     }).then((result) => {
         if (result.isConfirmed) {
-            // Prepare form data
             const form = document.getElementById('downloadVoucherForm');
             const formData = new FormData(form);
 
-            // AJAX fetch with blob response
             fetch("{{ route('download_voucher') }}", {
                 method: 'POST',
                 headers: {
@@ -148,34 +146,30 @@ document.getElementById('downloadBtn').addEventListener('click', function() {
             })
             .then(response => {
                 if (!response.ok) throw new Error('Something went wrong!');
-                return response.blob();
+
+                // Get filename from Content-Disposition header
+                const contentDisposition = response.headers.get('Content-Disposition');
+                const fileNameMatch = contentDisposition?.match(/filename="(.+)"/);
+                const fileName = fileNameMatch ? fileNameMatch[1] : 'voucher.pdf';
+
+                return response.blob().then(blob => ({ blob, fileName }));
             })
-            .then(blob => {
-                // Create a link to download
+            .then(({ blob, fileName }) => {
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-
-                // Generate filename: Petty Cash Voucher YYYY-MM-DD.pdf
-                const today = new Date();
-                const yyyy = today.getFullYear();
-                const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months start at 0
-                const dd = String(today.getDate()).padStart(2, '0');
-                const formattedDate = `${yyyy}-${mm}-${dd}`;
-
-                a.download = `Petty Cash Voucher ${formattedDate}.pdf`;
+                a.download = fileName; // use backend-generated filename
                 document.body.appendChild(a);
                 a.click();
                 a.remove();
                 window.URL.revokeObjectURL(url);
 
-                // Show success alert
                 Swal.fire(
                     'Downloaded!',
                     'Your voucher has been downloaded.',
                     'success'
                 ).then(() => {
-                    location.reload(); // reload after success
+                    location.reload();
                 });
             })
             .catch(error => {
@@ -189,5 +183,6 @@ document.getElementById('downloadBtn').addEventListener('click', function() {
     });
 });
 </script>
+
 
 @endsection

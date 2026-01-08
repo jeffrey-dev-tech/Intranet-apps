@@ -14,11 +14,8 @@ class PettyCashController extends Controller
 public function pettycashform()
 {
     $user = Auth::user();
-    // Superusers: IDs 53 and 18 can access all departments
-    if (in_array($user->id, [53, 18,100])) {
-        $departments = Department::all();
-        $allowedDepartmentIds = $departments->pluck('id')->toArray();
-    } else {
+    
+ 
         // Check PCVUser for allowed departments
         $pcvUser = PCVUser::where('user_id', $user->id)->first();
 
@@ -32,8 +29,14 @@ public function pettycashform()
             ? $pcvUser->allowed_department
             : json_decode($pcvUser->allowed_department, true) ?? [];
 
-        $departments = Department::whereIn('id', $allowedDepartmentIds)->get();
-    }
+$departments = Department::whereIn('id', $allowedDepartmentIds)
+    ->get()
+    ->map(function($dept) {
+        // Capitalize first letter of each word
+          $dept->name = strtoupper($dept->name);
+        return $dept;
+    });
+   
 
     // Fetch latest N logs per department
     $logs = PCVLog::with('user')
@@ -81,7 +84,6 @@ public function download_voucher(Request $request)
     while ($attempt < $maxRetries) {
         try {
             $seriesNumbers = DB::transaction(function () use ($departmentId, $prefix, $year, $user) {
-                // Lock the last row
                 $lastLog = PCVLog::where('department', $departmentId)
                     ->lockForUpdate()
                     ->latest('created_at')
@@ -92,13 +94,11 @@ public function download_voucher(Request $request)
                     $startNumber = intval($matches[1]) + 1;
                 }
 
-                // Generate 4 series numbers
                 $seriesNumbers = [];
                 for ($i = 0; $i < 4; $i++) {
                     $seriesNumbers[] = sprintf('%s%s-%04d', $prefix, $year, $startNumber + $i);
                 }
 
-                // Save only the last series
                 $lastSeries = end($seriesNumbers);
                 PCVLog::create([
                     'user_id' => $user->id,
@@ -109,14 +109,12 @@ public function download_voucher(Request $request)
                 return $seriesNumbers;
             });
 
-            // If transaction succeeds, break the retry loop
-            break;
+            break; // success, exit retry loop
 
         } catch (\Illuminate\Database\QueryException $e) {
-            // Check for duplicate entry error (MySQL error code 1062)
-            if ($e->getCode() == 23000) {
+            if ($e->getCode() == 23000) { // duplicate entry
                 $attempt++;
-                usleep(100000); // wait 100ms before retry
+                usleep(100000);
                 continue;
             }
             throw $e;
@@ -152,25 +150,22 @@ public function download_voucher(Request $request)
     ])->render();
 
     $mpdf->WriteHTML($html);
-    $mpdf->SetProtection(
-    ['print'],          // allowed actions (empty = no permissions)
-    '',                 // user password (leave empty)
-    'admin-secret-123'  // owner password (REQUIRED)
-);
-$mpdf->SetHTMLFooter('
-<div style="text-align: center; font-size: 10px; color: #777;">
-    This document is system generated
-</div>
-');
-    // Draw horizontal cut line
-    $pageWidth = $mpdf->w;
-    $pageHeight = $mpdf->h;
-    // $mpdf->SetLineWidth(0.5);
-    // $mpdf->Line(10, $pageHeight / 2, $pageWidth - 10, $pageHeight / 2);
 
-    // Direct download
-    $fileName = $seriesNumbers[0] . '_to_' . end($seriesNumbers) . '.pdf';
-    return response($mpdf->Output($fileName, 'D'));
+    $mpdf->SetProtection(['print'], '', 'admin-secret-123');
+
+    $mpdf->SetHTMLFooter('
+        <div style="text-align: center; font-size: 10px; color: #777;">
+            This document is system generated
+        </div>
+    ');
+
+    // Return PDF as a string for AJAX
+    $pdfContent = $mpdf->Output('', 'S');
+$fileName = $seriesNumbers[0] . '_to_' . end($seriesNumbers) . '.pdf';
+
+return response($pdfContent)
+    ->header('Content-Type', 'application/pdf')
+    ->header('Content-Disposition', "attachment; filename=\"$fileName\"");
 }
 
 
