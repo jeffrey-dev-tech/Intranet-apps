@@ -39,7 +39,7 @@ class NotificationController extends Controller
                 return $row;
             });
 
-        // ===== 2) ACtivity Approval =====
+// ===== 2) ACtivity Approval =====
 $approval_fitnessChallenge = collect(); // empty collection by default
 if (in_array(auth()->id(), [69, 119])) {
     $approval_fitnessChallenge = Submission::select(

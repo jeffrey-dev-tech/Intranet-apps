@@ -142,7 +142,7 @@ class RequestFieldController extends Controller
           
                 <div class="col-sm-12">
                   <div class="form-group">
-                    <label class="control-label">Purpose of Request</label>
+                    <label class="control-label">Details of Request</label>
                     <textarea id="description_of_request" class="form-control" name="description_of_request" rows="5" placeholder="Input your purpose 255 characters only..." required></textarea>
                   </div>
                 </div>

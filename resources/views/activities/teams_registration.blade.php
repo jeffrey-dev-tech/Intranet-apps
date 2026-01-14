@@ -112,7 +112,7 @@
                         </form>
 
                         <p class="text-success mt-3 text-center">
-                            Registrations are open until {{ $registrationEnd->format('F j, Y') }}. Hurry up!
+                            Registrations are open until January 9, 2026. Hurry up!
                         </p>
                     </div>
                 </div>

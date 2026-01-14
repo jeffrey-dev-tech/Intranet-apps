@@ -18,7 +18,7 @@
 
         <div class="dropdown-body" style="max-height: 300px; overflow-y: auto;">
             @forelse($notifications as $notif)
-                <a href="{{ $notif['url'] }}" target="_blank"class="dropdown-item">
+                <a href="{{ $notif['url'] }}" class="dropdown-item">
                     <div class="icon">
                         <i data-feather="{{ $notif['icon'] }}"></i>
                     </div>

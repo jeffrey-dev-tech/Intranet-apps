@@ -111,7 +111,7 @@ public function activityList() {
    public function registration_view(){
          // Define registration period
     $registrationStart = \Carbon\Carbon::parse('2025-10-01');
-    $registrationEnd = \Carbon\Carbon::parse('2026-01-09');
+    $registrationEnd = \Carbon\Carbon::parse('2026-01-10');
 
     return view('activities.teams_registration', [
         'registrationStart' => $registrationStart,
