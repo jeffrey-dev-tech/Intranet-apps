@@ -186,40 +186,144 @@ width:100%;
             <h4 class="mb-3 mb-md-0">Welcome {{ Auth::user()->name }}!</h4>
 </div>
         </div>
-
-               
         <div class="row">
-          <div class="col-4 col-xl-4 grid-margin stretch-card box">
-            <div class="card overflow-hidden">
-                <div class="ranking-heading">
+<div class="col-4 grid-margin stretch-card">
+    <div class="card p-3">
+        <h2 class="cyber-heading">SANDEN CLIP & ANNOUNCEMENT</h2>
 
-  <h4 >Holidays</h4>
+        @php
+            $files = Storage::disk('public')->files('processed');
+            sort($files);
 
-    </div>
-              <div class="card-body" >
-             
-  
-    
+            $media = [];
+            foreach($files as $file) {
+                $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                $type = 'unknown';
 
+                if(in_array($ext, ['mp4','mov','avi','mkv','webm'])) {
+                    $type = 'video';
+                } elseif(in_array($ext, ['jpg','jpeg','png'])) {
+                    $type = 'image';
+                } elseif($ext === 'gif') {
+                    $type = 'gif';
+                }
 
- <div class="table-responsive">
-<table id="holidayTable" class="table">
-    <thead>
-        <tr>
-            <th>Events</th>
-            <th>Date</th>
-        </tr>
-    </thead>
-    <tbody>
-        <!-- Data will be populated via JS -->
-    </tbody>
-</table>
- </div>
-        
+                if($type !== 'unknown') {
+                    $media[] = [
+                        'url' => asset('storage/processed/' . basename($file)),
+                        'type' => $type
+                    ];
+                }
+            }
+        @endphp
 
-              </div>
+        @if(empty($media))
+            <p>No media found in the processed folder.</p>
+        @else
+            <div id="media-container">
+                <div class="media-wrapper"></div>
+
+                <div class="video-controls text-center mt-2">
+                    <button id="prevBtn" class="btn btn-primary">Prev</button>
+                    <button id="nextBtn" class="btn btn-primary">Next</button>
+                </div>
             </div>
-          </div>
+
+            <script>
+                const media = @json($media);
+                let current = 0;
+                const container = document.getElementById('media-container');
+                const wrapper = container.querySelector('.media-wrapper');
+
+                function playMedia(index) {
+                    // Loop index automatically
+                    if(index < 0) index = media.length - 1;
+                    if(index >= media.length) index = 0;
+                    current = index;
+
+                    wrapper.innerHTML = ''; // clear previous media
+                    const item = media[current];
+
+                    if(item.type === 'video') {
+                        const video = document.createElement('video');
+                        video.src = item.url;
+                        video.id = 'player';
+                        video.controls = true;
+                        video.autoplay = true;
+                        video.classList.add('media-item');
+                        wrapper.appendChild(video);
+
+                        video.addEventListener('ended', () => {
+                            playMedia(current + 1); // loop to next
+                        });
+
+                    } else { // image or gif
+                        const img = document.createElement('img');
+                        img.src = item.url;
+                        img.alt = 'Media';
+                        img.id = 'player';
+                        img.classList.add('media-item');
+                        wrapper.appendChild(img);
+
+                        // Show images/GIFs for 5 seconds then loop
+                        setTimeout(() => {
+                            playMedia(current + 1);
+                        }, 5000);
+                    }
+                }
+
+                document.getElementById('nextBtn').addEventListener('click', () => {
+                    playMedia(current + 1);
+                });
+
+                document.getElementById('prevBtn').addEventListener('click', () => {
+                    playMedia(current - 1);
+                });
+
+                // Start first media
+                playMedia(0);
+            </script>
+        @endif
+    </div>
+</div>
+
+<style>
+.cyber-heading {
+    text-align: center;
+    color: #1E40AF;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+     margin-top: 40px;
+}
+
+.media-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    padding-top: 56.25%; /* 16:9 ratio */
+}
+
+.media-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* full fit for images/videos/GIFs */
+    background: #000;   /* black bars if aspect ratio differs */
+    border-radius: 8px;
+}
+
+.video-controls .btn {
+    margin: 0 5px;
+}
+</style>
+
+
+
 
             <div class="col-8 col-xl-8 grid-margin stretch-card box" >
   <div class="card overflow-hidden">

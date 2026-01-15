@@ -12,8 +12,11 @@ use App\Http\Controllers\VersionControlController;
 use App\Http\Controllers\SubsystemController;
 use App\Http\Controllers\FetchTestController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\VideoController;
 Route::middleware(['auth', 'dashboard.maintenance', 'password.changed'])->group(function () {
     
+Route::get('/render-cyber-videos', [VideoController::class, 'renderAllCyberSecurityVideos'])
+    ->name('render-cyber-videos');
     Route::get('/dashboard', [PageController::class, 'dashboard'])->name('dashboard');
     Route::get('/portal', [PortalController::class, 'index'])->name('portal');
     Route::get('/inventory/data', [InventoryController::class, 'getData'])->name('inventory.data');
