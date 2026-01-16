@@ -173,6 +173,28 @@ to 79 Manila Line: (02) 8-898- 5110
                     <td style="font-weight: bold; background-color: #ffffff;">Description of Request</td>
                     <td>{{ $request_data['description_of_request'] ?? 'N/A' }}</td>
                 </tr>
+
+                @elseif($type_request === 'Project_Request')
+                <tr>
+                    <td style="font-weight: bold; background-color: #ffffff;">Reference #</td>
+                    <td>{{ $reference_no ?? 'N/A' }}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; background-color: #ffffff;">Name</td>
+                    <td>{{ $request_data['requestor_name']?? 'N/A' }}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; background-color: #ffffff;">Type</td>
+                    <td>{{ $request_data['type_request'] ?? 'N/A' }}</td>
+                </tr>
+               <tr>
+                    <td style="font-weight: bold; background-color: #ffffff;">Description of Request</td>
+                    <td>{{ $request_data['project_details'] ?? 'N/A' }}</td>
+                </tr>
+                   <tr>
+                    <td style="font-weight: bold; background-color: #ffffff;">Description of Request</td>
+                    <td>{{ $request_data['description_of_request'] ?? 'N/A' }}</td>
+                </tr>
          
             @else
                 <tr>

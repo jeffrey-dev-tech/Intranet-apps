@@ -77,6 +77,8 @@
             <div class="tab-pane fade" id="purchase_request" role="tabpanel" aria-labelledby="purchase_request-tab">
             <div class="table-responsive" id="PurchaseRequestTbl"></div>
         </div>
+
+        
     </div>
 </div>
 

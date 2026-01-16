@@ -123,10 +123,6 @@ width:100%;
 
 }
 
-</style>
-
-
-<style>
 
 .ranking-heading {
   display: flex;                 /* arrange items side by side */
@@ -160,10 +156,6 @@ width:100%;
 .ranking-heading h3 {
   text-align: center;                 /* keep aspect ratio */
 }
-
-
-</style>
-<style>
   #teamRanking {
     font-size: 13px;       /* smaller font */
     width: 100%;           /* shrink to fit content */
@@ -178,7 +170,65 @@ width:100%;
   #teamRanking th {
     font-weight: 600;      /* still keep headers readable */
   }
+.cyber-heading {
+    text-align: center;
+    color: #1E40AF;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1.7rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+     margin-top: 40px;
+}
+
+.media-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    padding-top: 56.25%; /* 16:9 ratio */
+}
+
+.media-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* full fit for images/videos/GIFs */
+    background: #1b0347;   /* black bars if aspect ratio differs */
+    border-radius: 8px;
+}
+
+.video-controls .btn {
+    margin: 0 5px;
+}
+
+                
+                .fullscreen-btn {
+                    position: absolute;
+                    bottom: 10px;
+                    right: 10px;
+                    z-index: 10;
+                    background: rgba(0,0,0,0.5);
+                    color: #fff;
+                    border: none;
+                    padding: 5px 10px;
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    border-radius: 4px;
+                    transition: background 0.3s;
+                }
+
+                .fullscreen-btn:hover {
+                    background: rgba(0,0,0,0.8);
+                }
+
+                .video-controls .btn {
+                    margin: 0 5px;
+                }
 </style>
+
+
 
 <div class="page-content">
         <div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
@@ -189,7 +239,7 @@ width:100%;
         <div class="row">
 <div class="col-4 grid-margin stretch-card">
     <div class="card p-3">
-        <h2 class="cyber-heading">SANDEN CLIP & ANNOUNCEMENT</h2>
+        <h2 class="cyber-heading">SANDEN CLIP, ANNOUNCEMENT & AWARENESS</h2>
 
         @php
             $files = Storage::disk('public')->files('processed');
@@ -235,92 +285,65 @@ width:100%;
                 const container = document.getElementById('media-container');
                 const wrapper = container.querySelector('.media-wrapper');
 
-                function playMedia(index) {
-                    // Loop index automatically
-                    if(index < 0) index = media.length - 1;
-                    if(index >= media.length) index = 0;
+                function showMedia(index) {
+                    if (index < 0) index = media.length - 1;
+                    if (index >= media.length) index = 0;
                     current = index;
 
-                    wrapper.innerHTML = ''; // clear previous media
+                    // Clear previous media
+                    wrapper.innerHTML = '';
+
                     const item = media[current];
+                    let element;
 
                     if(item.type === 'video') {
-                        const video = document.createElement('video');
-                        video.src = item.url;
-                        video.id = 'player';
-                        video.controls = true;
-                        video.autoplay = true;
-                        video.classList.add('media-item');
-                        wrapper.appendChild(video);
-
-                        video.addEventListener('ended', () => {
-                            playMedia(current + 1); // loop to next
-                        });
-
+                        element = document.createElement('video');
+                        element.src = item.url;
+                        element.controls = true;
+                        element.autoplay = false;
+                        element.preload = 'metadata'; // Lazy-load video
                     } else { // image or gif
-                        const img = document.createElement('img');
-                        img.src = item.url;
-                        img.alt = 'Media';
-                        img.id = 'player';
-                        img.classList.add('media-item');
-                        wrapper.appendChild(img);
-
-                        // Show images/GIFs for 5 seconds then loop
-                        setTimeout(() => {
-                            playMedia(current + 1);
-                        }, 5000);
+                        element = document.createElement('img');
+                        element.src = item.url;
+                        element.alt = 'Media';
                     }
+
+                    element.classList.add('media-item', item.type);
+                    wrapper.appendChild(element);
+
+                    // Fullscreen button
+                    const fsBtn = document.createElement('button');
+                    fsBtn.innerHTML = '⛶';
+                    fsBtn.classList.add('fullscreen-btn');
+                    wrapper.appendChild(fsBtn);
+
+                    fsBtn.addEventListener('click', () => {
+                        if (wrapper.requestFullscreen) wrapper.requestFullscreen();
+                        else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
+                        else if (wrapper.msRequestFullscreen) wrapper.msRequestFullscreen();
+                    });
+
+                    // Double-click fullscreen
+                    element.addEventListener('dblclick', () => {
+                        if (wrapper.requestFullscreen) wrapper.requestFullscreen();
+                        else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
+                        else if (wrapper.msRequestFullscreen) wrapper.msRequestFullscreen();
+                    });
                 }
 
-                document.getElementById('nextBtn').addEventListener('click', () => {
-                    playMedia(current + 1);
-                });
-
-                document.getElementById('prevBtn').addEventListener('click', () => {
-                    playMedia(current - 1);
-                });
+                document.getElementById('nextBtn').addEventListener('click', () => showMedia(current + 1));
+                document.getElementById('prevBtn').addEventListener('click', () => showMedia(current - 1));
 
                 // Start first media
-                playMedia(0);
+                showMedia(0);
             </script>
+
+
         @endif
     </div>
 </div>
 
-<style>
-.cyber-heading {
-    text-align: center;
-    color: #1E40AF;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-     margin-top: 40px;
-}
 
-.media-wrapper {
-    position: relative;
-    width: 100%;
-    max-width: 640px;
-    margin: 0 auto;
-    padding-top: 56.25%; /* 16:9 ratio */
-}
-
-.media-item {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain; /* full fit for images/videos/GIFs */
-    background: #000;   /* black bars if aspect ratio differs */
-    border-radius: 8px;
-}
-
-.video-controls .btn {
-    margin: 0 5px;
-}
-</style>
 
 
 
