@@ -164,9 +164,6 @@
      background-color: #f4f6f9; 
 } 
 
-
-
-
 /* CSS */
 .button-2 {
   background-color: rgba(51, 51, 51, 0.05);

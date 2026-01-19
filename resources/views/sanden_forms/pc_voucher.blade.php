@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>4 Vouchers per Page</title>
+<title>PCV</title>
 <style>
 body {
     font-family: Arial, sans-serif;
@@ -108,7 +108,7 @@ body {
                 <th colspan="2">PARTICULARS</th>
                 <th>AMOUNT</th>
             </tr>
-            @for ($i = 0; $i < 8; $i++)
+            @for ($i = 0; $i < 7; $i++)
             <tr>
                 <td colspan="2">&nbsp;</td>
                 <td>&nbsp;</td>
@@ -135,6 +135,12 @@ body {
             <tr>
                 <td colspan="3">Paid by: Petty Cash Custodian</td>
             </tr>
+    <tr>
+  <td colspan="3" style="font-size: 7px; font-style: italic;">
+    {{ $formattedSeries }} - {{ $uniquePairs[$formattedSeries] }}
+  </td>
+</tr>
+
         </table>
     </td>
     @endfor

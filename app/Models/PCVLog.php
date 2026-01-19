@@ -11,11 +11,13 @@ class PCVLog extends Model
 
     protected $table = 'pcv_logs';
 
-    protected $fillable = [
+      protected $fillable = [
         'user_id',
         'last_series_no',
         'department',
+        'unique_code',
     ];
+
 
     public function user()
     {

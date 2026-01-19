@@ -648,32 +648,45 @@ public function updateStatus($reference_no, Request $request)
         Log::info("updateStatus: Handling MIS logic by status", ['status' => $status]);
         switch ($status) {
             case 'completed':
-                $hasPendingNonMIS = DB::table('it_request_approval')
-                    ->join('users', 'users.email', '=', 'it_request_approval.approver_email')
-                    ->where('it_request_approval.reference_no', $reference_no)
-                    ->where('it_request_approval.status', 'Pending')
-                    ->where('users.department', 'not like', 'MIS%')
-                    ->exists();
 
-                Log::info("updateStatus: Pending Non-MIS approvals exist?", ['hasPendingNonMIS' => $hasPendingNonMIS]);
+    $hasPendingNonMIS = DB::table('it_request_approval')
+        ->join('users', 'users.email', '=', 'it_request_approval.approver_email')
+        ->where('it_request_approval.reference_no', $reference_no)
+        ->where('it_request_approval.status', 'Pending')
+        ->where('users.department', 'not like', 'MIS%')
+        ->exists();
 
-                if ($hasPendingNonMIS) {
-                    DB::rollBack();
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'Cannot mark as Completed. There are still pending Non-MIS approvals.',
-                    ], 400);
-                }
+    if ($hasPendingNonMIS) {
+        DB::rollBack();
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Cannot mark as Completed. There are still pending Non-MIS approvals.',
+        ], 400);
+    }
 
-                ItRequest::where('reference_no', $reference_no)
-                    ->update([
-                        'status' => 'Completed',
-                        'Level_Request' => $levelRequest ?: $itRequest->Level_Request,
-                        'updated_at' => now(),
-                    ]);
-                Log::info("updateStatus: IT request marked as Completed", ['reference_no' => $reference_no]);
-                DB::commit();
-                return response()->json(['status' => 'success', 'message' => 'Request marked as Completed and requestor notified.']);
+    // ✅ Update request
+    ItRequest::where('reference_no', $reference_no)
+        ->update([
+            'status' => 'Completed',
+            'Level_Request' => $levelRequest ?: $itRequest->Level_Request,
+            'updated_at' => now(),
+        ]);
+
+    // ✅ EMAIL REQUESTOR + CC MIS
+    $this->sendNotificationEmail(
+        [$itRequest->requestor_email],               // TO
+        "[IT Request {$reference_no}] - Completed",  // SUBJECT
+        $itRequest,
+        $reference_no,
+        ['mis.scp@sanden-rs.com']                     // CC
+    );
+
+    DB::commit();
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Request marked as Completed and requestor notified.',
+    ]);
 
             case 'approved':
                 if (in_array($levelRequest, ['high', 'very high'])) {
@@ -735,8 +748,14 @@ public function updateStatus($reference_no, Request $request)
 /**
  * 🔹 Centralized Email Sender
  */
-private function sendNotificationEmail($to, $subject, $itRequest, $reference_no, $view = 'emails.ITRequestApproval', $cc = [])
-{
+private function sendNotificationEmail(
+    $to,
+    $subject,
+    $itRequest,
+    $reference_no,
+    $cc = [],
+    $view = 'emails.ITRequestApproval'
+) {
     try {
         $logoPath = public_path('img/sanden-logo-white.png');
         $logoDataUri = file_exists($logoPath)
@@ -750,11 +769,20 @@ private function sendNotificationEmail($to, $subject, $itRequest, $reference_no,
             'logoDataUri'  => $logoDataUri,
         ])->render();
 
-        (new RequestMailService())->registration_mail($to, $cc, [], $subject, $body, []);
+        (new RequestMailService())->registration_mail(
+            $to,       // TO
+            $cc,       // CC
+            [],        // BCC
+            $subject,
+            $body,
+            []         // Attachments
+        );
+
     } catch (\Exception $mailEx) {
         Log::error("[$reference_no] Email send failed: " . $mailEx->getMessage());
     }
 }
+
 private function finalizeRequestStatus($itRequest, $reference_no, $status, $levelRequest)
 {
     // Default Level_Request to 'Low' if empty

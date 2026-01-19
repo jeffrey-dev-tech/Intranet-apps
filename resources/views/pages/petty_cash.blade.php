@@ -3,9 +3,16 @@
 @section('title', 'Petty Cash Voucher')
 
 @section('content')
-
+<style>
+.wrap-text {
+    white-space: normal !important;  /* allow wrapping */
+    word-break: break-word !important; /* break long words if needed */
+    overflow-wrap: break-word !important;
+    max-width: 150px; /* optional: set max width for the column */
+}
+</style>
 <div class="page-content d-flex justify-content-center align-items-center">
-    <div class="col-md-8">
+    <div class="col-md-12">
         <div class="card">
             <div class="card-body">
                 <!-- Logo and Title -->
@@ -62,7 +69,9 @@
         </select>
     </div>
 </div>
-
+@php
+    $showUniqueCodeFor = [100,18,53,34,97,84]; // Replace with the actual user IDs
+@endphp
             <thead class="table-light">
                 <tr>
                     <th>#</th>
@@ -70,26 +79,54 @@
                     <th>Requester</th>
                     <th>Department/Region</th>
                     <th>Series No</th>
+                    @if(in_array(Auth::id(), $showUniqueCodeFor))
+            <th>Unique Code</th>
+        @endif
                 </tr>
             </thead>
-            <tbody>
-                @php $counter = 1; @endphp
-                @forelse($pcvLogs as $departmentLogs)
-                    @foreach($departmentLogs as $log)
-                        <tr>
-                            <td>{{ $counter++ }}</td>
-                            <td>{{ optional($log->created_at)->format('Y-m-d H:i:s') ?? 'N/A' }}</td>
-                            <td>{{ $log->user ? $log->user->name : 'N/A' }}</td>
-                            <td>{{ optional($log->departmentModel)->name ?? 'N/A' }}</td>
-                            <td>{{ $log->last_series_no }}</td>
-                        </tr>
-                    @endforeach
-                @empty
-                    <tr>
-                        <td colspan="5" class="text-center">No PCV logs found.</td>
-                    </tr>
-                @endforelse
-            </tbody>
+   <tbody>
+@php $counter = 1; @endphp
+@forelse($pcvLogs as $departmentLogs)
+    @foreach($departmentLogs as $log)
+        <tr>
+            <td>{{ $counter++ }}</td>
+            <td>{{ optional($log->created_at)->format('Y-m-d H:i:s') ?? 'N/A' }}</td>
+            <td>{{ $log->user ? $log->user->name : 'N/A' }}</td>
+            <td>{{ optional($log->departmentModel)->name ?? 'N/A' }}</td>
+            <td>{{ $log->last_series_no }}</td>
+
+            @if(in_array(Auth::id(), $showUniqueCodeFor))
+                <td class="wrap-text" style="white-space: normal; word-break: break-word;">
+                    @if($log->unique_code)
+                        @php
+                            // Decode JSON string if stored as JSON
+                            $codes = json_decode($log->unique_code, true);
+                        @endphp
+
+                        @if(is_array($codes))
+                            @foreach($codes as $series => $code)
+                                {{ $series }}:{{ $code }}<br>
+                            @endforeach
+                        @else
+                            {{ $log->unique_code }}
+                        @endif
+                    @else
+                        N/A
+                    @endif
+                </td>
+            @endif
+        </tr>
+    @endforeach
+@empty
+    <tr>
+        <td colspan="{{ in_array(Auth::id(), $showUniqueCodeFor) ? 6 : 5 }}" class="text-center">
+            No PCV logs found.
+        </td>
+    </tr>
+@endforelse
+</tbody>
+
+
         </table>
     </div>
 </div>
@@ -101,7 +138,6 @@
         </div>
     </div>
 </div>
-
 <script src="assets/js/sweetalert2@11.js"></script>
 <script>
     $(document).ready(function() {

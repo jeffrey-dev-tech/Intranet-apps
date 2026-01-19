@@ -50,7 +50,17 @@ $departments = Department::whereIn('id', $allowedDepartmentIds)
         'pcvLogs' => $logs,
     ]);
 }
+ public function generateRandomString($length = 12) {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
 
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+
+        return $randomString;
+    }
 public function download_voucher(Request $request)
 {
     $user = Auth::user();
@@ -66,7 +76,7 @@ public function download_voucher(Request $request)
         'RO-MINDANAO' => 'DVO',
         'RO-VISAYAS' => 'VIS',
         'FINANCE' => 'FIN',
-        'HUMAN RESOURCE' => 'HRD',
+        'ADMIN' => 'ADM',
         'COLD CHAIN' => 'CC',
         'AFTER SALES' => 'AFT',
         'SCM' => 'LOG',
@@ -81,9 +91,14 @@ public function download_voucher(Request $request)
     $maxRetries = 5;
     $attempt = 0;
 
+    $seriesNumbers = [];
+    $uniquePairs = []; // Define outside closure so it’s accessible for PDF
+
     while ($attempt < $maxRetries) {
         try {
-            $seriesNumbers = DB::transaction(function () use ($departmentId, $prefix, $year, $user) {
+            // DB transaction
+            list($seriesNumbers, $uniquePairs) = DB::transaction(function () use ($departmentId, $prefix, $year, $user) {
+
                 $lastLog = PCVLog::where('department', $departmentId)
                     ->lockForUpdate()
                     ->latest('created_at')
@@ -93,28 +108,33 @@ public function download_voucher(Request $request)
                 if ($lastLog && preg_match('/-(\d{4})$/', $lastLog->last_series_no, $matches)) {
                     $startNumber = intval($matches[1]) + 1;
                 }
+$seriesNumbers = []; // generated series numbers
+$uniquePairs = [];   // series-no => unique-code mapping
 
-                $seriesNumbers = [];
-                for ($i = 0; $i < 4; $i++) {
-                    $seriesNumbers[] = sprintf('%s%s-%04d', $prefix, $year, $startNumber + $i);
-                }
+for ($i = 0; $i < 4; $i++) {
+    $series = sprintf('%s%s-%04d', $prefix, $year, $startNumber + $i);
+    $uniqueCode = $this->generateRandomString(12);
+    $seriesNumbers[] = $series;
+    $uniquePairs[$series] = $uniqueCode; // map each series to its own unique code
+}
 
-                $lastSeries = end($seriesNumbers);
-                PCVLog::create([
-                    'user_id' => $user->id,
-                    'department' => $departmentId,
-                    'last_series_no' => $lastSeries,
-                ]);
+// Save last series with unique code
+PCVLog::create([
+    'user_id' => $user->id,
+    'department' => $departmentId,
+    'last_series_no' => end($seriesNumbers),
+    'unique_code' => json_encode($uniquePairs), // store all pairs if needed
+]);
 
-                return $seriesNumbers;
+
+                return [$seriesNumbers, $uniquePairs];
             });
 
             break; // success, exit retry loop
-
         } catch (\Illuminate\Database\QueryException $e) {
             if ($e->getCode() == 23000) { // duplicate entry
                 $attempt++;
-                usleep(100000);
+                usleep(100000); // wait 0.1s
                 continue;
             }
             throw $e;
@@ -142,11 +162,13 @@ public function download_voucher(Request $request)
         'margin_right' => 10,
     ]);
 
+    // Pass series numbers and unique codes to PDF view
     $html = view('sanden_forms.pc_voucher', [
         'user' => $user,
         'department' => $department,
         'seriesNumbers' => $seriesNumbers,
         'date' => now(),
+        'uniquePairs' => $uniquePairs, // list of [series-unique code]
     ])->render();
 
     $mpdf->WriteHTML($html);
@@ -159,13 +181,12 @@ public function download_voucher(Request $request)
         </div>
     ');
 
-    // Return PDF as a string for AJAX
     $pdfContent = $mpdf->Output('', 'S');
-$fileName = $seriesNumbers[0] . '_to_' . end($seriesNumbers) . '.pdf';
+    $fileName = $seriesNumbers[0] . '_to_' . end($seriesNumbers) . '.pdf';
 
-return response($pdfContent)
-    ->header('Content-Type', 'application/pdf')
-    ->header('Content-Disposition', "attachment; filename=\"$fileName\"");
+    return response($pdfContent)
+        ->header('Content-Type', 'application/pdf')
+        ->header('Content-Disposition', "attachment; filename=\"$fileName\"");
 }
 
 
