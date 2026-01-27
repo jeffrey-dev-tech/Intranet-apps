@@ -62,6 +62,7 @@ public function select_log_id(Request $request, $log_id)
             'activity' => $submission->activity,
             'unit' => $submission->activity?->unit,
             'other_informations' => $submission->other_informations,
+              'submission_type' => $submission->submission_type,
         ];
     });
 
@@ -413,30 +414,47 @@ public function activityLogsList()
 {
     $userId = auth()->user()->id;
 
-    // Determine which submissions to fetch
-    if (in_array($userId, [63, 100])) {
-        // Admins: get all submissions
-        $submissions = Submission::with(['activity', 'team', 'user', 'level'])->get();
-    } else {
-        // Regular users: get only their submissions
-        $submissions = Submission::with(['activity', 'team', 'user', 'level'])
-            ->where('user_id', $userId)
-            ->get();
+    // Base query: admins see all, users see only their submissions
+    $submissionsQuery = Submission::with(['activity', 'team', 'user', 'level']);
+
+    if (!in_array($userId, [63, 100])) {
+        $submissionsQuery->where('user_id', $userId);
     }
 
-    // Transform data
+    // Sort by creation date so admin sees earliest submissions first
+    $submissions = $submissionsQuery->orderBy('created_at', 'asc')->get();
+
     $data = $submissions->map(function ($submission) use ($userId) {
+
+        // Determine if admin can approve
+        $canApprove = false;
+        if (in_array($userId, [69, 119]) && $submission->status === 'pending') {
+            // Check earliest pending submission for this user/team/level
+            $earliestPending = Submission::where('activity_id', $submission->activity_id)
+                ->where('level_id', $submission->level_id)
+                ->where('user_id', $submission->user_id)
+                ->where('status', 'pending')
+                ->orderBy('created_at', 'asc')
+                ->first();
+
+            if ($earliestPending && $earliestPending->id === $submission->id) {
+                $canApprove = true;
+            }
+        }
+
         return [
             'log_id' => $submission->log_id,
             'activity_name' => $submission->activity_name,
             'level_number' => $submission->level?->level_number,
             'progress_value' => $submission->progress_value,
+            'submission_type' => $submission->submission_type,
             'status' => $submission->status,
             'team_name' => $submission->team?->name,
             'user_name' => $submission->user?->name,
             'activity' => $submission->activity,
             'unit' => $submission->activity?->unit,
-            'can_approve' => in_array($userId, [69, 119]) && $submission->status === 'pending',
+            'created_at' => $submission->created_at, // show submission date
+            'can_approve' => $canApprove,
         ];
     });
 
@@ -444,6 +462,7 @@ public function activityLogsList()
         'activity_log' => $data
     ]);
 }
+
 
 
 public function checkUserPendingStatus()

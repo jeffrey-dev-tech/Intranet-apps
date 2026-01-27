@@ -66,9 +66,25 @@ input[type="file"]::file-selector-button:active { background-color: #e5e7eb; }
             <!-- Activity select -->
             <div class="mb-3">
               <label class="form-label">Activity</label>
-              <select name="activity_id" id="activity_id" class="form-select" required></select>
+              <select name="activity_id" id="activity_id" class="form-select" ></select>
             </div>
-
+            <div class="mb-3" id="teamSelectContainer" style="display:none;">
+    <label class="form-label">Select Team</label>
+    <select id="team_select" class="form-select"></select>
+</div>
+<div class="mb-3" id="dynamicLevelContainer" style="display:none;">
+  <label class="form-label">Select Level</label>
+  <select id="level_select" name="level_id" class="form-select" ></select>
+</div>
+<div class="mb-3">
+    <label class="form-label">Submission Type</label>
+    <select name="submission_type" id="submission_type" class="form-select">
+        <option value="">Select Type</option>
+        <option value="party">Party</option>
+        <option value="individual">Individual</option>
+    </select>
+    <small class="text-muted">Each member must submit at least one Party submission to complete the level.</small>
+</div>
             <!-- Progress Value -->
             <div class="mb-3">
               <label class="form-label">Progress Value</label>
@@ -147,25 +163,75 @@ input[type="file"]::file-selector-button:active { background-color: #e5e7eb; }
     </div>
   </div>
 </div>
-
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const activitySelect = document.getElementById('activity_id');
     const teamNameInput = document.getElementById('team_name');
-    const pendingLevelInput = document.getElementById('pending_level');
-    const displayLevelInput = document.getElementById('display_level');
+    const pendingLevelInput = document.getElementById('pending_level'); // hidden level_id
+    const displayLevelInput = document.getElementById('display_level'); // display
     const progressInput = document.getElementById('progress_value');
     const progressUnit = document.getElementById('progress_unit');
     const lastProgressInput = document.getElementById('last_progress_value');
     const lastProgressUnit = document.getElementById('last_progress_unit');
     const requiredValueInput = document.getElementById('required_value');
     const requiredUnit = document.getElementById('required_unit');
+    const teamIdInput = document.getElementById('team_id');
     const submitButton = document.querySelector('#formLog button[type="submit"]');
     const formLog = document.getElementById('formLog');
     const userId = "{{ auth()->id() }}";
     const submitUrl = "{{ route('submission.store') }}";
 
+    const dynamicLevelContainer = document.getElementById('dynamicLevelContainer');
+    const levelSelect = document.getElementById('level_select');
+    const teamSelectContainer = document.getElementById('teamSelectContainer');
+    const teamSelect = document.getElementById('team_select');
 
+    // Reset all dynamic fields
+    function resetFields() {
+        teamNameInput.value = '';
+        pendingLevelInput.value = '';
+        displayLevelInput.value = '';
+        lastProgressInput.value = '';
+        lastProgressUnit.textContent = '';
+        progressInput.value = '';
+        progressUnit.textContent = '';
+        requiredValueInput.value = '';
+        requiredUnit.textContent = '';
+        teamIdInput.value = '';
+
+        dynamicLevelContainer.style.display = 'none';
+        teamSelectContainer.style.display = 'none';
+        levelSelect.innerHTML = '';
+        teamSelect.innerHTML = '';
+
+        levelSelect.required = false;
+        teamSelect.required = false;
+    }
+
+    // Team select listener
+    teamSelect.addEventListener('change', function () {
+        const selected = this.selectedOptions[0];
+        if (!selected) return;
+
+        teamIdInput.value = this.value;
+        teamNameInput.value = selected.textContent.split(' (Last')[0];
+        lastProgressInput.value = selected.dataset.progress || 0;
+        lastProgressUnit.textContent = selected.dataset.unit || '';
+
+        progressInput.value = '';
+        progressUnit.textContent = selected.dataset.unit || '';
+    });
+
+    // Level select listener
+    levelSelect.addEventListener('change', function () {
+        const selected = this.selectedOptions[0];
+        if (!selected) return;
+
+        pendingLevelInput.value = this.value;
+        displayLevelInput.value = selected.textContent;
+        requiredValueInput.value = selected.dataset.required || 0;
+        requiredUnit.textContent = selected.dataset.unit || '';
+    });
 
     // Load activities
     fetch("{{ route('activities.listActivity') }}")
@@ -181,86 +247,106 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .catch(err => console.error('Error loading activities:', err));
 
-    // Reset fields helper
-    function resetFields() {
-        teamNameInput.value = '';
-        pendingLevelInput.value = '';
-        displayLevelInput.value = '';
-        lastProgressInput.value = '';
-        lastProgressUnit.textContent = '';
-        progressInput.value = '';
-        progressUnit.textContent = '';
-        requiredValueInput.value = '';
-        requiredUnit.textContent = '';
-        document.getElementById('team_id').value = '';
-       
-    }
+   // Activity change handler
+activitySelect.addEventListener('change', async function () {
+    const activityId = this.value;
+    resetFields();
+    if (!activityId) return;
 
-    // Check if progress already meets required value
-    // function checkAlreadyMet() {
-    //     const lastProgress = parseFloat(lastProgressInput.value) || 0;
-    //     const requiredValue = parseFloat(requiredValueInput.value) || 0;
+    const url = "{{ route('activities.findPendingLevel', ['activity_id' => ':activity_id', 'user_id' => ':user_id']) }}"
+        .replace(':activity_id', activityId)
+        .replace(':user_id', userId);
 
-    //     if (requiredValue > 0 && lastProgress >= requiredValue) {
-    //         submitButton.disabled = true;
-    //         Swal.fire({
-    //             icon: 'info',
-    //             title: 'Already Met!',
-    //             text: 'You have already reached the required value for this level.',
-    //             confirmButtonText: 'OK'
-    //         });
-    //     } else {
-    //         submitButton.disabled = false;
-    //     }
-    // }
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        if (!data || Object.keys(data).length === 0) return;
 
-    // Handle activity change
-    activitySelect.addEventListener('change', async function () {
-        const activityId = this.value;
+        // Fill basic last progress info
+        lastProgressInput.value = data.last_progress_value ?? 0;
+        lastProgressUnit.textContent = data.unit || '';
 
-        resetFields();
-        if (!activityId) return;
+        // -------------------------
+        // 1️⃣ Handle pending team
+        // -------------------------
+        if (data.has_pending_level) {
+            teamIdInput.value = data.team_id || '';
+            teamNameInput.value = data.team_name || '';
+            pendingLevelInput.value = data.pending_level || '';
+            displayLevelInput.value = `Level ${data.display_level || ''}`;
+            requiredValueInput.value = data.level?.required_value || 0;
+            requiredUnit.textContent = data.unit || '';
 
-        const url = "{{ route('activities.findPendingLevel', ['activity_id' => ':activity_id', 'user_id' => ':user_id']) }}"
-            .replace(':activity_id', activityId)
-            .replace(':user_id', userId);
+            dynamicLevelContainer.style.display = 'block';
+            // Optionally hide the dropdown if you want pending level read-only
+            levelSelect.style.display = 'none';
 
-        try {
-            const res = await fetch(url);
-            const data = await res.json();
-            if (!data || Object.keys(data).length === 0) return;
-
-            const { team_name, pending_level, display_level, progress_value, unit, team_id, per_member_required } = data;
-
-            // Fill fields
-            teamNameInput.value = team_name || '';
-            pendingLevelInput.value = pending_level || '';
-            displayLevelInput.value = display_level || '';
-            lastProgressInput.value = progress_value ?? 0;
-            lastProgressUnit.textContent = unit || '';
-            progressUnit.textContent = unit || '';
-            document.getElementById('team_id').value = team_id || '';
-
-            requiredValueInput.value = per_member_required ?? 0;
-            requiredUnit.textContent = unit || '';
-
-            // Check if already met
-            // checkAlreadyMet();
-
-        } catch (err) {
-            console.error('Error fetching pending level:', err);
-            submitButton.disabled = true;
+            return; // stop further processing
         }
-    });
 
-    // Optional: dynamically check if typed progress exceeds required value
-    // progressInput.addEventListener('input', checkAlreadyMet);
+        // -------------------------
+        // 2️⃣ No pending team
+        // -------------------------
+
+        // Populate team select if multiple teams
+        if (data.teams && data.teams.length > 0) {
+            teamSelect.innerHTML = '<option value="">Select Team</option>';
+            data.teams.forEach(team => {
+                const opt = document.createElement('option');
+                opt.value = team.id;
+                opt.textContent = `${team.name} (Last: ${team.last_progress_value})`;
+                opt.dataset.progress = team.last_progress_value;
+                opt.dataset.unit = data.unit || '';
+                teamSelect.appendChild(opt);
+            });
+            teamSelectContainer.style.display = 'block';
+            teamSelect.required = true;
+        }
+
+        // Populate levels up to admin-set active level
+        if (data.levels && typeof data.level_active !== 'undefined') {
+            levelSelect.innerHTML = '<option value="">Select Level</option>';
+            levelSelect.style.display = 'block';
+            data.levels.forEach(level => {
+                if (level.level_number <= data.level_active) {
+                    const opt = document.createElement('option');
+                    opt.value = level.id;
+                    opt.textContent = `Level ${level.level_number} (Required: ${level.required_value})`;
+                    opt.dataset.required = level.required_value;
+                    opt.dataset.unit = data.unit || '';
+
+                    // Preselect next level after last submitted
+                    if (level.level_number === (data.last_level_number ?? 0) + 1) {
+                        opt.selected = true;
+                        pendingLevelInput.value = level.id;
+                        displayLevelInput.value = `Level ${level.level_number}`;
+                        requiredValueInput.value = level.required_value;
+                        requiredUnit.textContent = data.unit || '';
+                        progressInput.value = '';
+                        progressUnit.textContent = data.unit || '';
+                    }
+
+                    levelSelect.appendChild(opt);
+                }
+            });
+
+            dynamicLevelContainer.style.display = 'block';
+            levelSelect.required = true;
+        }
+
+        // Prefill last progress if available
+        if (data.last_team_id) teamIdInput.value = data.last_team_id;
+        if (data.team_name) teamNameInput.value = data.team_name;
+    } catch (err) {
+        console.error('Error fetching pending level:', err);
+    }
+});
+
+
 
     // AJAX form submission
     formLog.addEventListener('submit', async function (e) {
         e.preventDefault();
-       
-
         const formData = new FormData(formLog);
 
         const result = await Swal.fire({

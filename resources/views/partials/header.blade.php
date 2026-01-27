@@ -13,7 +13,7 @@
 	<link rel="stylesheet" href="{{ asset('assets/vendors/core/core.css') }}">
 	<!-- endinject -->
     <!-- FullCalendar JS -->
-    <script src="{{ asset('assets/js/fullcalendar.index.global.min.js') }}"></script>
+	<!-- FullCalendar CSS -->
 	<!-- plugin css for this page -->
 	<link rel="stylesheet" href="{{ asset('assets/vendors/datatables.net-bs4/dataTables.bootstrap4.css') }}">
 	<!-- end plugin css for this page -->

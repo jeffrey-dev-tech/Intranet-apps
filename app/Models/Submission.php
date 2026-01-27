@@ -17,10 +17,12 @@ class Submission extends Model
         'level_id',
         'activity_name',
         'file_path',
-            'other_informations',
+        'other_informations',
         'progress_value',
-               'progress_value_exceed',
+        'progress_value_exceed',
         'status',
+        'submission_type', // add this
+
     ];
 
     // Relationships
@@ -43,9 +45,7 @@ class Submission extends Model
     {
          return $this->belongsTo(ChallengeLevel::class, 'level_id');
     }
-
-    
-public static function teamProgress()
+ public static function teamProgress()
 {
     return self::select(
             'submissions.team_id',
@@ -60,30 +60,45 @@ public static function teamProgress()
             'activities.unit',
             'activities.level_active',
             DB::raw('(SUM(submissions.progress_value) / challenge_levels.required_value) * 100 as progress_percentage'),
-            DB::raw('CASE WHEN SUM(submissions.progress_value) >= challenge_levels.required_value THEN teams.updated_at ELSE NULL END as completed_at')
+            // Mark completed_at only if number of Party submissions >= team size
+            DB::raw("(CASE 
+                        WHEN (
+                            SELECT COUNT(*) 
+                            FROM submissions s2 
+                            WHERE s2.team_id = submissions.team_id
+                              AND s2.level_id = submissions.level_id
+                              AND s2.status = 'approved'
+                              AND s2.submission_type = 'party'
+                        ) >= (
+                            SELECT COUNT(*) 
+                            FROM team_user tu 
+                            WHERE tu.team_id = submissions.team_id
+                        )
+                        THEN teams.updated_at
+                        ELSE NULL
+                      END) as completed_at")
         )
         ->join('teams', 'teams.id', '=', 'submissions.team_id')
         ->join('challenge_levels', 'challenge_levels.id', '=', 'submissions.level_id')
         ->join('activities', 'activities.id', '=', 'challenge_levels.activity_id')
         ->where('submissions.status', 'approved')
         ->where('activities.status', 'active')
-        ->whereNotNull('activities.level_active') // only if an active level is set
-        ->whereColumn('challenge_levels.level_number', 'activities.level_active') // 🔑 only that active level
+        ->whereNotNull('activities.level_active')
+        ->whereColumn('challenge_levels.level_number', 'activities.level_active')
         ->groupBy(
-            'submissions.team_id',
-            'submissions.level_id',
-            'teams.name',
-            'teams.status',
-            'teams.updated_at',
-            'challenge_levels.activity_name',
-            'challenge_levels.level_number',
-            'challenge_levels.required_value',
-            'activities.unit',
-            'activities.level_active'
-        )
-        ->orderByDesc('total_progress')
-        ->orderByDesc('completed_at')
-        ->get();
+    'submissions.team_id',
+    'submissions.level_id',
+    'teams.name',
+    'teams.status',
+    'teams.updated_at',
+    'challenge_levels.activity_name',
+    'challenge_levels.level_number',
+    'challenge_levels.required_value',
+    'activities.unit',
+    'activities.level_active'
+)
+->orderByRaw('completed_at IS NULL, completed_at ASC')
+->get();
 }
 
 }

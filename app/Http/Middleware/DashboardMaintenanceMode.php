@@ -21,7 +21,7 @@ class DashboardMaintenanceMode
             
             // If this specific route is in maintenance, show special view
             if ($routeName === 'activities.log-form') {
-               return response()->view('errors.message_closed', [], 503);
+               return response()->view('errors.dashboard-maintenance', [], 503);
             }
             // Developer bypass
             if (Auth::check() && Auth::user()->role === '6') {

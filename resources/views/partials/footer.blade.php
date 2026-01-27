@@ -111,6 +111,7 @@ Km. 54 National Highway, Calamba 4027 Laguna</p>
 		</div>
 	</div>
 <!-- core:js -->
+ 
 <script src="{{ asset('assets/vendors/core/core.js') }}"></script>
 <script src="{{ asset('assets/vendors/owl.carousel/owl.carousel.min.js') }}"></script>
 <!-- endinject -->
@@ -132,10 +133,8 @@ Km. 54 National Highway, Calamba 4027 Laguna</p>
 
 <!-- custom js for this page -->
 <script src="{{ asset('assets/js/data-table.js') }}"></script>
-	<!-- <script src="{{ asset('assets/vendors/jquery-ui/jquery-ui.min.js') }}"></script>
-	<script src="{{ asset('assets/vendors/moment/moment.min.js') }}"></script>
-	<script src="{{ asset('assets/vendors/fullcalendar/main.min.js') }}"></script>
-	<script src="{{ asset('assets/js/fullcalendar.js') }}"></script> -->
+
+
 	<!-- end custom js for this page -->
   @livewireScripts
 

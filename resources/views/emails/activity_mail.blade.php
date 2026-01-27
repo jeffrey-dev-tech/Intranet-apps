@@ -111,6 +111,10 @@ to 79 Manila Line: (02) 8-898- 5110
         <td style="font-weight: bold; background-color: #ffffff;">Progress Value</td>
         <td>{{ $progress_value }}</td>
     </tr>
+       <tr>
+        <td style="font-weight: bold; background-color: #ffffff;">Submission Type</td>
+        <td>{{ $submission_type }}</td>
+    </tr>
     <tr>
         <td style="font-weight: bold; background-color: #ffffff;">Other Info</td>
         <td>{{ $other_info }}</td>

@@ -57,10 +57,12 @@
                             <th style="color: white;">LOG ID</th>
                             <th style="color: white;">Team Name</th>
                             <th style="color: white;">Activity</th>
+                              <th style="color: white;">Submission type</th>
                             <th style="color: white;">Level</th>
                             <th style="color: white;">Progress Value</th>
                             <th style="color: white;">Unit</th>
                             <th style="color: white;">Name</th>
+                                    <th style="color: white;">Date Submitted</th>
                             <th style="color: white;">Status</th>
                             <th style="color: white;">Action</th>
                         </tr>
@@ -310,31 +312,52 @@ async function fetchTeams() {
 
             const approvalUrlTemplate = "{{ route('approvalForm.activity', ['log_id' => '__id__']) }}";
 
-            logs.forEach(row => {
-                const viewUrl = approvalUrlTemplate.replace('__id__', row.log_id);
-                logsTableBody.innerHTML += `
-                    <tr style="text-align:center;">
-                        <td>${row.log_id}</td>
-                        <td>${row.team_name ?? 'N/A'}</td>
-                        <td>${row.activity_name ?? 'N/A'}</td>
-                        <td>${row.level_number ?? 'N/A'}</td>
-                        <td>${row.progress_value ?? 'N/A'}</td>
-                        <td>${row.unit ?? 'N/A'}</td>
-                        <td>${row.user_name ?? 'N/A'}</td>
-                        <td>
-                            <span class="badge ${
-                                row.status === 'approved' ? 'badge-success' :
-                                row.status === 'disapproved' ? 'badge-danger' :
-                                row.status === 'cancelled' ? 'badge-warning' :
-                                'badge-secondary'
-                            }">${row.status}</span>
-                        </td>
-                        <td>
-                            <a class="btn btn-sm btn-primary" href="${viewUrl}" target="_blank">View</a>
-                        </td>
-                    </tr>
-                `;
-            });
+logs.forEach(row => {
+    const viewUrl = approvalUrlTemplate.replace('__id__', row.log_id);
+
+    // Format created_at as "JAN-26-26, 02:36 PM"
+    let createdAtFormatted = 'N/A';
+    if (row.created_at) {
+        const date = new Date(row.created_at);
+        const monthAbbr = date.toLocaleString('en-US', { month: 'short' }).toUpperCase(); // e.g., JAN
+        const day = String(date.getDate()).padStart(2, '0'); // 01, 02, 26 etc
+        const year = String(date.getFullYear()).slice(-2); // last 2 digits of year
+        const hour = date.getHours();
+        const minute = String(date.getMinutes()).padStart(2, '0');
+
+        // Convert 24h -> 12h format
+        const hour12 = hour % 12 || 12; // 0 -> 12
+        const ampm = hour < 12 ? 'AM' : 'PM';
+
+        createdAtFormatted = `${monthAbbr}-${day}-${year}, ${hour12}:${minute} ${ampm}`;
+    }
+
+    logsTableBody.innerHTML += `
+        <tr style="text-align:center;">
+            <td>${row.log_id}</td>
+            <td>${row.team_name ?? 'N/A'}</td>
+            <td>${row.activity_name ?? 'N/A'}</td>
+            <td>${row.submission_type ?? 'N/A'}</td>
+            <td>${row.level_number ?? 'N/A'}</td>
+      <td>${row.progress_value != null ? Number(row.progress_value).toFixed(2) : 'N/A'}</td>
+            <td>${row.unit ?? 'N/A'}</td>
+            <td>${row.user_name ?? 'N/A'}</td>
+            <td>${createdAtFormatted}</td>
+            <td>
+                <span class="badge ${
+                    row.status === 'approved' ? 'badge-success' :
+                    row.status === 'disapproved' ? 'badge-danger' :
+                    row.status === 'cancelled' ? 'badge-warning' :
+                    'badge-secondary'
+                }">${row.status}</span>
+            </td>
+            <td>
+                <a class="btn btn-sm btn-primary" href="${viewUrl}" target="_blank">View</a>
+            </td>
+        </tr>
+    `;
+});
+
 
             if (logsTable) logsTable.destroy();
             logsTable = $('#ActivityLogsTable').DataTable({ search: { regex: true } });

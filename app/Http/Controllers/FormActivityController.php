@@ -5,6 +5,7 @@ use App\Models\Team;
 use Illuminate\Http\Request;
 use App\Models\Submission;
 use App\Models\Activity;
+use App\Models\ChallengeLevel;
 use App\Models\TeamUser;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -17,57 +18,107 @@ class FormActivityController extends Controller
         $activities = Activity::all(['id', 'name']); // Only fetch id & name
         return response()->json($activities);
     }
-
-
 public function findPendingLevel($activity_id, $user_id)
 {
-    // Find the team with pending status where this user is a member
-    $team = Team::where('activity_id', $activity_id)
-        ->where('status', 'pending')
-        ->whereHas('users', function ($query) use ($user_id) {
-            $query->where('user_id', $user_id);
-        })
-        ->with([
-            'level',    // Get level details (includes team_size & required_value)
-            'activity', // Get activity details (for unit)
-        ])
-        ->first(['id', 'name', 'level_id', 'activity_id']);
+    $activity = Activity::findOrFail($activity_id);
+    $levelActive = $activity->level_active ?? 0; // Admin-set active level
 
-    if ($team) {
-        // Sum all approved submissions for this user, activity, level, team
-        $progressValue = Submission::where('user_id', $user_id)
-            ->where('team_id', $team->id)
-            ->where('activity_id', $activity_id)
-            ->where('level_id', $team->level_id)
-            ->where('status', 'approved')
+    // 1️⃣ Check if user has a pending team
+    $pendingTeam = Team::where('teams.activity_id', $activity_id)
+        ->where('teams.status', 'pending')
+        ->whereHas('users', fn($q) => $q->where('users.id', $user_id))
+        ->with(['level', 'activity'])
+        ->first();
+
+    if ($pendingTeam) {
+        $totalProgress = Submission::where('submissions.user_id', $user_id)
+            ->where('submissions.team_id', $pendingTeam->id)
+            ->where('submissions.activity_id', $activity_id)
+            ->where('submissions.level_id', $pendingTeam->level_id)
+            ->where('submissions.status', 'approved')
             ->sum('progress_value');
 
-        // Use fixed team size from challenge_levels
-        $teamSize = $team->level?->team_size ?: 1;
-
-        // Required value per member
-        $perMemberRequired = ($team->level?->required_value ?? 0) / max($teamSize, 1);
+        $teamSize = $pendingTeam->level?->team_size ?: 1;
+        $perMemberRequired = ($pendingTeam->level?->required_value ?? 0) / max($teamSize, 1);
 
         return response()->json([
-            'team_id'            => $team->id,
-            'team_name'          => $team->name,
-            'pending_level'      => $team->level?->id,
-            'display_level'      => $team->level?->level_number,
-            'progress_value'     => $progressValue,
-            'per_member_required'=> $perMemberRequired,
-            'unit'               => $team->activity?->unit,
+            'has_pending_level'   => true,
+            'team_id'             => $pendingTeam->id,
+            'team_name'           => $pendingTeam->name,
+            'pending_level'       => $pendingTeam->level?->id,
+            'display_level'       => $pendingTeam->level?->level_number,
+            'progress_value'      => null,
+            'per_member_required' => $perMemberRequired,
+            'unit'                => $pendingTeam->activity?->unit,
+            'last_team_id'        => $pendingTeam->id,
+            'last_progress_value' => $totalProgress,
+            'level' => [
+                'id' => $pendingTeam->level?->id,
+                'level_number' => $pendingTeam->level?->level_number,
+                'required_value' => $pendingTeam->level?->required_value,
+            ],
         ]);
     }
 
-    // No team found
+    // 2️⃣ No pending team → get all user teams for this activity
+    $userTeams = Team::where('teams.activity_id', $activity_id)
+        ->whereHas('users', fn($q) => $q->where('users.id', $user_id))
+        ->get(['id', 'name']);
+
+    $activityUnit = $activity->unit;
+
+    // Map last progress for each team
+    $teams = $userTeams->map(fn($team) => [
+        'id' => $team->id,
+        'name' => $team->name,
+        'last_progress_value' => $team->submissions()
+            ->where('submissions.user_id', $user_id)
+            ->where('submissions.status', 'approved')
+            ->sum('progress_value'),
+    ]);
+
+    // 3️⃣ Get last approved submission
+    $lastCompletedSubmission = Submission::where('submissions.user_id', $user_id)
+        ->where('submissions.activity_id', $activity_id)
+        ->where('submissions.status', 'approved')
+        ->orderByDesc('submissions.created_at')
+        ->first();
+
+    $lastLevelNumber = $lastCompletedSubmission?->level?->level_number ?? 0;
+
+    // 4️⃣ Collect levels **up to admin active level**
+    $levels = ChallengeLevel::where('activity_id', $activity_id)
+        ->where('level_number', '<=', $levelActive)
+        ->orderBy('level_number')
+        ->get(['id', 'level_number', 'required_value']);
+
+    // Determine next level to preselect
+    $nextLevel = $levels->firstWhere('level_number', $lastLevelNumber + 1) ?? $levels->last();
+
     return response()->json([
-        'team_name'           => null,
-        'pending_level'       => null,
-        'progress_value'      => 0,
-        'per_member_required' => 0,
-        'unit'                => null,
+        'has_pending_level'   => false,
+        'activity_id'         => $activity_id,
+        'teams'               => $teams,
+        'unit'                => $activityUnit,
+        'last_team_id'        => $lastCompletedSubmission?->team_id ?? null,
+        'last_progress_value' => $teams->sum('last_progress_value'),
+        'level'               => $nextLevel
+            ? [
+                'id' => $nextLevel->id,
+                'level_number' => $nextLevel->level_number,
+                'required_value' => $nextLevel->required_value,
+            ]
+            : null,
+        'levels'              => $levels->map(fn($l) => [
+            'id' => $l->id,
+            'level_number' => $l->level_number,
+            'required_value' => $l->required_value,
+        ]),
+        'last_level_number' => $lastLevelNumber,
+        'level_active'      => $levelActive, // send to frontend for reference
     ]);
 }
+
 
 public function store(Request $request)
 {
@@ -77,51 +128,68 @@ public function store(Request $request)
         // --- Validate request ---
         $validated = $request->validate([
             'activity_id'        => 'required|exists:activities,id',
+            'level_id'           => 'required|exists:challenge_levels,id',
             'progress_value'     => 'required|numeric',
             'other_informations' => 'required|string',
             'team_id'            => 'required|exists:teams,id',
             'department'         => 'required|string',
-            'email'              => 'required|email',
+            'email'              => 'required|string',
+            'submission_type'    => 'required|in:individual,party',
         ]);
 
-        // --- Load team and its level ---
-        $team = Team::with('users', 'level')->findOrFail($validated['team_id']);
-        $level = $team->level;
+        // --- Load Team ---
+        $team = Team::with('users')->findOrFail($validated['team_id']);
 
-        if (!$level) {
+        // --- Load Activity ---
+        $activity = Activity::with('challengeLevels')->findOrFail($validated['activity_id']);
+
+        // --- Load the level being submitted ---
+        $submissionLevel = ChallengeLevel::findOrFail($validated['level_id']);
+
+        // --- Ensure the level belongs to the activity ---
+        if ($submissionLevel->activity_id !== $activity->id) {
             return response()->json([
                 'success' => false,
-                'message' => "Challenge level not found for this team."
-            ], 404);
-        }
-
-        // --- Check if team is complete ---
-        $currentMembersCount = $team->users()->count();
-        if ($currentMembersCount < $level->team_size) {
-            return response()->json([
-                'success' => false,
-                'message' => "Submission blocked: Team '{$team->name}' is not complete yet. Current members: {$currentMembersCount}/{$level->team_size}."
+                'message' => 'Invalid level for this activity.'
             ], 422);
         }
 
+        // 🔐 --- LEVEL LOCK: Use Activity helper ---
+        if (!$activity->isLevelUnlocked($submissionLevel->level_number)) {
+            return response()->json([
+                'success' => false,
+                'message' => "Submission blocked. Admin has only unlocked up to Level {$activity->maxActiveLevel()}."
+            ], 403);
+        }
+
+        // --- Check if team is complete ---
+        $requiredTeamSize = $submissionLevel->team_size ?? null;
+        if ($requiredTeamSize) {
+            $currentMembersCount = $team->users()->count();
+            if ($currentMembersCount < $requiredTeamSize) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Submission blocked: Team '{$team->name}' is not complete yet. {$currentMembersCount}/{$requiredTeamSize} members."
+                ], 422);
+            }
+        }
+
         // --- Generate log_id ---
-        $prefix = 'LOG';
-        $date = date('Ymd');
-        $randomSuffix = substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 4);
-        $logId = $prefix . '-' . $date . '-' . $randomSuffix;
+        $logId = 'LOG-' . date('Ymd') . '-' . substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 4);
 
         // --- Create submission ---
         $submission = Submission::create([
             'log_id'             => $logId,
             'user_id'            => auth()->id(),
             'team_id'            => $team->id,
-            'activity_id'        => $validated['activity_id'],
-            'activity_name'      => Activity::find($validated['activity_id'])->name,
-            'level_id'           => $level->id,
+            'activity_id'        => $activity->id,
+            'activity_name'      => $activity->name,
+            'level_id'           => $submissionLevel->id,
             'progress_value'     => $validated['progress_value'],
             'other_informations' => $validated['other_informations'],
             'department'         => $validated['department'],
             'email'              => $validated['email'],
+            'submission_type'    => $validated['submission_type'],
         ]);
 
         // --- Handle attachments ---
@@ -143,9 +211,7 @@ public function store(Request $request)
 
         // --- Prepare email ---
         $to = ['neil.olivera.no@sanden-rs.com'];
-        $cc = [];
-        $bcc = [];
-        $subject = "New Activity Submission - {$submission->activity_name}";
+        $subject = "New Activity Submission - {$activity->name}";
 
         $logoPath = public_path('img/sanden-logo-white.png');
         $logoDataUri = file_exists($logoPath)
@@ -154,8 +220,9 @@ public function store(Request $request)
 
         $body = view('emails.activity_mail', [
             'team_name'      => $team->name,
-            'activity_name'  => $submission->activity_name,
-            'activity_level' => $level->level_number,
+            'activity_name'  => $activity->name,
+            'submission_type'=> $submission->submission_type,
+            'activity_level' => $submissionLevel->level_number,
             'uploader_name'  => auth()->user()->name,
             'department'     => auth()->user()->department,
             'progress_value' => $submission->progress_value,
@@ -164,20 +231,18 @@ public function store(Request $request)
             'logoDataUri'    => $logoDataUri,
         ])->render();
 
-        // --- Send email ---
-        $mailService = new ActivitiesMailService();
-        $mailService->registration_mail($to, $cc, $bcc, $subject, $body, $attachments);
+        (new ActivitiesMailService())->registration_mail($to, [], [], $subject, $body, $attachments);
 
         DB::commit();
 
-        // --- Cleanup temporary files ---
+        // --- Cleanup temp files ---
         foreach ($tempFiles as $file) {
             if (file_exists($file)) unlink($file);
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Submission created successfully, email sent, and attachments cleaned up.',
+            'message' => 'Submission created successfully.'
         ], 201);
 
     } catch (\Throwable $e) {
@@ -186,10 +251,11 @@ public function store(Request $request)
 
         return response()->json([
             'success' => false,
-            'message' => 'Server error: ' . $e->getMessage(),
+            'message' => 'Server error.'
         ], 500);
     }
 }
+
 
 
 }

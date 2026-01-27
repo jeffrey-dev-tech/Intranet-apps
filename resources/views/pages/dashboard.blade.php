@@ -4,6 +4,11 @@
 @section('title', 'Dashboard')
 
 @section('content')
+
+
+
+
+
 <style>
 .two-columns {
   display: grid;
@@ -686,236 +691,163 @@ const table = $('#holidayTable').DataTable({
 
 
 </script>
+<style>
+/* Container for button + calendar */
+.calendar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* spacing between button and calendar */
+}
+
+/* FullCalendar width & height */
+#calendar {
+    width: 100%;       /* full width of column */
+    height: 600px;     /* fixed height for month view */
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+/* Optional: adjust table layout for day cells if needed */
+.fc .fc-daygrid-day-frame {
+    overflow: hidden;
+    white-space: normal;
+}
+</style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-var calendarEl = document.getElementById('calendar');
-var calendar = new FullCalendar.Calendar(calendarEl, {
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+
+   var calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'dayGridMonth',
     headerToolbar: {
         left: 'prev,next today',
         center: 'title',
         right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
     },
-    events: '{{ route("calendar.events") }}', // Fetch events from backend
-    dayMaxEventRows: true,
-    dayMaxEvents: true,
+    events: '{{ route("calendar.events") }}',
+    
+    dayMaxEvents: 0,  // Laravel route returning JSON events
+        eventClick: function(info) {
+            info.jsEvent.preventDefault();
+            
+            // Fetch event details from your backend
+            fetch('{{ route("calendar.show", ":id") }}'.replace(':id', info.event.id))
+                .then(res => res.json())
+                .then(data => {
+                    // Populate your modal
+                    document.getElementById('eventTitle').textContent = data.title;
+                    document.getElementById('eventAgenda').textContent = data.agenda;
+                    document.getElementById('eventStart').textContent = data.start;
+                    document.getElementById('eventEnd').textContent = data.end ?? 'N/A';
+                    document.getElementById('eventDescription').textContent = data.description || 'No description';
 
-    eventClick: function(info) {
-        info.jsEvent.preventDefault();
+                    // Meeting room handling
+                    const meetingRoomRow = document.getElementById('meetingRoomRow');
+                    if (data.agenda === 'Room' && data.meeting_room) {
+                        let roomLabel = '';
+                        if (data.meeting_room === 'conference_room_1f') roomLabel = 'Conference Room (1st Floor)';
+                        else if (data.meeting_room === 'meeting_room_1_2f_right') roomLabel = 'Meeting Room 1 (2nd Floor Right)';
+                        else if (data.meeting_room === 'meeting_room_2_3f_right') roomLabel = 'Meeting Room 2 (3rd Floor Right)';
+                        else roomLabel = data.meeting_room;
 
-        fetch('{{ route("calendar.show", ":id") }}'.replace(':id', info.event.id))
-            .then(response => response.json())
-          .then(data => {
-    // Format function for date/time with AM/PM
-    function formatDateTime(dateString) {
-        if (!dateString) return 'N/A';
-        const date = new Date(dateString);
-        return date.toLocaleString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-        });
-    }
-
-    // Basic info
-    document.getElementById('eventTitle').textContent = data.title;
-    document.getElementById('eventAgenda').textContent = data.agenda;
-    document.getElementById('eventStart').textContent = formatDateTime(data.start);
-    document.getElementById('eventEnd').textContent = data.end ? formatDateTime(data.end) : 'N/A';
-    document.getElementById('eventDescription').textContent = data.description ? data.description : 'No description';
-
-    // Meeting Room handling
- if (data.agenda === 'Room' && data.meeting_room) {
-    let meetingRoomLabel = '';
-
-    // Manually map each meeting room value
-    if (data.meeting_room === 'conference_room_1f') {
-        meetingRoomLabel = 'Conference Room (1st Floor)';
-    } else if (data.meeting_room === 'meeting_room_1_2f_right') {
-        meetingRoomLabel = 'Meeting Room 1 (2nd Floor Right side)';
-    } else if (data.meeting_room === 'meeting_room_2_3f_right') {
-        meetingRoomLabel = 'Meeting Room 2 (3rd Floor Right side)';
-    } else {
-        meetingRoomLabel = data.meeting_room; // fallback in case value doesn’t match
-    }
-
-    document.getElementById('eventMeetingRoom').textContent = meetingRoomLabel;
-    document.getElementById('meetingRoomRow').style.display = '';
-} else {
-    document.getElementById('meetingRoomRow').style.display = 'none';
-}
-
-    // Set delete button ID
-const deleteBtn = document.getElementById('deleteEventBtn');
-if (deleteBtn) {
-    deleteBtn.setAttribute('data-id', info.event.id);
-}
-
-    // Show modal
-    $('#viewEventModal').modal('show');
-})
-
-            .catch(error => {
-                console.error('Error fetching event:', error);
-                Swal.fire('Error!', 'Failed to load event details.', 'error');
-            });
-    }
-});
-
-calendar.render();
-
-    // Handle form submit with fetch
-
-    const agendaSelect = document.getElementById('agenda');
-  const meetingRoomGroup = document.getElementById('meeting-room-group');
-
-  agendaSelect.addEventListener('change', function() {
-    if (this.value === 'Room') {
-      meetingRoomGroup.style.display = 'block';
-    } else {
-      meetingRoomGroup.style.display = 'none';
-    }
-  });
-document.getElementById('eventForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    let formData = new FormData(this);
-
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "Do you want to create this event?",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, create it!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-
-            // Show loading spinner
-            Swal.fire({
-                title: 'Creating Event...',
-                text: 'Please wait while we save your event.',
-                allowOutsideClick: false,
-                didOpen: () => Swal.showLoading()
-            });
-
-            fetch('{{ route("calendar.store") }}', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: formData
-            })
-            .then(async response => {
-                const data = await response.json().catch(() => null);
-
-                Swal.close(); // Always close loading alert
-
-                if (!response.ok) {
-                    // Laravel validation error or custom response
-                    if (response.status === 422 && data) {
-                        // Validation errors (like missing fields or room conflict)
-                        if (data.errors) {
-                            const messages = Object.values(data.errors).flat().join('<br>');
-                            Swal.fire({
-                                title: 'Validation Error',
-                                html: messages,
-                                icon: 'warning'
-                            });
-                        } else if (data.message) {
-                            Swal.fire('Warning', data.message, 'warning');
-                        } else {
-                            Swal.fire('Error!', 'Validation failed.', 'error');
-                        }
+                        document.getElementById('eventMeetingRoom').textContent = roomLabel;
+                        meetingRoomRow.style.display = '';
                     } else {
-                        Swal.fire('Error!', 'Something went wrong on the server.', 'error');
+                        meetingRoomRow.style.display = 'none';
                     }
-                    return; // stop here
-                }
 
-                // Success
-                if (data.status === 'success') {
-                    $('#eventModal').modal('hide');
-                    document.getElementById('eventForm').reset();
-                    calendar.refetchEvents();
+                    // Set delete button
+                    const deleteBtn = document.getElementById('deleteEventBtn');
+                    if (deleteBtn) deleteBtn.setAttribute('data-id', info.event.id);
 
-                    Swal.fire({
-                        title: 'Created!',
-                        text: 'Your event has been added successfully.',
-                        icon: 'success',
-                        timer: 2000,
-                        showConfirmButton: false
-                    }).then(() => {
-                        location.reload();
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                Swal.close();
-                Swal.fire('Error!', 'Unable to create event.', 'error');
-            });
+                    // Show modal
+                    $('#viewEventModal').modal('show');
+                });
         }
     });
-});
 
-document.getElementById('deleteEventBtn').addEventListener('click', function () {
-    let eventId = this.getAttribute('data-id');
+    calendar.render();
 
-    Swal.fire({
-        title: 'Are you sure?',
-        text: 'This action cannot be undone!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'Cancel'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            fetch('{{ route("calendar.destroy", ":id") }}'.replace(':id', eventId), {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    $('#viewEventModal').modal('hide');
-                    calendar.refetchEvents();
+    // Show/hide meeting room select in add modal
+    const agendaSelect = document.getElementById('agenda');
+    const meetingRoomGroup = document.getElementById('meeting-room-group');
 
-                    Swal.fire(
-                        'Deleted!',
-                        'The event has been deleted.',
-                        'success'
-                    ).then(() => {
-    location.reload();
-});
-                } else {
-                    Swal.fire(
-                        'Error!',
-                        'There was a problem deleting the event.',
-                        'error'
-                    );
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-               Swal.fire('Error!', 'Unable to delete event.', 'error');
-            });
-        }
+    agendaSelect.addEventListener('change', function() {
+        meetingRoomGroup.style.display = (this.value === 'Room') ? 'block' : 'none';
     });
-});
 
+    // Handle new event submission
+    document.getElementById('eventForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        let formData = new FormData(this);
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to create this agenda?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes'
+        }).then(result => {
+            if(result.isConfirmed) {
+                fetch('{{ route("calendar.store") }}', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
+                    body: formData
+                })
+                .then(async res => {
+                    const data = await res.json().catch(()=>null);
+                    if(res.ok && data.status === 'success') {
+                        $('#eventModal').modal('hide');
+                        this.reset();
+                        calendar.refetchEvents(); // refresh calendar
+                        Swal.fire('Created!', 'Agenda added successfully', 'success');
+                    } else {
+                        Swal.fire('Error!', data?.message || 'Validation failed', 'error');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    Swal.fire('Error!', 'Unable to create agenda', 'error');
+                });
+            }
+        });
+    });
+
+    // Handle delete
+    document.getElementById('deleteEventBtn')?.addEventListener('click', function() {
+        let eventId = this.getAttribute('data-id');
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This action cannot be undone!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes'
+        }).then(result => {
+            if(result.isConfirmed) {
+                fetch('{{ route("calendar.destroy", ":id") }}'.replace(':id', eventId), {
+                    method: 'DELETE',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.status === 'success') {
+                        $('#viewEventModal').modal('hide');
+                        calendar.refetchEvents();
+                        Swal.fire('Deleted!', 'Agenda deleted successfully', 'success');
+                    } else Swal.fire('Error!', 'Failed to delete', 'error');
+                })
+                .catch(err => {
+                    console.error(err);
+                    Swal.fire('Error!', 'Unable to delete agenda', 'error');
+                });
+            }
+        });
+    });
 
 });
 </script>
+	<script src="{{ asset('assets/js/fullcalendar@6.1.8.index.global.min.js') }}"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const url = "{{ route('team.ranking') }}";
@@ -958,9 +890,9 @@ for (const row of data) {
     <td>${row.activity_name ?? 'N/A'}</td>
     <td>${row.unit ?? 'N/A'}</td>
     <td>Level ${row.level_number ?? 'N/A'}</td>
-    <td>${row.total_progress ?? 0}</td>
+    <td>${row.total_progress != null ? Number(row.total_progress).toFixed(2) : '0'}</td>
     <td>${row.progress_percentage ? row.progress_percentage.toFixed(2) + '%' : '0%'}</td>
-    <td>${row.completed_at ? new Date(row.completed_at).toLocaleString() : 'No date'}</td>
+    <td>${row.completed_at ? new Date(row.completed_at).toLocaleString() : 'In progress'}</td>
   `;
 
   tbody.appendChild(tr);

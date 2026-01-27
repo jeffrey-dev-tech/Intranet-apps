@@ -71,6 +71,10 @@
                                             <td style="font-weight: bold; background-color: #f9f9f9;">Name</td>
                                             <td id="submitterName"></td>
                                         </tr>
+                                          <tr>
+                                            <td style="font-weight: bold; background-color: #f9f9f9;">Submission Type</td>
+                                            <td id="submission_type"></td>
+                                        </tr>
                                         <tr>
                                             <td style="font-weight: bold; background-color: #f9f9f9;">Progress Value</td>
                                             <td id="progressCell"></td>
@@ -147,7 +151,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('progressCell').textContent = `${log.progress_value || 'N/A'} ${log.unit || ''}`;
         document.getElementById('otherCell').textContent = log.other_informations || 'N/A';
         document.getElementById('submitterName').textContent = log.user_name || 'N/A';
-
+        document.getElementById('submission_type').textContent = log.submission_type || 'N/A';
         // Show approval row only for user 69/119 AND pending logs
 const userId = @json(auth()->user()->id);
 
