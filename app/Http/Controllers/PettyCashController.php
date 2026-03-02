@@ -75,14 +75,11 @@ public function download_voucher(Request $request)
         'RO-NL' => 'NL',
         'RO-MINDANAO' => 'DVO',
         'RO-VISAYAS' => 'VIS',
-        'FINANCE' => 'FIN',
         'ADMIN' => 'ADM',
         'COLD CHAIN' => 'CC',
         'AFTER SALES' => 'AFT',
         'SCM' => 'LOG',
-        'SOUTH LUZON' => 'SL',
         'PROCUREMENT & IMPORTATION' => 'PROC',
-        'MIS' => 'MIS',
     ];
 
     $prefix = $regionCodeMap[$department->name] ?? 'GEN';

@@ -45,7 +45,7 @@ class Submission extends Model
     {
          return $this->belongsTo(ChallengeLevel::class, 'level_id');
     }
- public static function teamProgress()
+public static function teamProgress()
 {
     return self::select(
             'submissions.team_id',
@@ -60,7 +60,25 @@ class Submission extends Model
             'activities.unit',
             'activities.level_active',
             DB::raw('(SUM(submissions.progress_value) / challenge_levels.required_value) * 100 as progress_percentage'),
-            // Mark completed_at only if number of Party submissions >= team size
+
+            // ✅ Sum of approved submissions per member in JSON (progress_value and exceed)
+            DB::raw("(SELECT JSON_ARRAYAGG(
+                        CONCAT(u.name, ' (', sub.total_progress, ' | Exceed: ', sub.total_exceed, ')')
+                      )
+                      FROM (
+                          SELECT s2.user_id, 
+                                 SUM(s2.progress_value) AS total_progress,
+                                 SUM(s2.progress_value_exceed) AS total_exceed
+                          FROM submissions s2
+                          WHERE s2.team_id = submissions.team_id
+                            AND s2.level_id = submissions.level_id
+                            AND s2.status = 'approved'
+                          GROUP BY s2.user_id
+                      ) AS sub
+                      JOIN users u ON u.id = sub.user_id
+            ) as member_submissions"),
+
+            // Completed at logic
             DB::raw("(CASE 
                         WHEN (
                             SELECT COUNT(*) 
@@ -86,19 +104,24 @@ class Submission extends Model
         ->whereNotNull('activities.level_active')
         ->whereColumn('challenge_levels.level_number', 'activities.level_active')
         ->groupBy(
-    'submissions.team_id',
-    'submissions.level_id',
-    'teams.name',
-    'teams.status',
-    'teams.updated_at',
-    'challenge_levels.activity_name',
-    'challenge_levels.level_number',
-    'challenge_levels.required_value',
-    'activities.unit',
-    'activities.level_active'
-)
-->orderByRaw('completed_at IS NULL, completed_at ASC')
-->get();
+            'submissions.team_id',
+            'submissions.level_id',
+            'teams.name',
+            'teams.status',
+            'teams.updated_at',
+            'challenge_levels.activity_name',
+            'challenge_levels.level_number',
+            'challenge_levels.required_value',
+            'activities.unit',
+            'activities.level_active'
+        )
+        // Order: completed teams first by oldest completed_at, then in-progress by total_progress desc
+        ->orderByRaw('completed_at IS NULL, completed_at ASC')
+        ->orderByDesc('total_progress')
+        ->get();
 }
+
+
+
 
 }

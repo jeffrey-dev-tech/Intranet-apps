@@ -129,7 +129,6 @@
     </div>
 </div>
 
-
 <script>
 document.addEventListener('DOMContentLoaded', async () => {
     const logId = "{{ $log_id }}";
@@ -142,7 +141,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
         const res = await fetch(fetchUrl, { headers: { 'Accept': 'application/json' } });
-        const data = await res.json();
+
+        let data;
+        try {
+            // Try parsing JSON
+            data = await res.json();
+        } catch (jsonError) {
+            // If JSON fails, it's likely a PHP error page
+            const text = await res.text();
+            console.error('PHP/Server Error:', text);
+            Swal.fire('Server Error!', 'Failed to load activity log.<br><pre>' + text + '</pre>', 'error');
+            return;
+        }
+
         const log = data.activity_log[0] || {};
 
         document.getElementById('teamCell').textContent = log.team_name || 'N/A';
@@ -152,68 +163,77 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('otherCell').textContent = log.other_informations || 'N/A';
         document.getElementById('submitterName').textContent = log.user_name || 'N/A';
         document.getElementById('submission_type').textContent = log.submission_type || 'N/A';
-        // Show approval row only for user 69/119 AND pending logs
-const userId = @json(auth()->user()->id);
 
-if (approvalRow && (userId === 63 || userId === 100) && log.status === 'pending') {
-    approvalRow.style.display = 'table-row';
-    console.log('Approval row displayed');
-} else {
-    console.log('Approval row remains hidden');
-}
-
-
+        const userId = @json(auth()->user()->id);
+        if (approvalRow && (userId === 63 || userId === 100 || userId === 59) && log.status === 'pending') {
+            approvalRow.style.display = 'table-row';
+        }
 
     } catch (error) {
-        console.error('Error loading log data:', error);
-        Swal.fire('Error!', 'Failed to load activity log.', 'error');
+        console.error('Fetch failed:', error);
+        Swal.fire('Error!', 'Failed to fetch activity log.<br>' + error.message, 'error');
     }
 
     if (!submitBtn) return;
 
     submitBtn.addEventListener('click', async () => {
-        const status = statusSelect.value;
-        if (!status) {
-            Swal.fire('Please select a status!', '', 'warning');
+    const status = statusSelect.value;
+    if (!status) {
+        Swal.fire('Please select a status!', '', 'warning');
+        return;
+    }
+
+    const confirm = await Swal.fire({
+        title: `Are you sure?`,
+        text: `You are about to mark this as "${status}"`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, confirm',
+        cancelButtonText: 'Cancel'
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+        const response = await fetch(updateUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ 
+                log_id: logId, 
+                status,
+                // Include submitted_value so Laravel validation passes
+                submitted_value: parseFloat(document.getElementById('progressCell').textContent) || 0
+            })
+        });
+
+        // Read the body once
+        const text = await response.text();
+
+        let result;
+        try {
+            result = JSON.parse(text); // try parsing JSON
+        } catch {
+            console.error('Server Error (not JSON):', text);
+            Swal.fire('Server Error!', '<pre>' + text + '</pre>', 'error');
             return;
         }
 
-        const confirm = await Swal.fire({
-            title: `Are you sure?`,
-            text: `You are about to mark this as "${status}"`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, confirm',
-            cancelButtonText: 'Cancel'
-        });
-
-        if (!confirm.isConfirmed) return;
-
-        try {
-            const response = await fetch(updateUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ log_id: logId, status })
-            });
-
-            const result = await response.json();
-
-            if (response.ok && result.success) {
-                Swal.fire('Updated!', 'Status has been updated successfully.', 'success')
-                    .then(() => location.reload());
-            } else {
-                throw new Error(result.message || 'Failed to update status');
-            }
-        } catch (error) {
-            console.error('Update failed:', error);
-            Swal.fire('Error!', `Failed to update status. ${error.message}`, 'error');
+        if (response.ok && result.success) {
+            Swal.fire('Updated!', 'Status has been updated successfully.', 'success')
+                .then(() => location.reload());
+        } else {
+            throw new Error(result.message || 'Failed to update status');
         }
-    });
-});
 
+    } catch (error) {
+        console.error('Update failed:', error);
+        Swal.fire('Error!', `Failed to update status. ${error.message}`, 'error');
+    }
+});
+});
 </script>
 
 

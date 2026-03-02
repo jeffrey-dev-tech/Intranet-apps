@@ -9,6 +9,7 @@ class DepartmentHead extends Model
     protected $fillable = [
         'name',
         'department',
+        'user_id',
         'role',
         'email',
     ];
@@ -18,4 +19,7 @@ class DepartmentHead extends Model
     {
         return $this->hasMany(User::class, 'head_id');
     }
+
+
+
 }

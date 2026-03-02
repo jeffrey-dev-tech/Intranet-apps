@@ -9,6 +9,8 @@ $routeFiles = [
     'activities.php',
     'teams.php',
     'pettycash.php',
+    'travel.php',
+    'accounts.php',
 ];
 
 foreach ($routeFiles as $file) {

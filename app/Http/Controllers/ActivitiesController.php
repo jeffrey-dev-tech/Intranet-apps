@@ -166,100 +166,101 @@ public function getActivity()
         'progressInfo' => $progressInfo
     ]);
 }
+
 public function updateStatus(Request $request)
 {
-    $request->validate([
-        'log_id' => 'required|exists:submissions,log_id',
-        'status' => 'required|in:approved,disapproved',
-        'submitted_value' => 'required|numeric|min:0', // the new submitted value
-    ]);
-
-    DB::beginTransaction();
-
     try {
-        // Fetch submission with related team & level
+        // ================= Validation =================
+        $validated = $request->validate([
+            'log_id' => 'required|exists:submissions,log_id',
+            'status' => 'required|in:approved,disapproved',
+            'submitted_value' => 'required|numeric|min:0',
+        ]);
+
+        DB::beginTransaction();
+
+        // ================= Fetch submission =================
         $log = Submission::with('team.users', 'level')
-            ->where('log_id', $request->log_id)
+            ->where('log_id', $validated['log_id'])
             ->firstOrFail();
 
-        $submittedValue = $request->input('submitted_value');
+        $submittedValue = $validated['submitted_value'];
 
-        if ($request->status === 'approved') {
+        if ($validated['status'] === 'approved') {
 
-            // ================= Per-member quota =================
-            $teamSize = ($log->submission_type === 'party')
-                ? ($log->team?->users->count() ?: 1)
-                : 1;
+            // ================= Team & Level Info =================
+            $team = $log->team;
+            $level = $log->level;
+            $teamMemberCount = $team->users()->count();
 
-            $perMemberRequired = ($log->level?->required_value ?? 0) / max($teamSize, 1);
+            $teamLimit = $level?->required_value ?? 0;
 
-            // ================= Total previously approved progress for this user =================
-            $totalApprovedForUser = Submission::where('activity_id', $log->activity_id)
+            // ================= Per-member limit =================
+            $perMemberLimit = $teamMemberCount > 0 ? $teamLimit / $teamMemberCount : 0;
+
+            // ================= Total approved by this member =================
+            $memberTotalApproved = Submission::where('team_id', $team->id)
+                ->where('user_id', $log->user_id)
+                ->where('activity_id', $log->activity_id)
                 ->where('level_id', $log->level_id)
                 ->where('status', 'approved')
-                ->where('user_id', $log->user_id)
                 ->sum('progress_value');
 
-            // ================= Determine allowed progress and overflow =================
-            if ($totalApprovedForUser >= $perMemberRequired) {
-                // User already met quota → all new submission goes to overflow
-                $allowedProgress = 0;
-                $overflow = $submittedValue;
-            } else {
-                $remaining = $perMemberRequired - $totalApprovedForUser;
-                $allowedProgress = 0; // always put into overflow if already met
-                $overflow = $submittedValue; 
-            }
+            // ================= Remaining allowed for this member =================
+            $remainingForMember = max(0, $perMemberLimit - $memberTotalApproved);
+
+            // ================= Allowed & overflow =================
+            $allowedProgress = min($submittedValue, $remainingForMember);
+            $overflow = max(0, $submittedValue - $allowedProgress);
 
             // ================= Save submission =================
-            $log->progress_value = $allowedProgress;          
-            $log->progress_value_exceed += $overflow;        
+            $log->progress_value = $allowedProgress;
+            $log->progress_value_exceed += $overflow;
             $log->status = 'approved';
             $log->save();
 
             // ================= Team Completion Logic =================
-            if ($log->team) {
-                $teamMemberCount = $log->team->users()->count();
-
-                // Count distinct members who have at least one approved party submission
-                $partySubmitterCount = Submission::where('team_id', $log->team_id)
+            if ($team) {
+                // Count distinct party submitters
+                $partySubmitters = Submission::where('team_id', $team->id)
                     ->where('activity_id', $log->activity_id)
                     ->where('level_id', $log->level_id)
                     ->where('status', 'approved')
                     ->where('submission_type', 'party')
-                    ->distinct('user_id')
-                    ->count('user_id');
+                    ->groupBy('user_id')
+                    ->havingRaw('SUM(progress_value) >= ?', [$perMemberLimit])
+                    ->pluck('user_id')
+                    ->toArray();
 
-                // Team completes only if all members submitted at least once party
-                if ($partySubmitterCount >= $teamMemberCount && $log->team->status !== 'completed') {
-                    $log->team->timestamps = false;       // prevent automatic updated_at change
-                    $log->team->status = 'completed';
-                    $log->team->updated_at = $log->created_at; // use submission created_at
-                    $log->team->save();
-                    $log->team->timestamps = true;
+                if (count($partySubmitters) >= $teamMemberCount && $team->status !== 'completed') {
+                    $team->timestamps = false;
+                    $team->status = 'completed';
+                    $team->updated_at = $log->created_at; // Use submission creation date
+                    $team->save();
+                    $team->timestamps = true;
                 }
             }
 
         } else {
-            // ================= Disapproved Submission =================
-            $log->progress_value = 0;                  // reset progress
-            $log->progress_value_exceed = 0;           // reset overflow
+            // ================= Disapproved =================
+            $log->progress_value = 0;
+            $log->progress_value_exceed = 0;
             $log->status = 'disapproved';
             $log->save();
         }
 
         DB::commit();
-
         return response()->json(['success' => true]);
+
+    } catch (\Illuminate\Validation\ValidationException $ve) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Validation failed',
+            'errors' => $ve->errors()
+        ], 422);
 
     } catch (\Exception $e) {
         DB::rollBack();
-        Log::error('Update Status Failed', [
-            'request_data' => $request->all(),
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
-
         return response()->json([
             'success' => false,
             'message' => 'Failed to update status',
@@ -267,7 +268,6 @@ public function updateStatus(Request $request)
         ], 500);
     }
 }
-
 
 
 public function Form_Logs()

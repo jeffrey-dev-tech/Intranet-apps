@@ -188,41 +188,40 @@ async function fetchTeams() {
             return;
         }
 
+   const currentUserId = {{ auth()->user()->id }};
+
     data.teams.forEach(team => {
-    teamsTableBody.innerHTML += `
-        <tr style="text-align:center;">
-            <td>${team.name.toUpperCase()}</td>
-            <td>${team.activity_name ?? 'N/A'}</td>
-            <td>
-                <span class="badge ${
-                    team.status === 'completed' ? 'badge-success' :
-                    team.status === 'cancelled' ? 'badge-danger' :
-                    team.status === 'pending' ? 'badge-warning' :
-                    'badge-secondary'
-                }">${team.status}</span>
-            </td>
-            <td>${team.users_count}</td>
-            <td>
-                <button 
-                    class='btn btn-success' 
-                    data-toggle="modal" 
-                    data-target="#view_modal_members" 
-                    data-team-id="${team.id}">
-                    View
-                </button>
-                ${
-                    {{ auth()->user()->id }} === 69 
-                    ? `<button 
-                        class='btn btn-danger btn-delete-team' 
+        teamsTableBody.innerHTML += `
+            <tr style="text-align:center;">
+                <td>${team.name.toUpperCase()}</td>
+                <td>${team.activity_name ?? 'N/A'}</td>
+                <td>
+                    <span class="badge ${
+                        team.status === 'completed' ? 'badge-success' :
+                        team.status === 'cancelled' ? 'badge-danger' :
+                        team.status === 'pending' ? 'badge-warning' :
+                        'badge-secondary'
+                    }">${team.status}</span>
+                </td>
+                <td>${team.users_count}</td>
+                <td>
+                    <button 
+                        class='btn btn-success' 
+                        data-toggle="modal" 
+                        data-target="#view_modal_members" 
                         data-team-id="${team.id}">
-                        Delete
-                       </button>` 
-                    : ''
-                }
-            </td>
-        </tr>
-    `;
-});
+                        View
+                    </button>
+                    ${currentUserId === 69 ? `
+                        <button 
+                            class='btn btn-danger btn-delete-team' 
+                            data-team-id="${team.id}">
+                            Delete
+                        </button>` : ''}
+                </td>
+            </tr>
+        `;
+    });
 
 
         // SweetAlert Delete

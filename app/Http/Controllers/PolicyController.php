@@ -87,6 +87,51 @@ public function policy_tbl(Request $request)
     'data'     => $data
 ]);
 }
+public function toggleStatus(Request $request)
+{
+    // ✅ Validate incoming request
+    $validated = $request->validate([
+        'id' => 'required|integer|exists:documents,id',
+        'status' => 'required|boolean', // match the JS key
+    ]);
+
+    try {
+        // Wrap in transaction for rollback
+        DB::beginTransaction();
+
+        $policy = Policy::find($validated['id']);
+        if (!$policy) {
+            // Rollback just in case (though nothing changed yet)
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Document not found.'
+            ], 404);
+        }
+
+        // Update status
+        $policy->active = $validated['status'];
+        $policy->save();
+
+        // Commit transaction
+        DB::commit();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status updated successfully',
+            'active' => $policy->active
+        ]);
+
+    } catch (\Exception $e) {
+        // Rollback on any error
+        DB::rollBack();
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to update status: ' . $e->getMessage()
+        ], 500);
+    }
+}
 
 public function document_tbl(Request $request)
 {

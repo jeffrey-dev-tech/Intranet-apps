@@ -210,7 +210,7 @@ public function store(Request $request)
         }
 
         // --- Prepare email ---
-        $to = ['neil.olivera.no@sanden-rs.com'];
+        $to = ['neil.olivera.no@sanden-rs.com','nelson.cubio.nc@sanden-rs.com'];
         $subject = "New Activity Submission - {$activity->name}";
 
         $logoPath = public_path('img/sanden-logo-white.png');

@@ -50,5 +50,13 @@ public function users()
         return $this->hasMany(Submission::class);
     }
 
-    
+      public function members()
+    {
+        return $this->belongsToMany(
+            User::class,       // Related model
+            'team_user',       // Pivot table
+            'team_id',         // Foreign key on pivot for this model
+            'user_id'          // Foreign key on pivot for related model
+        )->withPivot('role', 'progress_value', 'joined_at');
+    }
 }

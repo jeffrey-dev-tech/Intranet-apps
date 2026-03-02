@@ -3,8 +3,19 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SpecialAccessController;
 use App\Http\Controllers\VpnController;
+use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\GoogleDriveController;
 Route::get('/vpn-expired-list', [VpnController::class, 'emailExpiredList'])->name('vpn.expired_list');
+
+
+
 Route::middleware(['auth', 'dashboard.maintenance', 'password.changed'])->group(function () {
+Route::post('/ColdChainServiceReport/upload-pdf', [GoogleDriveController::class, 'uploadPdfFromForm']);
+Route::get('/ColdChainServiceReport/files', [GoogleDriveController::class, 'listFiles'])->name('Gdrive.list');
+Route::get('/ColdChainServiceReport/service-form', [GoogleDriveController::class, 'form'])->name('ColdChainServiceReport.form');
+Route::get('/ColdChainServiceReport-download/{fileId}/{fileName}', [GoogleDriveController::class, 'download'])->name('ColdChainServiceReport.download');
+// Route::get('/google/auth', [GoogleAuthController::class, 'redirectToGoogle']);
+// Route::get('/google/callback', [GoogleAuthController::class, 'handleGoogleCallback'])->name('google.callback');
 Route::middleware(['auth', 'role:6,5'])->group(function () {
 Route::get('/special-access', [SpecialAccessController::class, 'index'])->name('special-access.index');
 Route::get('/maintenance-mode', [SpecialAccessController::class, 'maintenance_form'])->name('maintenance.form');

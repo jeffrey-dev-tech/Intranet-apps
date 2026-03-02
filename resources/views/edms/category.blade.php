@@ -49,58 +49,142 @@
         @endforeach
     </tbody>
 </table> --}}
+<div class="col-md-12 mb-3">
+    <input type="text" id="categorySearch" class="form-control" placeholder="Search categories...">
+</div>
 <hr>
 <style>
-    .category-link {
-        color: rgb(53, 32, 32);
-        text-decoration: none;
-        transition: color 0.3s ease, text-shadow 0.3s ease;
-    }
+/* Grid container for folders */
+.folder-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px;
+    padding: 15px 0;
+}
 
-    .category-link:hover {
-        color: #1ab467; /* darker blue */
-        text-shadow: 0 0 5px rgb(230, 230, 230);
-    
-    }
+/* Each folder tile */
+.folder-tile {
+    background: #f3f4f6;
+    border-radius: 15px;
+    padding: 15px 10px;
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 160px;
+    position: relative;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+/* Hover effect */
+.folder-tile:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 16px 28px rgba(0,0,0,0.25), 0 0 18px rgba(26,180,103,0.3);
+    background: linear-gradient(135deg, #e0f7ff, #d2eaff);
+}
+
+/* Folder icon */
+.folder-tile i.closed {
+    font-size: 60px;
+    color: #87CEEB;
+    margin: 5px 0;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.folder-tile i.open {
+    font-size: 60px;
+    color: #87CEEB;
+    display: none;
+    margin: 5px 0;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+/* Switch folder icon on hover */
+.folder-tile:hover i.closed { display: none; }
+.folder-tile:hover i.open { display: inline-block; transform: scale(1.15); }
+
+/* Folder ID badge */
+.folder-id {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    background: #1ab467;
+    padding: 2px 8px;
+    border-radius: 12px;
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Folder name text */
+.folder-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #494949;
+    margin-top: 8px;
+    margin-bottom: 4px;
+    text-decoration: none;
+    word-break: break-word;
+    transition: color 0.2s ease;
+}
+
+/* Change name color on hover */
+.folder-tile:hover .folder-name {
+    color: #1ab467;
+}
+
+/* Number of docs */
+.folder-docs {
+    font-size: 13px;
+    font-weight: 500;
+    color: #555;
+    transition: color 0.2s ease;
+}
+
+/* Highlight docs count on hover */
+.folder-tile:hover .folder-docs {
+    color: #1ab467;
+}
 </style>
 
-<div class="row">
+
+<div class="folder-grid">
     @foreach ($results as $category)
-        <div class="col-md-6 mb-3">
-            <div class="p-3 border rounded d-flex justify-content-between align-items-center" 
-                 style="background: #d2eaff;">
-                  R{{ $category->id }}
-                <div class="d-flex align-items-center">
-                    <div>
-                        <a href="{{ route('document.render', ['category_id' => $category->id, 'category_name'=> $category->name]) }}" 
-                           target="_blank" class="category-link">
-                            {{ $category->name }}
-                        </a>
-                    </div>
-                </div>
-  <div style="display: flex; flex-direction: column; align-items: center;">
-  <img 
-    src="{{ asset('img/folder.png') }}" alt="Folder" style="width: 30px; height: 30px; display: block; margin: 0; padding: 0;">
-  <p style="margin: 0; padding: 0; font-weight: 500; color: #333;">
-    {{ $category->policies_count ?? 0 }} Docs
-  </p>
-</div>
-</div>
-        </div>
+        <a href="{{ route('document.render', ['category_id' => $category->id, 'category_name'=> $category->name]) }}" 
+           target="_blank" class="folder-tile">
+            <div class="folder-id">R{{ $category->id }}</div>
+            <i class="fa-solid fa-folder closed"></i>
+            <i class="fa-solid fa-folder-open open"></i>
+            <span class="folder-name">{{ $category->name }}</span>
+            <span class="folder-docs">{{ $category->policies_count ?? 0 }} Docs</span>
+        </a>
     @endforeach
-</div>
-
-               
+</div>           
   </div>
   </div>
-
-   
-
-
-
-
-
   </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('categorySearch');
+        const folderTiles = document.querySelectorAll('.folder-tile');
+
+        searchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+
+            folderTiles.forEach(tile => {
+                const name = tile.querySelector('.folder-name').textContent.toLowerCase();
+                if (name.includes(query)) {
+                    tile.style.display = 'flex';
+                } else {
+                    tile.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
 
  <!-- <script>
         $(document).ready(function() {

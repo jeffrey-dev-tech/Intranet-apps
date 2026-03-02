@@ -98,6 +98,7 @@ to 79 Manila Line: (02) 8-898- 5110
         <tr>
             <td colspan="2"><div style="margin-top: 20px; font-size: 16px; font-weight: bold; color: #009fe3; text-align: center;">
     ⚠ Please use these credentials to log in to your FortiClient VPN.
+    ⚠ Please Do Not Reply
 </div></td>
         </tr>
            
@@ -119,7 +120,7 @@ to 79 Manila Line: (02) 8-898- 5110
       </tr>
       <tr>
         <td style="font-size: 16px; color: #f9f9f9; font-weight: bold; text-align: center;">
-          sanden.mis.sm@sanden-rs.com
+          mis.scp@sanden-rs.com
         </td>
       </tr>
     </table>

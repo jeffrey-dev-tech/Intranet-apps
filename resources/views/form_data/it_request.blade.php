@@ -188,49 +188,158 @@
   touch-action: manipulation;
 }
 </style> 
+<style>
+/* Extra small table body text */
+.table tbody {
+    font-size: 0.65rem;  /* extra small */
+}
+
+/* Optional: reduce row padding for compactness */
+.table tbody td {
+    padding: 0.2rem 0.4rem;
+}
+
+/* Keep header normal size */
+.table thead {
+    font-size: 1rem;
+}
+</style>
+
 <!-- Bootstrap 4 Modal -->
 <script src="{{ asset('assets/js/jquery.js') }}"></script>
+<style>
+/* Extra small table body font */
+.table tbody {
+    font-size: 0.65rem;  /* extra small */
+}
+
+/* Reduce cell padding for compactness */
+.table tbody td {
+    padding: 0.2rem 0.4rem;
+}
+
+/* Keep header normal size */
+.table thead {
+    font-size: 1rem;
+}
+</style>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    let currentRefNo = null; // store selected reference number globally
+    let currentRefNo = null;
+
+    // --- Helper: Format date as JAN-01-26 02:30 PM ---
+    function formatDate(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+
+        const monthNames = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+        const month = monthNames[date.getMonth()];
+        const day = String(date.getDate()).padStart(2,'0');
+        const year = String(date.getFullYear()).slice(-2);
+
+        let hours = date.getHours();
+        const minutes = String(date.getMinutes()).padStart(2,'0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // midnight
+        const hoursStr = String(hours).padStart(2,'0');
+
+        return `${month}-${day}-${year} ${hoursStr}:${minutes} ${ampm}`;
+    }
+
+    // --- Helper: Calculate time interval (Completed rows only) ---
+    function getTimeInterval(startDateStr, endDateStr) {
+        if (!startDateStr || !endDateStr) return '';
+        const start = new Date(startDateStr);
+        const end = new Date(endDateStr);
+
+        let diffMs = end - start;
+        if (diffMs < 0) return '';
+
+        const minutes = Math.floor(diffMs / 60000);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+        const months = Math.floor(days / 30);
+
+        const remDays = days % 30;
+        const remHours = hours % 24;
+        const remMinutes = minutes % 60;
+
+        let parts = [];
+        if (months) parts.push(`${months} month${months > 1 ? 's' : ''}`);
+        if (remDays) parts.push(`${remDays} day${remDays > 1 ? 's' : ''}`);
+        if (remHours) parts.push(`${remHours} hour${remHours > 1 ? 's' : ''}`);
+        if (remMinutes) parts.push(`${remMinutes} min${remMinutes > 1 ? 's' : ''}`);
+
+        return parts.join(', ') || '0 min';
+    }
+
+    // --- Helper: Convert text to Title Case ---
+    function toTitleCase(str) {
+        if (!str) return '';
+        return str.toString().trim().split(' ').map(word => {
+            return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        }).join(' ');
+    }
 
     // --- Generic function to render tables ---
     function renderTable(containerId, tableId, tableData, columns) {
         let tableHtml = `<table id="${tableId}" class="table table-striped table-hover table-bordered text-center"><thead class="thead-dark"><tr>`;
         tableHtml += `<th>#</th>`;
+
+        const hasCompleted = tableData.some(item => item.status === 'Completed');
+
+        // Render headers
         columns.forEach(col => {
             tableHtml += `<th>${col.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</th>`;
+            if (col === 'created_at' && hasCompleted) {
+                tableHtml += `<th>Completion Date</th>`;
+                tableHtml += `<th>Time Interval</th>`;
+            }
         });
+
         tableHtml += `<th>Actions</th></tr></thead><tbody>`;
 
+        // Render rows
         tableData.forEach((item, index) => {
             tableHtml += `<tr>`;
-            tableHtml += `<td>${index + 1}</td>`; // Incremental ID
+            tableHtml += `<td>${index + 1}</td>`;
+
             columns.forEach(col => {
-             if (col === 'status') {
-    let statusBadge = '';
-    switch(item[col]) {
-        case 'Pending':
-            statusBadge = "<span class='badge badge-warning'>Pending</span>";
-            break;
-        case 'Approved':
-            statusBadge = "<span class='badge badge-primary'>Approved</span>";
-            break;
-        case 'Completed':
-            statusBadge = "<span class='badge badge-success'>Completed</span>";
-            break;
-        case 'Rejected':
-            statusBadge = "<span class='badge badge-danger'>Rejected</span>";
-            break;
-        default:
-            statusBadge = `<span class='badge badge-secondary'>${item[col]}</span>`;
-    }
-    tableHtml += `<td>${statusBadge}</td>`;
-} else {
-    tableHtml += `<td>${item[col] || ''}</td>`;
-}
+                if (col === 'status') {
+                    let statusBadge = '';
+                    switch(item[col]) {
+                        case 'Pending':
+                            statusBadge = "<span class='badge badge-warning'>Pending</span>";
+                            break;
+                        case 'Approved':
+                            statusBadge = "<span class='badge badge-primary'>Approved</span>";
+                            break;
+                        case 'Completed':
+                            statusBadge = "<span class='badge badge-success'>Completed</span>";
+                            break;
+                        case 'Rejected':
+                            statusBadge = "<span class='badge badge-danger'>Rejected</span>";
+                            break;
+                        default:
+                            statusBadge = `<span class='badge badge-secondary'>${item[col]}</span>`;
+                    }
+                    tableHtml += `<td>${statusBadge}</td>`;
+                } else if (col === 'created_at') {
+                    tableHtml += `<td>${formatDate(item[col])}</td>`;
+
+                    if (hasCompleted) {
+                        tableHtml += `<td>${item.status === 'Completed' ? formatDate(item.updated_at) : ''}</td>`;
+                        tableHtml += `<td>${item.status === 'Completed' ? getTimeInterval(item.created_at, item.updated_at) : ''}</td>`;
+                    }
+                } else {
+                    // Apply Title Case to all text columns
+                    tableHtml += `<td>${toTitleCase(item[col]) || ''}</td>`;
+                }
             });
+
             tableHtml += `
                 <td>
                     <div class="btn-group" role="group">
@@ -238,16 +347,14 @@ document.addEventListener('DOMContentLoaded', function () {
                             •••
                         </button>
                         <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop1">
-                 <a 
-  href="/FormData/it-request/approval/${item.reference_no}" 
-  target="_blank" 
-  class="view_btn btn btn-sm btn-success">
-  <i data-feather="eye"></i>
-</a>
+                            <a href="/FormData/it-request/approval/${item.reference_no}" target="_blank" class="view_btn btn btn-sm btn-success">
+                                <i data-feather="eye"></i>
+                            </a>
                         </div>
                     </div>
                 </td>
             `;
+
             tableHtml += `</tr>`;
         });
 
@@ -266,19 +373,15 @@ document.addEventListener('DOMContentLoaded', function () {
     fetch("{{ route('IT.Request.Form.Data') }}")
     .then(response => response.json())
     .then(data => {
-        renderTable('BorrowRequestTbl', 'BorrowTable', data.filter(d => d.type_request === 'Borrow_Item'), ['reference_no','requestor_name','department','item_name','date_needed','plan_return_date','status']);
-        renderTable('RepairRequestTbl', 'RepairTable', data.filter(d => d.type_request === 'Repair_Request'), ['reference_no','requestor_name','department','issue','status']);
-        renderTable('ProjectRequestTbl', 'ProjectTable', data.filter(d => d.type_request === 'Project_Request'), ['reference_no','requestor_name','type_request','description_of_request','status']);
-        renderTable('PurchaseRequestTbl', 'PurchaseTable', data.filter(d => d.type_request === 'Purchase_Item'), ['reference_no','requestor_name','type_request','description_of_request','status']);
-        renderTable('IntranetRequestTbl', 'IntranetTable', data.filter(d => d.type_request === 'Intranet_Request'), ['reference_no','requestor_name','type_request','description_of_request','status']);
+        renderTable('BorrowRequestTbl', 'BorrowTable', data.filter(d => d.type_request === 'Borrow_Item'), ['reference_no','requestor_name','department','item_name','date_needed','plan_return_date','created_at','status']);
+        renderTable('RepairRequestTbl', 'RepairTable', data.filter(d => d.type_request === 'Repair_Request'), ['reference_no','requestor_name','department','issue','created_at','status']);
+        renderTable('ProjectRequestTbl', 'ProjectTable', data.filter(d => d.type_request === 'Project_Request'), ['reference_no','requestor_name','type_request','description_of_request','created_at','status']);
+        renderTable('PurchaseRequestTbl', 'PurchaseTable', data.filter(d => d.type_request === 'Purchase_Item'), ['reference_no','requestor_name','type_request','description_of_request','created_at','status']);
+        renderTable('IntranetRequestTbl', 'IntranetTable', data.filter(d => d.type_request === 'Intranet_Request'), ['reference_no','requestor_name','type_request','description_of_request','created_at','status']);
     })
     .catch(error => console.error('Error fetching item request data:', error));
 
-
 });
 </script>
-
-
-
 
 @endsection

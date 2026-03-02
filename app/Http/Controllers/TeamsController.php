@@ -15,6 +15,11 @@ use Illuminate\Validation\Rule;
 use App\Services\ActivitiesMailService;
 class TeamsController extends Controller
 {
+
+   public function teamRanking()
+    {
+        return response()->json(Submission::teamProgress());
+    }
     
     /**
      * Show all teams (optional dashboard page)
@@ -382,16 +387,13 @@ public function getByInvite($code)
 
 
 
-   public function teamRanking()
-    {
-        return response()->json(Submission::teamProgress());
-    }
+
 
 public function list()
 {
     $userId = auth()->id(); // logged-in user ID
 
-    if ($userId == 63 || $userId == 100 || $userId == 34 || $userId == 18) {
+    if ($userId == 63 || $userId == 100 || $userId == 34 || $userId == 18 || $userId == 59) {
         // Special users: fetch all teams (all statuses)
         $teams = Team::withCount('users')->get();
     } else {
@@ -417,7 +419,7 @@ public function activityLogsList()
     // Base query: admins see all, users see only their submissions
     $submissionsQuery = Submission::with(['activity', 'team', 'user', 'level']);
 
-    if (!in_array($userId, [63, 100])) {
+    if (!in_array($userId, [63, 100, 59])) {
         $submissionsQuery->where('user_id', $userId);
     }
 
@@ -428,7 +430,7 @@ public function activityLogsList()
 
         // Determine if admin can approve
         $canApprove = false;
-        if (in_array($userId, [69, 119]) && $submission->status === 'pending') {
+        if (in_array($userId, [63, 100]) && $submission->status === 'pending') {
             // Check earliest pending submission for this user/team/level
             $earliestPending = Submission::where('activity_id', $submission->activity_id)
                 ->where('level_id', $submission->level_id)

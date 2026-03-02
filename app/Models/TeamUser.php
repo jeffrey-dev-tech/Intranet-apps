@@ -21,4 +21,5 @@ class TeamUser extends Pivot
 {
     return $this->belongsTo(\App\Models\Team::class);
 }
+
 }

@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\ItRequestApproval;
+use App\Models\ApprovalRequest;
 use App\Models\Submission;
 
 class Notifications extends Component
@@ -54,6 +55,9 @@ class Notifications extends Component
                     'created_at' => $row->created_at,
                 ]);
         }
+
+
+        
 
         // Merge and sort
         $this->notifications = collect()

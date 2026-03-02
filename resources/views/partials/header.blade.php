@@ -20,7 +20,7 @@
 
 	<!-- inject:css -->
 	<!-- endinject -->
-
+	<link rel="stylesheet" href="{{ asset('assets/vendors/mdi/css/materialdesignicons.min.css') }}">
 	<!-- Layout styles -->  
 	   <link rel="stylesheet" href="{{ asset('assets/vendors/owl.carousel/owl.carousel.min.css')}}">
 	    <link rel="stylesheet" href="{{ asset('assets/vendors/owl.carousel/owl.theme.default.min.css')}}">
@@ -80,6 +80,7 @@
             <div class="collapse" id="collapseForms">
               <ul class="nav sub-menu">
 				<li class="nav-item"><a href="{{ route('IT.RequestForm') }}" class="nav-link">IT Request Form</a> </li>
+		
 				<!-- <li class="nav-item"><a href="{{ route('Deposit_Form') }}" class="nav-link">Deposit Form</a> </li>
 				<li class="nav-item"><a href="{{ route('LunchPass_Form') }}" class="nav-link">Lunch Pass Form</a> </li>
 				<li class="nav-item"><a href="" class="nav-link">Shuttle Request</a> </li> -->
@@ -160,7 +161,7 @@
             <div class="collapse" id="collapseFormData">
               <ul class="nav sub-menu">
 				<li class="nav-item"><a href="{{ route('IT.Request.Data.view') }}" class="nav-link">IT Request Data</a> </li>
-              </ul>
+				              </ul>
             </div>
           </li>
 	 @endif
@@ -190,10 +191,31 @@
 					<li class="nav-item">
                 	<a href="{{ route('vpn.page') }}" class="nav-link">VPN</a>
                 </li>
+			
         </ul>
             </div>
           </li>
 		   @endif
+@endauth
+
+@auth
+    @if (in_array(auth()->user()->id, [100])) 
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#hrmenu" role="button" aria-expanded="false" aria-controls="hrmenu">
+                <i class="link-icon" data-feather="user"></i>
+                <span class="link-title">HR</span>
+                <i class="link-arrow" data-feather="chevron-down"></i>
+            </a>
+
+            <div class="collapse" id="hrmenu">
+                <ul class="nav sub-menu">
+                    <li class="nav-item">
+                        <a href="{{ route('accounts.page') }}" class="nav-link">Employee List</a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+    @endif
 @endauth
 
 	             @auth

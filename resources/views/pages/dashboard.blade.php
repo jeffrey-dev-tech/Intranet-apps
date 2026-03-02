@@ -231,6 +231,12 @@ width:100%;
                 .video-controls .btn {
                     margin: 0 5px;
                 }
+                #teamRanking td:nth-child(9) {  /* Members column */
+    max-width: 200px;           /* limit width */
+    white-space: normal;         /* allow wrapping */
+    overflow-wrap: anywhere;     /* break long strings */
+    font-size: 0.85rem;          /* smaller font for long names */
+}
 </style>
 
 
@@ -351,36 +357,37 @@ width:100%;
 
 
 
+        <div class="col-8 col-xl-8 grid-margin stretch-card box">
+            <div class="card overflow-hidden">
 
+                <!-- Orange bar at top of card -->
+                <img class="ranking-heading-2" src="{{ asset('img/Q1 - Lets Win Together1.jpg') }}" alt="">
 
-            <div class="col-8 col-xl-8 grid-margin stretch-card box" >
-  <div class="card overflow-hidden">
-    
-    <!-- Orange bar at top of card -->
-   <img class="ranking-heading-2" src="{{asset('img/Q1 - Lets Win Together1.jpg')}}" alt="">
-    
-    <div class="card-body">
-      <div class="table-responsive">
-        <table id="teamRanking" class="table-hover" >
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Team</th>
-              <th>Activity</th>
-              <th>Unit</th>
-              <th>Level</th>
-              <th>Total Progress</th>
-              <th>Progress %</th>
-              <th>Date Accomplished</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-    
-  </div>
-</div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="teamRanking" class="table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Team</th>
+                                    <th>Activity</th>
+                                    <th>Unit</th>
+                                    <th>Level</th>
+                                    <th>Total Progress</th>
+                                    <th>Progress %</th>
+                                    <th>Date Accomplished</th>
+                                    <th>Members (Approved Submissions)</th>
+
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
 
 
 
@@ -719,7 +726,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
 
    var calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: 'dayGridMonth',
+    initialView: 'listWeek',
     headerToolbar: {
         left: 'prev,next today',
         center: 'title',
@@ -872,19 +879,17 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      data.sort((a, b) => (b.total_progress ?? 0) - (a.total_progress ?? 0));
+      // ✅ DO NOT re-sort data; backend already returns correct order
 
       let rank = 1;
-for (const row of data) {
-  // Determine medal icon or plain rank number
-  let rankDisplay = "";
-  if (rank === 1) rankDisplay = `<img src="{{ asset('img/rank-icon/1st.png') }}" alt="Rank 1" width="20">`;
-  else if (rank === 2) rankDisplay = `<img src="{{ asset('img/rank-icon/2nd.png') }}" alt="Rank 2" width="20">`;
-  else if (rank === 3) rankDisplay = `<img src="{{ asset('img/rank-icon/3rd.png') }}" alt="Rank 3" width="20">`;
-  else rankDisplay = rank; // plain number for 4th, 5th, etc.
-
-  const tr = document.createElement('tr');
-  tr.innerHTML = `
+      for (const row of data) {
+        let rankDisplay = "";
+        if (rank === 1) rankDisplay = `<img src="{{ asset('img/rank-icon/1st.png') }}" alt="Rank 1" width="20">`;
+        else if (rank === 2) rankDisplay = `<img src="{{ asset('img/rank-icon/2nd.png') }}" alt="Rank 2" width="20">`;
+        else if (rank === 3) rankDisplay = `<img src="{{ asset('img/rank-icon/3rd.png') }}" alt="Rank 3" width="20">`;
+        else rankDisplay = rank;
+const tr = document.createElement('tr');
+tr.innerHTML = `
     <td>${rankDisplay}</td>
     <td>${row.team_name ?? 'N/A'}</td>
     <td>${row.activity_name ?? 'N/A'}</td>
@@ -893,23 +898,23 @@ for (const row of data) {
     <td>${row.total_progress != null ? Number(row.total_progress).toFixed(2) : '0'}</td>
     <td>${row.progress_percentage ? row.progress_percentage.toFixed(2) + '%' : '0%'}</td>
     <td>${row.completed_at ? new Date(row.completed_at).toLocaleString() : 'In progress'}</td>
-  `;
+    <td>${row.member_submissions ? JSON.parse(row.member_submissions).join(', ') : 'N/A'}</td>
+`;
 
-  tbody.appendChild(tr);
-  rank++; // increment rank at the end
-}
-
+        tbody.appendChild(tr);
+        rank++;
+      }
 
       // Initialize DataTable
       $('#teamRanking').DataTable({
         paging: true,
         searching: true,
-        ordering: true,
-        info: false, 
-        order: [[5, 'desc']], // sort by "Total Progress"
+        ordering: false, // ✅ disable client-side ordering
+        info: false,
         pageLength: 3,
         destroy: true
       });
+
     } catch (err) {
       console.error('Error fetching team ranking:', err);
       document.querySelector("#teamRanking tbody").innerHTML =
@@ -917,8 +922,9 @@ for (const row of data) {
     }
   })();
 });
-
 </script>
+
+
 <script src="{{asset('assets/js/anime.min.js')}}"></script>
 {{-- 
   <script>

@@ -314,50 +314,65 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
 
         let row_id = 1;
-        result.data.forEach(item => {
-            tableHtml += `
-                <tr>
-                    <td>${row_id}</td>
-                    <td>${item.filename}</td>
-                    <td>${item.label}</td>
-                    <td>${item.department}</td>
-                    <td>${item.upload_date}</td>
-                    <td>${item.doc_type}</td>
-                    <td style='text-align:center;'>
-   
-                        <button class="approved_btn" type="button"
-                            onclick="loadFile('${item.filename}', '${item.department}')"
-                            >
-                            <i class="fas fa-eye"></i>
-                        </button>
-                                     
-`;
+     result.data.forEach(item => {
+    const isActive = Number(item.active) === 1; // ensure numeric check
 
-            if (result.userRole === '5' || result.userRole === '6' ||loggedInUserId === 63) {
-                tableHtml += `
-                        <button class="done_btn modal_update_btn" type="button"
-                            data-target="#exampleModal" data-toggle="modal" data-id="${item.id}" data-department="${item.department}"
-                            data-filename="${item.filename}" data-labelname="${item.label}"
-                           >
-                            <i class="fas fa-sync"></i>
-                        </button>
+    tableHtml += `
+        <tr>
+            <td> `;
+             if (result.userRole === '5' || result.userRole === '6' || loggedInUserId === 63) {
+                   tableHtml += `<button class="status_btn btn btn-sm ${item.active == 1 }"
+    onclick="toggleStatus(${item.id}, ${item.active}, this)"
+    title="${item.active == 1 ? 'Deactivate' : 'Activate'}">
+    <i class="fa-solid ${item.active == 1 ? 'fa-toggle-on' : 'fa-toggle-off'}"></i>
+</button>`;
+             }
+    tableHtml += `${row_id}</td>
+            <td>${item.filename}</td>
+            <td>${item.label}</td>
+            <td>${item.department}</td>
+            <td>${item.upload_date}</td>
+            <td>${item.doc_type}</td>
+            <td style='text-align:center;'>
 
-                        <button class="disapproved_btn" type="button" onclick="deleteFile('${item.filename}', '${item.department}')">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                        <button class="approved_btn" type="button"
-                            onclick="download_file('${item.filename}', '${item.department}')"
-                           >
-                            <i class="fas fa-download"></i>
-                        </button>
-                        
-                        `;
-                        
-            }
+                <button class="approved_btn btn btn-sm btn-primary" type="button"
+                    onclick="loadFile('${item.filename}', '${item.department}')"
+                    title="View"
+                >
+                    <i class="fas fa-eye"></i>
+                </button>
+    `;
 
-            tableHtml += `</td></tr>`;
-            row_id++;
-        });
+    if (result.userRole === '5' || result.userRole === '6' || loggedInUserId === 63) {
+        tableHtml += `
+                <button class="done_btn modal_update_btn btn btn-sm btn-warning" type="button"
+                    data-target="#exampleModal" data-toggle="modal" data-id="${item.id}" data-department="${item.department}"
+                    data-filename="${item.filename}" data-labelname="${item.label}"
+                    title="Update"
+                >
+                    <i class="fas fa-sync"></i>
+                </button>
+
+                <button class="disapproved_btn btn btn-sm btn-danger" type="button"
+                    onclick="deleteFile('${item.filename}', '${item.department}')"
+                    title="Delete"
+                >
+                    <i class="fas fa-trash"></i>
+                </button>
+
+                <button class="approved_btn btn btn-sm btn-info" type="button"
+                    onclick="download_file('${item.filename}', '${item.department}')"
+                    title="Download"
+                >
+                    <i class="fas fa-download"></i>
+                </button>
+        `;
+    }
+
+    tableHtml += `</td></tr>`;
+    row_id++;
+});
+
 
         tableHtml += '</tbody></table>';
         document.getElementById('hardwareTableContainer').innerHTML = tableHtml;
@@ -383,6 +398,73 @@ deptSelect.addEventListener('change', function () {
         console.error('Error fetching inventory data:', error);
     });
 });
+/* **************************************** Toggle Status ************************************ */
+async function toggleStatus(id, currentStatus, btn) {
+    const newStatus = currentStatus ? 0 : 1;
+    const actionText = newStatus ? 'activate' : 'deactivate';
+
+    // ✅ Ask for confirmation first
+    const result = await Swal.fire({
+        title: `Are you sure?`,
+        text: `Do you want to ${actionText} this policy?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, proceed',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+    });
+
+    if (!result.isConfirmed) return; // User cancelled
+
+    try {
+        const res = await fetch("{{ route('policy.toggleStatus') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ id: id, status: newStatus })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+            throw new Error(data.message || 'Failed to toggle status');
+        }
+
+        // ✅ Update button icon and color dynamically
+        const icon = btn.querySelector('i');
+        if (newStatus) {
+            icon.classList.remove('fa-toggle-off');
+            icon.classList.add('fa-toggle-on');
+            btn.title = 'Deactivate';
+        } else {
+          
+            icon.classList.remove('fa-toggle-on');
+            icon.classList.add('fa-toggle-off');
+            btn.title = 'Activate';
+        }
+
+Swal.fire({
+    icon: 'success',
+    title: 'Status updated',
+    text: data.message,
+    timer: 1200,
+    showConfirmButton: false,
+    willClose: () => {
+        location.reload();
+    }
+});
+    } catch (err) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: err.message
+        });
+    }
+}
+
+/* **************************************** Toggle Status ************************************ */
 
 
 /* **************************************** End of policy table************************************ */  
